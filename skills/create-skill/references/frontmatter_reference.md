@@ -50,3 +50,42 @@ Skills without `context: fork` run inline and cannot be used by subagents.
 | `context: fork` | Yes | Yes | Yes |
 | `disable-model-invocation: true` | Yes | No | No |
 | `context: fork` + `disable-model-invocation: true` | Yes | No | Yes (when explicitly delegated) |
+
+## Additional Examples
+
+### Reference skill that runs inline
+
+```yaml
+---
+name: api-conventions
+description: "Documents API design patterns for this codebase. Use when writing new endpoints or reviewing API consistency."
+---
+
+When writing API endpoints:
+- Use RESTful naming conventions
+- Return consistent error formats
+```
+
+No `context: fork` needed -- this skill provides reference guidance that runs inline in the conversation.
+
+### Medium-freedom skill with tool restrictions
+
+```yaml
+---
+name: data-pipeline
+description: "Processes CSV files into structured database records with validation
+  and error recovery. Use when users mention data import, CSV processing, ETL,
+  or database ingestion."
+context: fork
+allowed-tools: Read, Grep, Bash(python3 *)
+---
+
+<instructions>
+1. Detect delimiter and encoding from the file header
+2. Validate columns against `references/column_mapping.md`
+3. Run `scripts/transform.py` on validated rows
+4. Report results: rows processed, skipped, and errors
+</instructions>
+```
+
+Medium freedom: workflow steps are fixed but transformation logic adapts to different schemas. `allowed-tools` restricts tool access to reading, searching, and running Python scripts.

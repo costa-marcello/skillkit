@@ -33,21 +33,24 @@ Files not intended to be loaded into context, but rather used within the output 
 
 ## Privacy and Path References
 
-**CRITICAL**: Skills intended for public distribution must not contain user-specific or company-specific information:
+Skills for public distribution must not contain user-specific or company-specific information.
 
-- **Forbidden**: Absolute paths to user directories (`/home/username/`, `/Users/username/`, `/mnt/c/Users/username/`)
-- **Forbidden**: Personal usernames, company names, department names, product names
-- **Forbidden**: OneDrive paths, cloud storage paths, or any environment-specific absolute paths
-- **Forbidden**: Hardcoded skill installation paths like `~/.claude/skills/` or `/Users/username/Workspace/claude-code-skills/`
-- **Allowed**: Relative paths within the skill bundle (`scripts/example.py`, `references/guide.md`)
-- **Allowed**: Standard placeholders (`~/workspace/project`, `username`, `your-company`)
-- **Best practice**: Reference bundled scripts using simple relative paths like `scripts/script_name.py` - Claude will resolve the actual location
+**Do not include:**
+- Absolute paths to user directories (`/home/username/`, `/Users/username/`, `/mnt/c/Users/username/`)
+- Personal usernames, company names, department names, product names
+- OneDrive paths, cloud storage paths, or environment-specific absolute paths
+- Hardcoded skill installation paths like `~/.claude/skills/`
+
+**Do include:**
+- Relative paths within the skill bundle (`scripts/example.py`, `references/guide.md`)
+- Standard placeholders (`~/workspace/project`, `username`, `your-company`)
+- Simple relative paths for bundled scripts (`scripts/script_name.py`) -- Claude resolves the actual location
 
 ## Versioning
 
-**CRITICAL**: Skills should NOT contain version history or version numbers in SKILL.md:
+Do not include version history or version numbers in SKILL.md.
 
-- **Forbidden**: Version sections (`## Version`, `## Changelog`, `## Release History`) in SKILL.md
-- **Forbidden**: Version numbers in SKILL.md body content
-- **Correct location**: Skill versions are tracked in marketplace.json under `plugins[].version`
-- **Rationale**: Marketplace infrastructure manages versioning; SKILL.md should be timeless content focused on functionality
+- No version sections (`## Version`, `## Changelog`, `## Release History`) in SKILL.md
+- No version numbers in SKILL.md body content
+- Track versions in marketplace.json under `plugins[].version`
+- Marketplace infrastructure manages versioning. SKILL.md should be timeless content focused on functionality.

@@ -16,7 +16,7 @@ Skills extend Claude's capabilities with specialized workflows, tool integration
 
 **Key structure:** `SKILL.md` (required) + optional `scripts/`, `references/`, `assets/` directories.
 
-##### YAML Frontmatter Reference
+### YAML Frontmatter Reference
 
 See `references/frontmatter_reference.md` for the complete field reference table. Key fields:
 
@@ -25,11 +25,11 @@ See `references/frontmatter_reference.md` for the complete field reference table
 - **`context: fork`**: Required for task-based skills. Ensures fresh context, subagent access, and prevents pollution between invocations.
 
 <example>
-**Example: Task-based skill with subagent execution:**
+**Task-based skill with subagent execution:**
 ```yaml
 ---
 name: deep-research
-description: Research a topic thoroughly using multiple sources
+description: "Researches topics thoroughly using multiple sources. Use when the user needs in-depth analysis of code, architecture, or documentation."
 context: fork
 agent: Explore
 ---
@@ -43,53 +43,37 @@ When invoked as `/deep-research authentication flow`, `$ARGUMENTS` becomes `auth
 </example>
 
 <example>
-**Example: Reference skill that runs inline:**
+**Side-effect skill requiring explicit invocation:**
 ```yaml
 ---
-name: api-conventions
-description: API design patterns for this codebase
+name: deploy-staging
+description: "Deploys the current branch to the staging environment. Use when users request deployment or staging preview."
+context: fork
+disable-model-invocation: true
 ---
-
-When writing API endpoints:
-- Use RESTful naming conventions
-- Return consistent error formats
 ```
+`disable-model-invocation: true` prevents auto-invocation. The user must run `/deploy-staging` explicitly.
 </example>
 
-##### Invocation Control
+See `references/frontmatter_reference.md` for additional examples (inline reference skills, medium-freedom skills with tool restrictions).
 
-| Frontmatter | You can invoke | Claude can invoke | Subagents can use |
-|-------------|----------------|-------------------|-------------------|
-| (default) | Yes | Yes | No (runs inline) |
-| `context: fork` | Yes | Yes | Yes |
-| `disable-model-invocation: true` | Yes | No | No |
-| `context: fork` + `disable-model-invocation: true` | Yes | No | Yes (when explicitly delegated) |
+### Invocation Control
 
-#### Bundled Resources (optional)
+See `references/frontmatter_reference.md` for the full invocation control matrix. Key rule: add `context: fork` to any task-based skill so subagents can access it.
 
-See `references/bundled_resources.md` for detailed guidance. Summary:
+### Bundled Resources
 
-- **`scripts/`**: Executable code for deterministic or frequently-rewritten tasks
-- **`references/`**: Documentation loaded on-demand (schemas, policies, guides)
-- **`assets/`**: Output files (templates, images, fonts) not loaded into context
+See `references/bundled_resources.md` for guidance on `scripts/`, `references/`, and `assets/` directories. For public distribution, use relative paths only -- no absolute paths, personal info, or version numbers.
 
-**CRITICAL** (for public distribution): No absolute paths, personal info, or version numbers in SKILL.md. Use relative paths only.
+### Best Practices
 
-### Progressive Disclosure
-
-Three-level loading: metadata (always) → SKILL.md (on trigger) → bundled resources (on demand). See `references/skill_anatomy.md` for details.
-
-### Skill Creation Best Practices
-
-Read `references/anthropic_best_practices_summary.md` before creating or updating skills. This summarizes Anthropic's official guidance on conciseness, degrees of freedom, description writing, and progressive disclosure.
-
-For complete official documentation: [Anthropic Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
+Read `references/anthropic_best_practices_summary.md` before creating or updating skills. For complete official documentation: [Anthropic Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
 
 </context>
 
-## CRITICAL: Edit Skills at Source Location
+## Edit Skills at Source Location
 
-**NEVER edit skills in `~/.claude/plugins/cache/`** — changes there are lost on cache refresh. Before any edit, confirm the file path does NOT contain `/cache/` or `/plugins/cache/`. Always edit the source repository copy.
+Do not edit skills in `~/.claude/plugins/cache/` -- changes are lost on cache refresh. Before any edit, confirm the file path does not contain `/cache/` or `/plugins/cache/`. Always edit the source repository copy.
 
 ## Skill Creation Process
 
@@ -97,7 +81,7 @@ For complete official documentation: [Anthropic Best Practices](https://platform
 
 **User input:** $ARGUMENTS
 
-If `$ARGUMENTS` is non-empty, treat it as the user's skill request. Extract the skill name, purpose, and any details provided. Skip Step 1 and proceed directly to Step 2 using the information given. Only ask clarifying questions if critical details are genuinely missing (e.g., no indication of what the skill should do at all).
+If `$ARGUMENTS` is non-empty, extract the skill name and purpose from it. Skip Step 1 and proceed to Step 2. Only ask clarifying questions if the skill's purpose is entirely unclear.
 
 If `$ARGUMENTS` is empty, begin at Step 1.
 
@@ -165,8 +149,8 @@ Filenames must be self-explanatory without reading contents.
 **Pattern**: `<content-type>_<specificity>.md`
 
 **Examples**:
-- ❌ `commands.md`, `cli_usage.md`, `reference.md`
-- ✅ `script_parameters.md`, `api_endpoints.md`, `database_schema.md`
+- Bad: `commands.md`, `cli_usage.md`, `reference.md`
+- Good: `script_parameters.md`, `api_endpoints.md`, `database_schema.md`
 
 **Test**: Can someone understand the file's contents from the name alone?
 
@@ -184,7 +168,11 @@ To complete SKILL.md, answer the following questions:
 
 #### Consistency Verification
 
-Before finalizing, verify no contradictions exist within SKILL.md, between SKILL.md and reference files, or in terminology (e.g., mixing "user" and "customer" inconsistently).
+Before finalizing, check for contradictions:
+
+1. Search SKILL.md for each decision or rule. Verify the same rule does not appear with different values elsewhere.
+2. For each term used more than twice, confirm the same word refers to the same concept throughout (e.g., do not mix "user" and "customer" for the same entity).
+3. For each reference file mentioned in SKILL.md, open it and confirm the guidance aligns with what SKILL.md states.
 
 ### Step 5: Sanitization Review (Optional)
 
@@ -200,33 +188,12 @@ Skip this step if:
 - Skill contains domain-specific examples from real systems
 - Skill will be distributed publicly or to other teams
 
-**Sanitization process:**
+**Sanitization process** (detailed in `references/sanitization_checklist.md`):
 
-1. **Load the checklist**: Read [references/sanitization_checklist.md](references/sanitization_checklist.md) for detailed guidance
-
-2. **Run automated scans** to identify potential sensitive content:
-   ```bash
-   # Product/project names, person names, paths
-   grep -rniE "portal|underwriting|mercury|glean|/Users/|/home/" skill-folder/
-
-   # Chinese characters (if skill should be English-only)
-   grep -rn '[一-龥]' skill-folder/
-   ```
-
-3. **Review and replace** each category:
-   - Product/project names → generic terms
-   - Person names → "Alice", "Bob", role-based references
-   - Entity names → generic entities (ORDER, USER, PRODUCT)
-   - Folder structures → generic paths
-   - Internal jargon → industry-standard terms
-   - Language-specific content → translate or remove
-
-4. **Verify completeness**:
-   - Re-run all grep patterns (should return no matches)
-   - Read through skill to ensure coherence
-   - Confirm skill still functions correctly
-
-See `references/sanitization_checklist.md` for common replacement patterns.
+1. Run the automated grep scans from the checklist against the skill folder
+2. Review each match and apply the category-specific replacements
+3. Re-run all scan patterns to confirm no matches remain
+4. Read through the skill to verify coherence and functionality
 
 ### Step 6: Security Review
 
@@ -264,40 +231,50 @@ If validation fails, the script will report the errors and exit without creating
 
 ### Step 8: Update Marketplace
 
-After packaging, update the marketplace registry to include the new or updated skill.
-
-**For new skills**, add an entry to `.claude-plugin/marketplace.json`:
-
-```json
-{
-  "name": "skill-name",
-  "description": "Copy from SKILL.md frontmatter description",
-  "source": "./",
-  "strict": false,
-  "version": "1.0.0",
-  "category": "developer-tools",
-  "keywords": ["relevant", "keywords"],
-  "skills": ["./skill-name"]
-}
-```
-
-**For updated skills**, bump the version in `plugins[].version` following semver:
-- Patch (1.0.x): Bug fixes, typo corrections
-- Minor (1.x.0): New features, additional references
-- Major (x.0.0): Breaking changes, restructured workflows
-
-**Also update** `metadata.version` and `metadata.description` if the overall plugin collection changed significantly.
+After packaging, update the marketplace registry so the skill is discoverable. Read `references/marketplace_update.md` for the JSON template and semver versioning rules.
 
 ### Step 9: Iterate
 
 After testing the skill, users may request improvements. Often this happens right after using the skill, with fresh context of how the skill performed.
 
 **Iteration workflow:**
-1. Use the skill on real tasks
-2. Notice struggles or inefficiencies
-3. Identify how SKILL.md or bundled resources should be updated
-4. Implement changes and test again
+1. Use the skill on a real task and record where Claude hesitates, asks unnecessary questions, or produces incorrect output.
+2. For each observed failure, trace back to the responsible section in SKILL.md or a reference file.
+3. Apply the fix: add missing context, tighten vague instructions, or add an example covering the failure case.
+4. Re-run the same task to verify the fix resolved the issue.
 
-**Refinement filter:** Only add what solves observed problems. If best practices already cover it, don't duplicate.
+**Refinement filter:** Only add what solves observed problems. If best practices already cover it, do not duplicate.
 
 </instructions>
+
+## End-to-End Example
+
+<example>
+**User request:** `/create-skill brand-guidelines`
+
+**Step 1:** Skipped -- purpose is clear from the name.
+
+**Step 2 (Planning):** Brand guidelines are reference content (high freedom). Resources needed:
+- `references/color_palette.md` -- hex codes, usage rules
+- `references/typography.md` -- font families, sizes, hierarchy
+- `assets/logo.png` -- brand logo file
+
+**Step 3 (Init):**
+```bash
+python3 scripts/init_skill.py brand-guidelines --path skills/
+```
+
+**Step 4 (Edit):** Write SKILL.md with:
+```yaml
+---
+name: brand-guidelines
+description: "Applies brand identity standards to UI components, documents, and presentations. Use when creating user-facing output, choosing colours, or selecting typography."
+license: MIT
+---
+```
+Body references `references/color_palette.md` and `references/typography.md`. Asks user to provide the logo file for `assets/`.
+
+**Step 5:** Skipped -- created from scratch for public use.
+
+**Steps 6-8:** Run security scan, package, update marketplace.
+</example>

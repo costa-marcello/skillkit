@@ -44,14 +44,19 @@ def find_path_references(content: str) -> list[str]:
     - Paths in example contexts (lines containing "Example:", "e.g.", etc.)
     - Generic documentation examples
     - Paths prefixed with file:// (e.g., file://scripts/xxx) - these are external tool references, not skill-internal paths
+    - Paths inside <example> blocks (illustrative, not real references)
     """
     # Pattern to match bundled resource paths (scripts/, references/, assets/)
     # Use negative lookbehind to exclude file:// prefixed paths
     pattern = r'(?<!file://)(?:scripts|references|assets)/[\w./-]+'
 
+    # Strip content inside <example> blocks before scanning
+    # These blocks contain illustrative paths, not real file references
+    stripped_content = re.sub(r'<example>.*?</example>', '', content, flags=re.DOTALL)
+
     # Find all matches with their line context
     unique_paths = set()
-    for line in content.split('\n'):
+    for line in stripped_content.split('\n'):
         # Skip lines that are clearly examples or documentation
         line_lower = line.lower()
         if any(x in line_lower for x in [
