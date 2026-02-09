@@ -1,6 +1,6 @@
 ---
 name: codex
-description: Runs Codex CLI for code analysis, refactoring, or automated editing. Use when the user asks to run codex exec, codex resume, or references OpenAI Codex. Uses gpt-5.2-codex by default for state-of-the-art software engineering.
+description: Invokes Codex CLI for code analysis, refactoring, or automated editing. Use when the user asks to run codex exec, codex resume, or references OpenAI Codex.
 context: fork
 ---
 
@@ -17,7 +17,7 @@ context: fork
 
 ## Running a Task
 
-1. Use `gpt-5.2-codex` model. Ask the user (via `AskUserQuestion`) which reasoning effort to use (`xhigh`, `high`, `medium`, or `low`). Default to `medium` if unsure.
+1. Use `gpt-5.2-codex` model. Ask the user (via `AskUserQuestion`) which reasoning effort to use (`xhigh`, `high`, `medium`, or `low`). Default to `medium` if the user does not specify.
 2. Select the sandbox mode required for the task; default to `--sandbox read-only` unless edits or network access are necessary.
 3. Assemble the command with the appropriate options:
    - `-m, --model <MODEL>`
@@ -25,7 +25,7 @@ context: fork
    - `--sandbox <read-only|workspace-write|danger-full-access>`
    - `--full-auto`
    - `-C, --cd <DIR>`
-   - `--skip-git-repo-check` (always include this flag)
+   - `--skip-git-repo-check` (include after confirming with user on first use per session)
 4. When continuing a previous session, use `codex exec --skip-git-repo-check resume --last` via stdin. When resuming, only add configuration flags if explicitly requested by the user (e.g., different model or reasoning effort). Resume syntax: `echo "your prompt here" | codex exec [flags] resume --last 2>/dev/null`. Flags must be placed between `exec` and `resume`.
 5. **IMPORTANT**: By default, append `2>/dev/null` to all `codex exec` commands to suppress thinking tokens (stderr). Only show stderr if the user explicitly requests to see thinking tokens or if debugging is needed.
 6. Run the command, capture stdout/stderr (filtered as appropriate), and summarize the outcome for the user.
@@ -96,18 +96,16 @@ echo "Continue the security analysis, focusing on authentication flows" | codex 
 
 ## Reasoning Effort Levels
 
-Model: `gpt-5.2-codex` (400K input / 128K output, $1.25/$10.00)
+Model: `gpt-5.2-codex` (400K input / 128K output). Check [Codex releases](https://github.com/openai/codex/releases) for current pricing and benchmarks.
 
-| Reasoning | Best for | Performance |
-| --- | --- | --- |
-| `xhigh` | Zero-day vulnerability discovery, deep architecture analysis, multi-hour agentic tasks | 80% SWE-bench Verified |
-| `high` | Security analysis, complex refactoring, performance optimization, debugging race conditions | Thorough reasoning |
-| `medium` ⭐ | Feature additions, bug fixes, code review, standard refactoring (recommended daily driver) | Balanced speed/quality |
-| `low` | Quick fixes, formatting, documentation, simple changes | Fast responses |
+| Reasoning | Best for |
+| --- | --- |
+| `xhigh` | Zero-day vulnerability discovery, deep architecture analysis, multi-hour agentic tasks |
+| `high` | Security analysis, complex refactoring, performance optimisation, debugging race conditions |
+| `medium` (default) | Feature additions, bug fixes, code review, standard refactoring |
+| `low` | Quick fixes, formatting, documentation, simple changes |
 
-**GPT-5.2-codex**: 30% faster than GPT-5, better tool handling, reduced hallucinations. See [Codex releases](https://github.com/openai/codex/releases) for model knowledge cutoff.
-
-**Cached Input Discount**: 90% off ($0.125/M tokens) for repeated context, cache lasts up to 24 hours.
+Cached input tokens receive a significant discount. Repeated context within 24 hours benefits from this automatically.
 
 ## Following Up
 - After every `codex` command, immediately use `AskUserQuestion` to confirm next steps, collect clarifications, or decide whether to resume with `codex exec resume --last`.
