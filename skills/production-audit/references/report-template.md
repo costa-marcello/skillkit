@@ -28,7 +28,7 @@ Use this structure for the final `PRODUCTION-AUDIT.md` output.
 | Security | [N] | [N] | [N] |
 | Scalability | [N] | [N] | [N] |
 | Infrastructure | [N] | [N] | [N] |
-| Dead Code | [N] | [N] | [N] |
+| Dead Code & Architecture | [N] | [N] | [N] |
 
 ### Top Blockers
 
@@ -99,7 +99,7 @@ Use this structure for the final `PRODUCTION-AUDIT.md` output.
 
 [List all findings]
 
-### Dead Code & Patchwork
+### Dead Code & Architecture
 
 [List all findings]
 

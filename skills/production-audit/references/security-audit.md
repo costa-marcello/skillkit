@@ -73,13 +73,15 @@ user = db.user.find(id=params["id"])  # might throw on malformed id
 
 ### Search Patterns
 
+Use Claude Code's built-in Grep tool (not shell grep) for these searches:
+
 ```
 # Hardcoded secrets (adapt patterns to the project's services)
-grep -r "sk_live_" "sk_test_" "DATABASE_URL=" "SECRET_KEY="
-grep -r "Bearer [a-zA-Z0-9]" --include="*.ts" --include="*.py"
+Grep pattern: "sk_live_|sk_test_|DATABASE_URL=|SECRET_KEY="
+Grep pattern: "Bearer [a-zA-Z0-9]"  glob: "*.{ts,py}"
 
-# .env in git
-git log --all --diff-filter=A -- "*.env*"
+# .env in git history
+Bash: git log --all --diff-filter=A -- "*.env*"
 ```
 
 ## Injection Vulnerabilities

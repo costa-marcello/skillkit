@@ -166,10 +166,4 @@ For each patchwork finding:
 
 ### Broken Imports
 [file:line, import path, error]
-
-### Architectural Quality
-[file path, line count, import chain for circular deps, coupling count]
-
-### Code Complexity
-[file:line, function name, complexity level, nesting depth]
 ```

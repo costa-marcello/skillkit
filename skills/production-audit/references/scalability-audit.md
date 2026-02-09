@@ -38,6 +38,13 @@ List each table and its indexed vs un-indexed columns that appear in `WHERE` cla
 3. **Serverless considerations.** Serverless/edge functions create new connections per cold start. Check for a connection pooler (PgBouncer, Prisma Accelerate, Supabase pooler, etc.).
 4. **Pool size vs expected load.** If the user specifies a target user count, calculate: expected concurrent requests / average query time = required pool size.
 
+### What to Report
+
+For each connection pooling finding:
+- Whether a singleton pattern is used (and where the client is instantiated)
+- Current pool size configuration vs recommended size for expected load
+- Whether a serverless connection pooler is configured (if applicable)
+
 ## Rate Limiting
 
 ### What to Check
@@ -57,6 +64,13 @@ List each table and its indexed vs un-indexed columns that appear in `WHERE` cla
 | Standard API endpoints | General protection | 100 req/15 min per IP |
 | Expensive operations (search, export, report generation) | Resource protection | 10 req/min per user |
 | Webhook routes | Verify signatures instead | N/A if signature-verified |
+
+### What to Report
+
+For each rate limiting finding:
+- Which high-priority routes lack rate limiting (auth, payment, upload)
+- Current limit values vs suggested limits from the table above
+- Any bypass vectors found (header switching, path variants)
 
 ## Caching
 

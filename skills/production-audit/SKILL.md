@@ -44,7 +44,7 @@ Spawn 4 agents in parallel. Each agent handles one or two audit dimensions and w
 | Agent 1: API & Sync | API endpoint mapping + frontend-backend sync | `references/api-audit.md` |
 | Agent 2: Security | Auth coverage, validation, CORS, secrets, injection, CSRF, CSP, dependency vulnerabilities, cookie security, password hashing | `references/security-audit.md` |
 | Agent 3: Scalability & Infra | Query performance, indexes, caching, CI/CD, monitoring | `references/scalability-audit.md` + `references/infrastructure-audit.md` |
-| Agent 4: Dead Code & Architecture | Unused files, orphaned components, duplicate utilities, patchwork, stale config, architectural quality, code complexity | `references/dead-code-audit.md` |
+| Agent 4: Dead Code & Architecture | Unused files, orphaned components, duplicate utilities, patchwork, stale config, architectural quality, code complexity | `references/dead-code-audit.md` + `references/architecture-audit.md` |
 
 If the project does not have a frontend (e.g., API-only service, CLI tool), merge Agent 1's scope into Agent 3 and spawn 3 agents instead.
 
@@ -66,7 +66,7 @@ Every finding must follow this structure:
 ```markdown
 ### [BLOCKER|WARNING|IMPROVEMENT] Short title
 
-**Dimension**: API Mapping | Frontend-Backend Sync | Security | Scalability | Infrastructure | Dead Code
+**Dimension**: API Mapping | Frontend-Backend Sync | Security | Scalability | Infrastructure | Dead Code & Architecture
 **File**: `path/to/file.ts:42`
 **Evidence**: What was found and why it matters
 **Impact**: What breaks or degrades if this is not addressed
@@ -141,7 +141,7 @@ Save the report to `PRODUCTION-AUDIT.md` in the project root. Follow the full te
 
 **Claude**:
 1. Maps project structure
-2. Spawns only 2 agents: Security + Dead Code
+2. Spawns only 2 agents: Security + Dead Code & Architecture
 3. Produces a focused report covering only those dimensions
 </example>
 
@@ -161,7 +161,7 @@ Save the report to `PRODUCTION-AUDIT.md` in the project root. Follow the full te
 **Claude**:
 1. Maps project structure: Django 5 with DRF, PostgreSQL, Celery workers, Redis cache, deployed on AWS ECS
 2. Skips frontend-backend sync (no frontend). Merges API audit into scalability agent.
-3. Spawns 3 agents: Security, Scalability & Infra (including API completeness), Dead Code
+3. Spawns 3 agents: Security, Scalability & Infra (including API completeness), Dead Code & Architecture
 4. Security agent adapts checks to Django middleware, DRF permissions, and Celery task auth
 5. Produces report with Django-specific findings (e.g., missing `DEFAULT_PERMISSION_CLASSES`, unprotected Celery tasks)
 </example>
