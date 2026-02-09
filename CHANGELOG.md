@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-02-09
+
 ### Changed
 - Updated README to reflect 21 skills and added orla3-production skill entry to the skills table
 - Improved changelog skill with restructured SKILL.md
@@ -53,5 +55,6 @@ All notable changes to this project will be documented in this file.
 - Fixed script invocations and variable names after skill rename
 - Fixed review-skill over-specification and deduplicated steps
 
-[Unreleased]: https://github.com/costa-marcello/skillkit/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/costa-marcello/skillkit/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/costa-marcello/skillkit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/costa-marcello/skillkit/releases/tag/v0.1.0
