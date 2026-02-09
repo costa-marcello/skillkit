@@ -1,125 +1,70 @@
 ---
 name: find-skills
-description: "Helps users discover and install agent skills. Use when users ask 'how do I do X', 'find a skill for X', 'is there a skill that can...', 'ccpm', 'claude code skill', 'installed skills', or express interest in extending capabilities."
+description: "Discovers and installs agent skills from the open ecosystem and CCPM registries. Use when users ask 'how do I do X', 'find a skill for X', 'is there a skill that can...', 'ccpm', 'claude code skill', 'installed skills', or want to extend capabilities."
+license: MIT
 context: fork
+agent: general-purpose
 ---
 
 # Find Skills
 
-Discovers and installs skills from two registries: the open agent skills ecosystem and CCPM (Claude Code Plugin Manager).
+Search query: `$ARGUMENTS`
 
-## Two Registries
+If `$ARGUMENTS` is empty, ask the user what skill they need.
 
-| Registry | CLI | When to Use |
-|----------|-----|-------------|
-| Open Ecosystem | `npx skills` | General agent skills (Vercel Labs, ComposioHQ, etc.) |
-| CCPM | `ccpm` | Claude Code-specific skills |
+<instructions>
 
-## Open Ecosystem (skills.sh)
+## Step 1: Pick the Registry
 
-The Skills CLI (`npx skills`) is the package manager for the open agent skills ecosystem. Skills are modular packages that extend agent capabilities.
+| User Request | Registry | CLI | Browse |
+|--------------|----------|-----|--------|
+| General coding (React, testing, DevOps) | Open Ecosystem | `npx skills` | https://skills.sh/ |
+| Claude Code features, document processing | CCPM | `ccpm` | https://ccpm.dev |
+| "installed skills", "my skills" | CCPM | `ccpm list` | -- |
 
-**Browse skills at:** https://skills.sh/
+Default to **Open Ecosystem** when the request is general. Use **CCPM** when the request targets Claude Code workflows or document formats (PDF, DOCX, XLSX, PPTX).
 
-### Commands
+## Step 2: Search
 
+**Open Ecosystem:**
 ```bash
-# Search for skills
-npx skills find [query]
-
-# Install a skill
-npx skills add <owner/repo@skill>
-
-# Install globally with auto-confirm
-npx skills add <package> -g -y
-
-# Check for updates
-npx skills check
-
-# Update all installed skills
-npx skills update
+npx skills find $ARGUMENTS
 ```
 
-### Example Workflow
-
+**CCPM:**
 ```bash
-# User asks "how do I make my React app faster?"
-npx skills find react performance
-
-# Results show:
-# vercel-labs/agent-skills@vercel-react-best-practices
-# └ https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices
-
-# Install it:
-npx skills add vercel-labs/agent-skills@vercel-react-best-practices -g -y
+ccpm search $ARGUMENTS
 ```
 
-## CCPM (Claude Code Skills)
+Run both searches when the registry is unclear. Present results from both.
 
-CCPM manages Claude Code-specific skills. Skills require Claude Code restart after installation.
+## Step 3: Install
 
-**Browse skills at:** https://ccpm.dev
-
-### Commands
-
+**Open Ecosystem:**
 ```bash
-# Search for skills
-ccpm search <query>
+npx skills add <owner/repo@skill> -g -y
+```
 
-# Install a skill
+**CCPM:**
+```bash
 ccpm install <skill-name>
-
-# Install to current project only
-ccpm install <skill-name> --project
-
-# Force reinstall
-ccpm install <skill-name> --force
-
-# List installed skills
-ccpm list
-
-# Get skill details
-ccpm info <skill-name>
-
-# Uninstall a skill
-ccpm uninstall <skill-name>
 ```
 
-### Example Workflow
+## Step 4: Verify Installation
 
+**Open Ecosystem:**
 ```bash
-# User asks about PDF processing
-ccpm search pdf
-
-# Get details on a skill
-ccpm info pdf-processor
-
-# Install it
-ccpm install pdf-processor
-
-# Remind user to restart Claude Code
+npx skills check
 ```
+Confirm the skill appears in the installed list.
 
-### Popular CCPM Skills
+**CCPM:**
+```bash
+ccpm list
+```
+Confirm the skill appears. Remind the user to restart Claude Code -- CCPM skills load at startup.
 
-| Skill | Purpose |
-|-------|---------|
-| `create-skill` | Create new Claude Code skills |
-| `pdf-processor` | PDF manipulation and analysis |
-| `docx` | Word document processing |
-| `xlsx` | Excel spreadsheet operations |
-| `pptx` | PowerPoint presentation creation |
-| `cloudflare-troubleshooting` | Debug Cloudflare issues |
-| `prompt-optimizer` | Improve prompt quality |
-
-## Which Registry to Use?
-
-| User Request | Registry | Why |
-|--------------|----------|-----|
-| General coding help (React, testing, etc.) | Open Ecosystem | Broader community skills |
-| Claude Code-specific features | CCPM | Designed for Claude Code |
-| Document processing (PDF, DOCX, etc.) | CCPM | Better integration |
-| "installed skills", "my skills" | CCPM | Use `ccpm list` |
+</instructions>
 
 ## Common Skill Categories
 
@@ -133,23 +78,67 @@ ccpm install pdf-processor
 | Design | ui, ux, design-system, accessibility |
 | Productivity | workflow, automation, git |
 
+## Registry Commands Reference
+
+### Open Ecosystem (`npx skills`)
+
+```bash
+npx skills find [query]           # Search for skills
+npx skills add <package> -g -y    # Install globally
+npx skills check                  # Check for updates
+npx skills update                 # Update all installed
+```
+
+### CCPM (`ccpm`)
+
+```bash
+ccpm search <query>               # Search for skills
+ccpm install <skill-name>         # Install a skill
+ccpm install <skill-name> --project  # Install to current project only
+ccpm info <skill-name>            # Get skill details
+ccpm list                         # List installed skills
+ccpm uninstall <skill-name>       # Remove a skill
+```
+
 ## When No Skills Are Found
 
-1. Acknowledge that no existing skill was found
-2. Offer to help with the task directly
-3. Suggest creating a custom skill:
-   - Open Ecosystem: `npx skills init my-skill`
-   - CCPM: Use the `create-skill` skill
+1. Tell the user no matching skill exists in either registry.
+2. Help with the task directly using built-in capabilities.
+3. If the user wants a reusable solution, create a custom skill:
+   - Open Ecosystem: run `npx skills init my-skill`
+   - CCPM: invoke the `/create-skill` skill
+
+<example>
+**User asks: "how do I make my React app faster?"**
+
+1. Search: `npx skills find react performance`
+2. Results show `vercel-labs/agent-skills@vercel-react-best-practices`
+3. Install: `npx skills add vercel-labs/agent-skills@vercel-react-best-practices -g -y`
+4. Verify: `npx skills check` -- confirm skill appears in list
+</example>
+
+<example>
+**User asks: "is there a skill for PDF processing?"**
+
+1. Search: `ccpm search pdf`
+2. Check details: `ccpm info pdf-processor`
+3. Install: `ccpm install pdf-processor`
+4. Verify: `ccpm list` -- confirm `pdf-processor` appears
+5. Remind user to restart Claude Code
+</example>
+
+<example>
+**User asks: "what skills do I have installed?"**
+
+1. Run: `ccpm list`
+2. Run: `npx skills check`
+3. Present combined results from both registries
+</example>
 
 ## Troubleshooting
 
-### "ccpm: command not found"
-```bash
-npm install -g @daymade/ccpm
-```
-
-### Skill not available after install (CCPM)
-Restart Claude Code — skills are loaded at startup.
-
-### Permission errors
-Check write permissions to `~/.claude/skills/` or try user scope (default).
+| Problem | Fix |
+|---------|-----|
+| `ccpm: command not found` | Run `npm install -g @daymade/ccpm` |
+| Skill not available after CCPM install | Restart Claude Code -- skills load at startup |
+| Permission errors | Check write permissions to `~/.claude/skills/` |
