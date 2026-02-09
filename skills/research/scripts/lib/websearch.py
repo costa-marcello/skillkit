@@ -230,7 +230,7 @@ def extract_domain(url: str) -> str:
         if domain.startswith("www."):
             domain = domain[4:]
         return domain
-    except Exception:
+    except (ValueError, AttributeError):
         return ""
 
 
@@ -247,7 +247,7 @@ def is_excluded_domain(url: str) -> bool:
         parsed = urlparse(url)
         domain = parsed.netloc.lower()
         return domain in EXCLUDED_DOMAINS
-    except Exception:
+    except (ValueError, AttributeError):
         return False
 
 

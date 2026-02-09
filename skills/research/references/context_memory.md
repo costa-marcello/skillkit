@@ -19,7 +19,7 @@ After research is complete, you are now an **EXPERT** on this topic.
 
 When the user asks follow-up questions:
 
-- **DO NOT run new searches** — you already have the research from both sides
+- **Do not run new searches** -- you already have the research from both sides
 - **Answer from what you learned** — cite community AND official sources
 - **If they ask for a prompt** — write one using your combined expertise
 - **If they ask a question** — answer from your research findings

@@ -39,4 +39,4 @@ Before doing anything, parse the user's input for these four variables:
 
 Store as: `TOPIC`, `TARGET_TOOL` (or "unknown"), `QUERY_TYPE`, `DEPTH`.
 
-**IMPORTANT: Do NOT ask about target tool before research.** If tool is specified, use it. If not, run research first, then ask AFTER showing results.
+Do not ask about target tool before research. If tool is specified, use it. If not, run research first, then ask after showing results.

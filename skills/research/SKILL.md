@@ -3,7 +3,7 @@ name: research
 description: "Researches any topic from the last 30 days by dispatching 6-10 parallel sub-agents across community discussions and official sources. Use when user wants deep research, topic analysis, community sentiment, or asks 'what's new with X'."
 argument-hint: "[topic] for [tool]" or "[topic]" or "[topic] deep"
 context: fork
-agent: Explore
+agent: general-purpose
 ---
 
 <instructions>
@@ -60,7 +60,7 @@ Extract four variables from user input before proceeding:
 
 See `references/intent_parsing.md` for query type definitions, detection patterns, and variable storage rules.
 
-**Do NOT ask about target tool before research.** If unspecified, ask AFTER showing results.
+Do not ask about target tool before research. If unspecified, ask after showing results.
 
 <context>
 State: TOPIC, TARGET_TOOL, QUERY_TYPE, DEPTH are now defined.
@@ -75,7 +75,7 @@ The Python script works in three modes based on available API keys:
 2. **Partial Mode** (one key): Reddit-only or X-only
 3. **Web-Only Mode** (no keys): Script provides no data, sub-agents do all the work
 
-API keys are OPTIONAL. The skill always dispatches sub-agents regardless. Determine mode quickly — don't block on this.
+API keys are optional. The skill always dispatches sub-agents regardless. Determine mode quickly.
 
 ## MCP Tool Detection
 
@@ -104,7 +104,7 @@ Store the output as `SCRIPT_DATA`. Check mode from output:
 - **"Mode: both"** / **"Mode: reddit-only"** / **"Mode: x-only"**: Script found data
 - **"Mode: web-only"**: No API keys, sub-agents provide all data
 
-Do NOT stop or warn if web-only. Proceed to Phase 2.
+Do not stop or warn if web-only. Proceed to Phase 2.
 
 <context>
 State: SCRIPT_DATA collected. All agents launched in ONE message for parallelism.
@@ -113,7 +113,7 @@ Dependencies: MCP_TOOLS block embedded in every sub-agent prompt.
 
 ## Phase 2: Sub-Agent Dispatch
 
-**All agents are launched in a SINGLE message with multiple Task tool calls for maximum parallelism.**
+Launch all agents in a single message with multiple Task tool calls for maximum parallelism.
 
 Refer to `references/subagent_prompts.md` for prompt templates and `references/source_categories.md` for source taxonomy.
 
@@ -126,7 +126,7 @@ Build each prompt from templates in `references/subagent_prompts.md`, filling: `
 
 See `references/agent_allocation.md` for full agent roles, focus areas, and dispatch pattern.
 
-**DISPATCH ALL AGENTS IN A SINGLE MESSAGE.** Do not dispatch sequentially.
+Dispatch all agents in a single message. Do not dispatch sequentially.
 
 ## Phase 3: Collect Results
 
@@ -134,7 +134,7 @@ After dispatching, collect results from all agents:
 
 1. Call `TaskOutput` for each dispatched agent
 2. Organize into: `COMMUNITY_FINDINGS` (C1-C5) and `OFFICIAL_FINDINGS` (O1-O5)
-3. **Graceful failure**: If an agent fails or returns empty, log which agent failed, continue with remaining results, note the gap in the final report. Do NOT retry.
+3. **Graceful failure**: If an agent fails or returns empty, log which agent failed, continue with remaining results, note the gap in the final report. Do not retry.
 
 <context>
 State: SCRIPT_DATA + COMMUNITY_FINDINGS + OFFICIAL_FINDINGS all collected.
@@ -167,11 +167,11 @@ Identify 3-5 topics where community and official sources can be compared:
 
 ## Internalize the Research
 
-**Ground your synthesis in ACTUAL research content, not pre-existing knowledge.** Read all agent outputs carefully — pay attention to exact names, specific insights, and real engagement numbers.
+Ground your synthesis in actual research content, not pre-existing knowledge. Read all agent outputs carefully, paying attention to exact names, specific insights, and real engagement numbers.
 
 ### If QUERY_TYPE = RECOMMENDATIONS
 
-Extract SPECIFIC NAMES from ALL sources (script + community + official agents). Count mentions across sources, note which sources recommend each, list by popularity.
+Extract specific names from all sources (script + community + official agents). Count mentions across sources, note which sources recommend each, list by popularity.
 
 <example>
 BAD: "Skills are powerful. Keep them under 500 lines."
@@ -180,19 +180,19 @@ GOOD: "Most mentioned: /commit (5 mentions, r/ClaudeAI + HN), remotion skill (4x
 
 ### For All Query Types
 
-From the ACTUAL RESEARCH OUTPUT, identify:
+From the actual research output, identify:
 - **PROMPT FORMAT** — Does research recommend JSON, structured params, natural language, keywords?
 - Top 3-5 patterns/techniques that appeared across multiple sources
-- Specific keywords, structures, or approaches mentioned BY THE SOURCES
-- Common pitfalls mentioned BY THE SOURCES
+- Specific keywords, structures, or approaches mentioned by the sources
+- Common pitfalls mentioned by the sources
 
-**If research says "use JSON prompts" or "structured prompts", you MUST deliver prompts in that format later.**
+If research says "use JSON prompts" or "structured prompts", deliver prompts in that format later.
 
-**SELF-CHECK**: Re-read your synthesis before displaying. Does it match what the research ACTUALLY says? If you catch yourself projecting your own knowledge, rewrite it.
+Self-check: Re-read your synthesis before displaying. If it does not match what the research actually says, rewrite it.
 
 ## Display Two-Sided Report
 
-Refer to `references/output_format.md` for the full template. Do NOT output any "Sources:" lists.
+Refer to `references/output_format.md` for the full template. Do not output any "Sources:" lists.
 
 ### 1. What the Community Says
 
@@ -214,7 +214,7 @@ If PROMPTING/NEWS/GENERAL:
 
 What the community is saying:
 
-[2-4 sentences synthesizing key insights FROM THE ACTUAL RESEARCH OUTPUT.]
+[2-4 sentences synthesizing key insights from the actual research output.]
 
 Key patterns:
 1. [Pattern from research]
@@ -259,9 +259,9 @@ Share your vision for what you want to create and I'll write a thoughtful prompt
 you can copy-paste directly into {TARGET_TOOL}.
 ```
 
-**Use real numbers from the research output.** Patterns should be actual insights, not generic advice.
+Use real numbers from the research output. Patterns should be actual insights, not generic advice.
 
-**If TARGET_TOOL is still unknown after showing results**, ask now:
+If TARGET_TOOL is still unknown after showing results, ask now:
 ```
 What tool will you use these prompts with?
 
@@ -272,13 +272,13 @@ Options:
 4. Other (tell me)
 ```
 
-After displaying the report and invitation, WAIT for the user to respond.
+After displaying the report and invitation, wait for the user to respond.
 
 ## Prompt Generation
 
 When the user shares their vision, write ONE tailored prompt using expertise from BOTH community and official sources.
 
-**Critical**: Match the FORMAT the research recommends (JSON, structured params, natural language, keywords).
+Match the format the research recommends (JSON, structured params, natural language, keywords).
 
 See `references/prompt_generation.md` for the full prompt writing protocol, quality checklist, and output footer templates.
 

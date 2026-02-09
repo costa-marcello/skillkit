@@ -53,8 +53,8 @@ QUERIES TO RUN (3-5 searches):
 {QUERIES}
 
 For each query:
-- EXCLUDE reddit.com and x.com from results
-- USE THE USER'S EXACT TERMINOLOGY — do not substitute terms based on your knowledge
+- Exclude reddit.com and x.com from results
+- Use the user's exact terminology. Do not substitute terms based on your knowledge
 - Look for content from the last 30 days specifically
 
 RETURN FORMAT (max 500 words):
@@ -74,10 +74,10 @@ For each relevant result found:
 ### Gaps
 - [Anything notable you could NOT find, or areas with sparse coverage]
 
-IMPORTANT:
-- Quality over quantity — 3 highly relevant findings beat 10 tangential ones
-- Report what people ACTUALLY said, not what you think they should have said
-- If a search returns nothing relevant, say so — don't fabricate findings
+Notes:
+- Quality over quantity. 3 highly relevant findings beat 10 tangential ones.
+- Report what people actually said, not what you think they should have said.
+- If a search returns nothing relevant, say so. Do not fabricate findings.
 ```
 
 ---
@@ -102,8 +102,8 @@ QUERIES TO RUN (3-5 searches):
 {QUERIES}
 
 For each query:
-- PRIORITIZE: .gov, .edu, official project sites, peer-reviewed sources, institutional reports
-- USE THE USER'S EXACT TERMINOLOGY — do not substitute terms based on your knowledge
+- Prioritise: .gov, .edu, official project sites, peer-reviewed sources, institutional reports
+- Use the user's exact terminology. Do not substitute terms based on your knowledge
 - Look for content from the last 30 days specifically
 
 RETURN FORMAT (max 500 words):
@@ -127,11 +127,11 @@ For each relevant result found:
 ### Gaps
 - [Areas where official information is lacking or outdated]
 
-IMPORTANT:
-- Prefer primary sources over summaries of primary sources
-- Distinguish between official statements and third-party analysis
-- If no authoritative sources exist for this topic, say so clearly
-- Report facts and data, not opinions (save opinions for community agents)
+Notes:
+- Prefer primary sources over summaries of primary sources.
+- Distinguish between official statements and third-party analysis.
+- If no authoritative sources exist for this topic, say so clearly.
+- Report facts and data, not opinions (save opinions for community agents).
 ```
 
 ---

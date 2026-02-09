@@ -22,7 +22,7 @@
 
 **RECOMMENDATIONS:**
 ```
-🏆 Most Mentioned:
+Most Mentioned:
 1. [Name] — mentioned {n}x (r/{sub}, HN, {forum}, @{handle})
 2. [Name] — mentioned {n}x (sources)
 3. [Name] — mentioned {n}x (sources)
