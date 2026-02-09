@@ -1,0 +1,20 @@
+# This .gitignore prevents system metadata, editor configurations, and temporary
+# files from being tracked in version control. This keeps the repository clean
+# and avoids conflicts when shared across different development environments
+# and operating systems.
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
