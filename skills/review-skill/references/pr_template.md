@@ -92,7 +92,7 @@ Generated with [Claude Code](https://claude.com/claude-code)
 - Link to best practices
 
 ### What This PR Does NOT Change
-**CRITICAL** - Always include this section to show respect for original work.
+Always include this section to show respect for the original work.
 
 ### Rationale
 - Explain WHY each change helps
@@ -118,12 +118,12 @@ Generated with [Claude Code](https://claude.com/claude-code)
 ### Examples
 
 ```
-❌ "Fixed the incorrect description format"
-✅ "Improved description for better skill discovery"
+BAD:  "Fixed the incorrect description format"
+GOOD: "Improved description for better skill discovery"
 
-❌ "The skill had several issues..."
-✅ "This PR adds improvements for..."
+BAD:  "The skill had several issues..."
+GOOD: "This PR adds improvements for..."
 
-❌ "Corrected the non-standard structure"
-✅ "Added marketplace support for easier installation"
+BAD:  "Corrected the non-standard structure"
+GOOD: "Added marketplace support for easier installation"
 ```

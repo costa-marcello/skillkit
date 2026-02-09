@@ -15,7 +15,7 @@ Complete checklist based on [official Anthropic best practices](https://platform
 - [ ] `description` field present and valid
   - Non-empty
   - Max 1024 characters
-  - **Third-person voice** (CRITICAL)
+  - **Third-person voice** (required -- most common failure)
   - Includes trigger conditions ("Use when...")
 
 - [ ] `context: fork` present for task-based skills
@@ -28,27 +28,27 @@ Complete checklist based on [official Anthropic best practices](https://platform
 **Third-Person Voice Check:**
 
 ```
-❌ "Browse YouTube videos..."          (imperative)
-❌ "You can use this to..."            (second person)
-❌ "I can help you..."                 (first person)
-❌ "Complete toolkit for..."           (noun phrase)
-✅ "Browses YouTube videos..."         (third-person verb)
-✅ "Extracts text from PDFs..."        (third-person verb)
-✅ "Processes Excel files and..."      (third-person verb)
+BAD:  "Browse YouTube videos..."          (imperative)
+BAD:  "You can use this to..."            (second person)
+BAD:  "I can help you..."                 (first person)
+BAD:  "Complete toolkit for..."           (noun phrase)
+GOOD: "Browses YouTube videos..."         (third-person verb)
+GOOD: "Extracts text from PDFs..."        (third-person verb)
+GOOD: "Processes Excel files and..."      (third-person verb)
 ```
 
 **Trigger Conditions Check:**
 
 ```
-❌ "Processes PDFs"
-✅ "Extracts text from PDFs. Use when working with PDF files or when the user mentions document extraction."
+BAD:  "Processes PDFs"
+GOOD: "Extracts text from PDFs. Use when working with PDF files or when the user mentions document extraction."
 ```
 
 ## File Structure
 
 ### Core Requirements
 
-- [ ] **SKILL.md body under 500 lines** (CRITICAL)
+- [ ] **SKILL.md body under 500 lines** (required)
 - [ ] **Only SKILL.md in root** (no loose .md files)
 - [ ] Reference files in `references/` folder
 - [ ] One level deep references (no nested references)
@@ -111,11 +111,12 @@ There are many libraries available for PDF processing...
 
 ## Scripts (if present)
 
-- [ ] Explicit error handling (no bare except)
-- [ ] No "voodoo constants" (all values justified)
-- [ ] Clear documentation
-- [ ] No hardcoded secrets or paths
-- [ ] Required packages listed
+Check using `content-quality-checklist.md` Section 5 and `script-quality.md` for detailed patterns.
+
+Quick pass/fail:
+- [ ] No bare `except:` clauses
+- [ ] No hardcoded secrets or user-specific paths
+- [ ] All constants documented with rationale
 
 ## Unified Grading Rubric
 
