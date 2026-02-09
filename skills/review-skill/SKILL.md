@@ -123,7 +123,7 @@ Auto-Fix Progress:
 |-------|--------------|
 | Description not third-person | Rewrite: "Processes...", "Extracts..." |
 | Missing trigger conditions | Add "Use when..." clause |
-| Missing `context: fork` | Add to frontmatter |
+| Missing `context: fork` (task-based skill) | Check for task-based signals (`<instructions>` tags, script references, `agent` field, 3+ numbered steps). Add to frontmatter only when signals are present. |
 | SKILL.md over 500 lines | Extract sections to `references/` |
 | Loose files in root | Move to `references/` with descriptive names |
 | Duplicate reference files | Merge and deduplicate |
@@ -207,19 +207,20 @@ git clone <github-url> /tmp/review-target
 - Who is the target user?
 - What workflow does it automate?
 
-**Step 4: Run structural evaluation** -- Apply `references/evaluation_checklist.md` against the cloned skill. Record pass/fail per item.
+**Step 4: Run evaluation** -- Follow the same evaluation sequence as Mode 1 (Steps 2-4): structural checks via `references/evaluation_checklist.md`, content quality via `references/content-quality-checklist.md`, and deep review via `references/research-backed-criteria.md` for open-source or production skills.
 
-**Step 5: Run content quality evaluation** -- Apply `references/content-quality-checklist.md` across all 8 dimensions.
-
-**Step 6: Run deep review** (for open-source or production skills) -- Apply `references/research-backed-criteria.md`.
-
-**Step 7: Generate improvement report** as markdown. Include:
+**Step 5: Generate improvement report** as markdown. Include:
 - What the skill does well (acknowledge strengths first)
 - Findings with file paths and line numbers
 - Suggested improvements ranked by severity
 - Do not make changes -- report only
 
-**Step 8: Clean up:**
+**Step 6: Verify report** before presenting:
+- [ ] Every finding has a file path and line number
+- [ ] Grade matches rubric criteria
+- [ ] Fixes are actionable (no "consider" or "ensure")
+
+**Step 7: Clean up:**
 ```bash
 rm -rf /tmp/review-target
 ```
@@ -260,16 +261,16 @@ Auto-PR Workflow:
 
 ### Core Principle: Additive Only
 
-When improving external skills, NEVER:
+When improving external skills, do not:
 - Delete existing files
 - Remove functionality
-- Change primary language
+- Change the primary language
 - Rename components
 
-ALWAYS:
-- Add new capabilities
-- Preserve original content
-- Explain every change
+Instead:
+- Add new capabilities alongside existing ones
+- Preserve original content intact
+- Explain every change in the PR description
 
 <example>
 **Additive Changes**
