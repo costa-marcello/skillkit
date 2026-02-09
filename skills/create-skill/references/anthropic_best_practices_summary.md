@@ -65,7 +65,7 @@ Structure skills in three loading tiers:
 
 ### Required Elements
 - [ ] YAML frontmatter with `name` and `description`
-- [ ] `context: fork` for task-based skills requiring subagent execution
+- [ ] `context: fork` present for task-based skills
 - [ ] Clear trigger conditions in description
 
 ### Quality Checks
@@ -98,7 +98,7 @@ If any answer is "no," add specificity until actionable.
 | Mistake | Fix |
 |---------|-----|
 | Generic description | Add specific trigger keywords |
-| Missing `context: fork` | Add for autonomous task skills |
+| Missing `context: fork` | Add for task-based skills |
 | Inline detailed docs | Move to `references/` files |
 | Hardcoded paths | Use relative paths or placeholders |
 | Version sections in SKILL.md | Track in marketplace.json only |

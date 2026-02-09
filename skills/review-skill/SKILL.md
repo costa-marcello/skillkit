@@ -6,7 +6,7 @@ context: fork
 agent: general-purpose
 ---
 
-# Skill Reviewer
+# Review Skill
 
 ## Target Skill
 

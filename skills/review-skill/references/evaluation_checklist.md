@@ -18,9 +18,10 @@ Complete checklist based on [official Anthropic best practices](https://platform
   - **Third-person voice** (CRITICAL)
   - Includes trigger conditions ("Use when...")
 
-- [ ] `context: fork` present **(MANDATORY)**
-  - Ensures fresh context for subagent workflows
-  - Prevents context pollution between invocations
+- [ ] `context: fork` present for task-based skills
+  - Required when skill performs autonomous tasks or needs subagent access
+  - Ensures fresh context and prevents pollution between invocations
+  - **Task-based signals:** `agent` or `allowed-tools` in frontmatter, `<instructions>` tags, script references, 3+ numbered steps, mode selection tables
 
 ### Description Quality
 
@@ -131,7 +132,7 @@ This is the single grading rubric for the entire skill. Combine findings from th
 ### Major vs Minor Issues
 
 **Major** (drops to C or below):
-- Over 500 lines or missing `context: fork`
+- Over 500 lines or missing `context: fork` on task-based skills
 - Wrong degrees of freedom for the task type
 - No feedback loop for destructive or complex operations
 - Scripts with bare `except:` or undocumented constants

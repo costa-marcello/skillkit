@@ -17,9 +17,9 @@ allowed-tools: Read, Grep, Bash(git *)
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `name` | No | Display name for the skill. If omitted, uses the directory name. Lowercase letters, numbers, and hyphens only (max 64 characters). |
+| `name` | No | Display name for the skill. If omitted, uses the directory name. Lowercase letters, numbers, and hyphens only (max 64 characters). No reserved words (anthropic, claude). Noun or short-phrase form preferred (pdf, changelog, smart-merge). |
 | `description` | Recommended | What the skill does and when to use it. Claude uses this to decide when to apply the skill. If omitted, uses the first paragraph of markdown content. **Max 1024 characters.** |
-| `context` | No | **Set to `fork` to run in a forked subagent context.** This is critical for skills that should be available to subagents spawned via the Task tool. Without `context: fork`, the skill runs inline in the main conversation. |
+| `context` | No | **Set to `fork` for task-based skills.** Ensures fresh context for each invocation and prevents context pollution. Without it, skills run inline and cannot be used by subagents. |
 | `agent` | No | Which subagent type to use when `context: fork` is set. Options: `Explore`, `Plan`, `general-purpose`, or custom agents from `.claude/agents/`. Default: `general-purpose`. |
 | `disable-model-invocation` | No | Set to `true` to prevent Claude from automatically loading this skill. Use for workflows you want to trigger manually with `/name`. Default: `false`. |
 | `user-invocable` | No | Set to `false` to hide from the `/` menu. Use for background knowledge users shouldn't invoke directly. Default: `true`. |
@@ -39,6 +39,8 @@ Use `context: fork` when the skill:
 - Should be available to subagents spawned via the Task tool
 - Needs isolated context that won't pollute the main conversation
 - Contains explicit task instructions (not just guidelines or reference content)
+
+Skills without `context: fork` run inline and cannot be used by subagents.
 
 ## Invocation Control Matrix
 

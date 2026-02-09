@@ -6,7 +6,7 @@ context: fork
 argument-hint: "[skill description or name]"
 ---
 
-# Skill Creator
+# Create Skill
 
 <context>
 
@@ -20,11 +20,9 @@ Skills extend Claude's capabilities with specialized workflows, tool integration
 
 See `references/frontmatter_reference.md` for the complete field reference table. Key fields:
 
-- **`name`**: Lowercase, hyphens only (max 64 chars)
+- **`name`**: Lowercase, hyphens only (max 64 chars). No reserved words (anthropic, claude). Noun or short-phrase form preferred (pdf, changelog, smart-merge).
 - **`description`**: Third-person verb + triggers (max 1024 chars)
-- **`context: fork`**: Required for task-based skills needing subagent access
-
-Use `context: fork` when the skill performs multi-step autonomous tasks, should be available to subagents, or needs isolated context.
+- **`context: fork`**: Required for task-based skills. Ensures fresh context, subagent access, and prevents pollution between invocations.
 
 <example>
 **Example: Task-based skill with subagent execution:**
