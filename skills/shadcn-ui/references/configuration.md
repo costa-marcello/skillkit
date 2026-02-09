@@ -4,34 +4,22 @@ Complete configuration files for shadcn/ui projects.
 
 ## TSConfig Configuration
 
+The `npx shadcn@latest init` command configures paths automatically. The key settings shadcn/ui requires:
+
 ```json
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "es6"],
-    "allowJs": true,
-    "skipLibCheck": true,
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true,
-    "plugins": [{ "name": "next" }],
     "baseUrl": ".",
     "paths": {
-      "@/components/*": ["./src/components/*"],
-      "@/lib/*": ["./src/lib/*"]
+      "@/*": ["./src/*"]
     }
-  },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  }
 }
 ```
+
+For full TSConfig, run `npx create-next-app@latest` which generates the correct defaults for your Next.js version.
 
 ## Tailwind Configuration
 
@@ -176,23 +164,15 @@ module.exports = {
 
 ## Required Dependencies
 
-```json
-{
-  "dependencies": {
-    "@radix-ui/react-accordion": "^1.1.2",
-    "@radix-ui/react-alert-dialog": "^1.0.5",
-    "@radix-ui/react-dialog": "^1.0.5",
-    "@radix-ui/react-dropdown-menu": "^2.0.6",
-    "@radix-ui/react-label": "^2.0.2",
-    "@radix-ui/react-select": "^2.0.0",
-    "@radix-ui/react-separator": "^1.0.3",
-    "@radix-ui/react-slot": "^1.0.2",
-    "@radix-ui/react-toast": "^1.1.5",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.0.0",
-    "lucide-react": "^0.294.0",
-    "tailwind-merge": "^2.0.0",
-    "tailwindcss-animate": "^1.0.7"
-  }
-}
-```
+The CLI installs exact versions automatically. For manual installation, use the latest versions of these packages:
+
+| Package | Purpose |
+|---------|---------|
+| `@radix-ui/react-*` | Accessible UI primitives (install per component) |
+| `class-variance-authority` | Variant management for components |
+| `clsx` | Conditional class joining |
+| `tailwind-merge` | Tailwind class conflict resolution |
+| `lucide-react` | Icon library |
+| `tailwindcss-animate` | Animation utilities |
+
+Run `npx shadcn@latest add <component>` to install the correct Radix primitives and their dependencies for each component.

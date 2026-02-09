@@ -2,10 +2,22 @@
 
 Complete reference for shadcn/ui CLI commands and installation patterns.
 
+## All Commands
+
+| Command | Purpose | Key Flags |
+|---------|---------|-----------|
+| `init` | Initialise project | `-t` template, `-b` base-color, `-y` skip prompts |
+| `add <component>` | Add a component | `-y` skip prompts, `-o` overwrite, `-a` all, `-p` path |
+| `search <query>` | Search registries | Fuzzy match by name/description |
+| `list` | List available components | Shows all registry items |
+| `view <component>` | Preview before installing | Shows source code and dependencies |
+| `build` | Generate registry JSON | For custom registry authors |
+| `migrate` | Run project migrations | Updates to latest patterns |
+
 ## Quick Commands
 
 ```bash
-# Initialize shadcn/ui
+# Initialise shadcn/ui
 npx shadcn@latest init
 
 # Add single component
@@ -17,8 +29,14 @@ npx shadcn@latest add button input form card
 # Add all components
 npx shadcn@latest add --all
 
-# Install CLI globally
-npm install shadcn@latest
+# Search for a component
+npx shadcn@latest search "date picker"
+
+# Preview a component before installing
+npx shadcn@latest view button
+
+# List all available components
+npx shadcn@latest list
 ```
 
 ## Framework-Specific Installation

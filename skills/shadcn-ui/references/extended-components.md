@@ -1,586 +1,405 @@
-# shadcn.io Component Library
+# Extended Components, Charts, Animations, and Hooks
 
-shadcn.io is a comprehensive React UI component library built on shadcn/ui principles, providing developers with production-ready, composable components for modern web applications. The library serves as a centralized resource for React developers who need high-quality UI components with TypeScript support, ranging from basic interactive elements to advanced AI-powered integrations. Unlike traditional component libraries that require package installations, shadcn.io components are designed to be copied directly into your project, giving you full control and customization capabilities.
-
-The library encompasses four major categories: composable UI components (terminal, dock, credit cards, QR codes, color pickers), chart components built with Recharts, animation components with Tailwind CSS integration, and custom React hooks for state management and lifecycle operations. Each component follows best practices for accessibility, performance, and developer experience, with comprehensive TypeScript definitions and Next.js compatibility. The platform emphasizes flexibility and customization, allowing developers to modify components at the source level rather than being constrained by package APIs.
+Additional shadcn.io components beyond the core library. These follow the same copy-paste pattern and integrate with the standard shadcn/ui setup.
 
 ## Core Components
 
 ### Terminal Component
-Interactive terminal emulator with typing animations and command execution simulation for developer-focused interfaces.
+
+Interactive terminal emulator with typing animations.
 
 ```tsx
 import { Terminal } from "@/components/ui/terminal"
 
 export default function DemoTerminal() {
- return (
- npm install @repo/terminalInstalling dependencies...npm start
- )
+  return (
+    <Terminal>
+      <Terminal.Line command="npm install @repo/terminal" />
+      <Terminal.Line output="Installing dependencies..." />
+      <Terminal.Line command="npm start" />
+    </Terminal>
+  )
 }
 ```
 
 ### Dock Component
-macOS-style application dock with smooth magnification effects on hover, perfect for navigation menus.
+
+macOS-style application dock with magnification on hover.
 
 ```tsx
 import { Dock, DockIcon } from "@/components/ui/dock"
 import { Home, Settings, User, Mail } from "lucide-react"
 
 export default function AppDock() {
- return (
-
- )
+  return (
+    <Dock>
+      <DockIcon><Home className="h-6 w-6" /></DockIcon>
+      <DockIcon><Settings className="h-6 w-6" /></DockIcon>
+      <DockIcon><User className="h-6 w-6" /></DockIcon>
+      <DockIcon><Mail className="h-6 w-6" /></DockIcon>
+    </Dock>
+  )
 }
 ```
 
 ### Credit Card Component
-Interactive 3D credit card component with flip animations for payment forms and card displays.
+
+Interactive 3D credit card with flip animation for payment forms.
 
 ```tsx
 import { CreditCard } from "@/components/ui/credit-card"
 import { useState } from "react"
 
 export default function PaymentForm() {
- const [cardData, setCardData] = useState({
- number: "4532 1234 5678 9010",
- holder: "JOHN DOE",
- expiry: "12/28",
- cvv: "123"
- })
+  const [cardData, setCardData] = useState({
+    number: "4532 1234 5678 9010",
+    holder: "JOHN DOE",
+    expiry: "12/28",
+    cvv: "123"
+  })
 
- return (
-  console.log("Card flipped:", flipped)}
- />
- )
+  return (
+    <CreditCard
+      number={cardData.number}
+      holder={cardData.holder}
+      expiry={cardData.expiry}
+      cvv={cardData.cvv}
+      onFlip={(flipped) => console.log("Card flipped:", flipped)}
+    />
+  )
 }
 ```
 
 ### Image Zoom Component
-Zoomable image component with smooth modal transitions for image galleries and product displays.
+
+Zoomable image with smooth modal transitions for galleries.
 
 ```tsx
 import { ImageZoom } from "@/components/ui/image-zoom"
 
 export default function ProductGallery() {
- return (
-
-
- )
+  return (
+    <ImageZoom
+      src="/product.jpg"
+      alt="Product image"
+      width={400}
+      height={300}
+    />
+  )
 }
 ```
 
 ### QR Code Component
-Generate and display customizable QR codes with styling options for links, contact information, and authentication.
+
+Customisable QR codes for links, contact info, and authentication.
 
 ```tsx
 import { QRCode } from "@/components/ui/qr-code"
 
 export default function ShareDialog() {
- const shareUrl = "https://shadcn.io"
-
- return (
-
-
-Scan to visit shadcn.io
-
-
- )
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <QRCode
+        value="https://shadcn.io"
+        size={200}
+        bgColor="#ffffff"
+        fgColor="#000000"
+      />
+      <p className="text-sm text-muted-foreground">Scan to visit shadcn.io</p>
+    </div>
+  )
 }
 ```
 
-### Color Picker Component
-Advanced color selection component supporting multiple color formats (HEX, RGB, HSL) with preview.
+### Colour Picker Component
+
+Advanced colour selection supporting HEX, RGB, and HSL formats.
 
 ```tsx
 import { ColorPicker } from "@/components/ui/color-picker"
 import { useState } from "react"
 
-export default function ThemeCustomizer() {
- const [color, setColor] = useState("#3b82f6")
+export default function ThemeCustomiser() {
+  const [color, setColor] = useState("#3b82f6")
 
- return (
-
-
-Selected: {color}
-
-)
+  return (
+    <div className="space-y-2">
+      <ColorPicker value={color} onChange={setColor} format="hex" />
+      <p className="text-sm">Selected: {color}</p>
+    </div>
+  )
 }
 ```
 
 ## Chart Components
 
-### Bar Chart Component
-Clean bar chart component for data comparison and categorical analysis using Recharts.
+Built with Recharts. Install: `npx shadcn@latest add chart`
+
+### Bar Chart
 
 ```tsx
 import { BarChart } from "@/components/ui/bar-chart"
 
-export default function SalesChart() {
 const data = [
-{ month: "Jan", sales: 4000, revenue: 2400 },
-{ month: "Feb", sales: 3000, revenue: 1398 },
-{ month: "Mar", sales: 2000, revenue: 9800 },
-{ month: "Apr", sales: 2780, revenue: 3908 },
-{ month: "May", sales: 1890, revenue: 4800 },
-{ month: "Jun", sales: 2390, revenue: 3800 }
+  { month: "Jan", sales: 4000, revenue: 2400 },
+  { month: "Feb", sales: 3000, revenue: 1398 },
+  { month: "Mar", sales: 2000, revenue: 9800 },
 ]
 
-return (
-`$${value.toLocaleString()}`}
-yAxisWidth={60}
+<BarChart
+  data={data}
+  index="month"
+  categories={["sales", "revenue"]}
+  valueFormatter={(value) => `$${value.toLocaleString()}`}
+  yAxisWidth={60}
 />
-)
-}
 ```
 
-### Line Chart Component
-Smooth line chart for visualizing trends and time-series data with multiple data series support.
+### Line Chart
 
 ```tsx
 import { LineChart } from "@/components/ui/line-chart"
 
-export default function MetricsChart() {
 const data = [
-{ date: "2024-01", users: 1200, sessions: 3400 },
-{ date: "2024-02", users: 1800, sessions: 4200 },
-{ date: "2024-03", users: 2400, sessions: 5800 },
-{ date: "2024-04", users: 3100, sessions: 7200 },
-{ date: "2024-05", users: 3800, sessions: 8900 }
+  { date: "2024-01", users: 1200, sessions: 3400 },
+  { date: "2024-02", users: 1800, sessions: 4200 },
+  { date: "2024-03", users: 2400, sessions: 5800 },
 ]
 
-return (
-
-)
-}
+<LineChart
+  data={data}
+  index="date"
+  categories={["users", "sessions"]}
+  colors={["blue", "green"]}
+/>
 ```
 
-### Pie Chart Component
-Donut chart component for displaying proportional data and percentage distributions.
+### Pie Chart
 
 ```tsx
 import { PieChart } from "@/components/ui/pie-chart"
 
-export default function MarketShareChart() {
 const data = [
-{ name: "Product A", value: 400, fill: "#3b82f6" },
-{ name: "Product B", value: 300, fill: "#10b981" },
-{ name: "Product C", value: 300, fill: "#f59e0b" },
-{ name: "Product D", value: 200, fill: "#ef4444" }
+  { name: "Product A", value: 400, fill: "#3b82f6" },
+  { name: "Product B", value: 300, fill: "#10b981" },
+  { name: "Product C", value: 200, fill: "#ef4444" },
 ]
 
-return (
-`${entry.name}: ${entry.value}`}
+<PieChart
+  data={data}
+  category="value"
+  index="name"
+  label={(entry) => `${entry.name}: ${entry.value}`}
 />
-)
-}
 ```
 
-### Area Chart Component
-Stacked area chart for visualizing volume changes over time with multiple data series.
+### Area Chart
 
 ```tsx
 import { AreaChart } from "@/components/ui/area-chart"
 
-export default function TrafficChart() {
 const data = [
-{ month: "Jan", mobile: 2000, desktop: 3000, tablet: 1000 },
-{ month: "Feb", mobile: 2200, desktop: 3200, tablet: 1100 },
-{ month: "Mar", mobile: 2800, desktop: 3800, tablet: 1300 },
-{ month: "Apr", mobile: 3200, desktop: 4200, tablet: 1500 },
-{ month: "May", mobile: 3800, desktop: 4800, tablet: 1800 }
+  { month: "Jan", mobile: 2000, desktop: 3000, tablet: 1000 },
+  { month: "Feb", mobile: 2200, desktop: 3200, tablet: 1100 },
 ]
 
-return (
-
-)
-}
+<AreaChart
+  data={data}
+  index="month"
+  categories={["mobile", "desktop", "tablet"]}
+  stacked={true}
+/>
 ```
 
-### Radar Chart Component
-Multi-axis chart for comparing multiple variables across different categories simultaneously.
+### Radar Chart
 
 ```tsx
 import { RadarChart } from "@/components/ui/radar-chart"
 
-export default function SkillsChart() {
 const data = [
-{ skill: "JavaScript", score: 85, industry: 75 },
-{ skill: "TypeScript", score: 80, industry: 70 },
-{ skill: "React", score: 90, industry: 80 },
-{ skill: "Node.js", score: 75, industry: 72 },
-{ skill: "CSS", score: 88, industry: 78 }
+  { skill: "JavaScript", score: 85, industry: 75 },
+  { skill: "TypeScript", score: 80, industry: 70 },
+  { skill: "React", score: 90, industry: 80 },
 ]
 
-return (
-
-)
-}
-```
-
-### Mixed Chart Component
-Combined bar and line chart for displaying multiple data types with different visualization methods.
-
-```tsx
-import { MixedChart } from "@/components/ui/mixed-chart"
-
-export default function PerformanceChart() {
-const data = [
-{ month: "Jan", revenue: 4000, growth: 5.2 },
-{ month: "Feb", revenue: 4200, growth: 5.0 },
-{ month: "Mar", revenue: 4800, growth: 14.3 },
-{ month: "Apr", revenue: 5200, growth: 8.3 },
-{ month: "May", revenue: 5800, growth: 11.5 }
-]
-
-return (
-
-)
-}
+<RadarChart
+  data={data}
+  index="skill"
+  categories={["score", "industry"]}
+/>
 ```
 
 ## Animation Components
 
-### Magnetic Effect Component
-Magnetic hover effect that smoothly follows cursor movement for interactive buttons and cards.
+### Magnetic Effect
+
+Follows cursor movement for interactive buttons and cards.
 
 ```tsx
 import { Magnetic } from "@/components/ui/magnetic"
 
-export default function InteractiveButton() {
-return (
-
-Hover me
-
-)
-}
+<Magnetic>
+  <Button>Hover me</Button>
+</Magnetic>
 ```
 
-### Animated Cursor Component
-Custom animated cursor with interactive effects and particle trails for immersive experiences.
+### Animated Cursor
+
+Custom cursor with interactive effects. Add to root layout.
 
 ```tsx
 import { AnimatedCursor } from "@/components/ui/animated-cursor"
 
-export default function Layout({ children }) {
-return (
-<>
-
-{children}
-
-)
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <AnimatedCursor color="#3b82f6" />
+      {children}
+    </>
+  )
 }
 ```
 
-### Apple Hello Effect Component
-Recreation of Apple's iconic "hello" animation with multi-language text transitions.
+### Apple Hello Effect
+
+Recreation of Apple's "hello" animation with multi-language transitions.
 
 ```tsx
 import { AppleHello } from "@/components/ui/apple-hello"
 
-export default function WelcomeScreen() {
 const greetings = [
-{ text: "Hello", lang: "en" },
-{ text: "Bonjour", lang: "fr" },
-{ text: "こんにちは", lang: "ja" },
-{ text: "Hola", lang: "es" },
-{ text: "你好", lang: "zh" }
+  { text: "Hello", lang: "en" },
+  { text: "Bonjour", lang: "fr" },
+  { text: "Hola", lang: "es" },
 ]
 
-return (
-
-)
-}
+<AppleHello greetings={greetings} speed={2000} fontSize="6rem" />
 ```
 
-### Liquid Button Component
-Button with fluid liquid animation effect on hover for engaging call-to-action elements.
+### Liquid Button
+
+Fluid animation effect on hover for call-to-action elements.
 
 ```tsx
 import { LiquidButton } from "@/components/ui/liquid-button"
 
-export default function CTASection() {
-return (
-console.log("CTA clicked")}
->
-Get Started
-
-)
-}
+<LiquidButton color="#3b82f6" onClick={() => console.log("clicked")}>
+  Get Started
+</LiquidButton>
 ```
 
-### Rolling Text Component
-Text animation that creates a rolling effect with smooth character transitions.
+### Rolling Text
+
+Character-by-character rolling animation.
 
 ```tsx
 import { RollingText } from "@/components/ui/rolling-text"
 
-export default function AnimatedHeading() {
-return (
-
-)
-}
+<RollingText text="Welcome to our site" speed={50} />
 ```
 
-### Shimmering Text Component
-Text with animated shimmer effect for attention-grabbing headings and highlights.
+### Shimmering Text
+
+Animated shimmer effect for headings.
 
 ```tsx
 import { ShimmeringText } from "@/components/ui/shimmering-text"
 
-export default function Hero() {
-return (
-
-)
-}
+<ShimmeringText text="Premium Feature" color="#f59e0b" speed={1500} />
 ```
 
 ## React Hooks
 
-### useBoolean Hook
-Enhanced boolean state management with toggle, enable, and disable methods for cleaner component logic.
+### useBoolean
+
+Enhanced boolean state with `toggle`, `setTrue`, `setFalse` methods.
 
 ```tsx
 import { useBoolean } from "@/hooks/use-boolean"
 
-export default function TogglePanel() {
 const modal = useBoolean(false)
-const loading = useBoolean(false)
-
-const handleSubmit = async () => {
-loading.setTrue()
-try {
-await submitForm()
-modal.setFalse()
-} finally {
-loading.setFalse()
-}
-}
-
-return (
-<>
-Toggle Modal
-{modal.value && (
-
-
-Status: {loading.value ? "Saving..." : "Ready"}
-
-Submit
-
-
-)}
-
-)
-}
+// modal.value, modal.toggle(), modal.setTrue(), modal.setFalse()
 ```
 
-### useCounter Hook
-Counter hook with increment, decrement, reset, and set functionality for numeric state management.
+### useCounter
+
+Numeric state with min/max bounds.
 
 ```tsx
 import { useCounter } from "@/hooks/use-counter"
 
-export default function CartCounter() {
 const quantity = useCounter(0, { min: 0, max: 99 })
-
-return (
-
-
- -
-{quantity.value}
-+
-
-Reset
-
-
-)
-}
+// quantity.value, quantity.increment(), quantity.decrement(), quantity.reset()
 ```
 
-### useLocalStorage Hook
-Persist state in browser localStorage with automatic serialization and deserialization.
+### useLocalStorage
+
+Persist state in localStorage with automatic serialisation.
 
 ```tsx
 import { useLocalStorage } from "@/hooks/use-local-storage"
 
-export default function UserPreferences() {
 const [theme, setTheme] = useLocalStorage("theme", "light")
-const [settings, setSettings] = useLocalStorage("settings", {
-notifications: true,
-emailUpdates: false
-})
-
-return (
-
-
-setTheme(e.target.value)}>
-LightDark setSettings({
-...settings,
-notifications: e.target.checked
-})}
-/>
-Enable Notifications
-
-
-)
-}
+const [settings, setSettings] = useLocalStorage("settings", { notifications: true })
 ```
 
-### useDebounceValue Hook
-Debounce values to prevent excessive updates and API calls during rapid user input.
+### useDebounceValue
+
+Debounce values to prevent excessive API calls.
 
 ```tsx
 import { useDebounceValue } from "@/hooks/use-debounce-value"
 import { useState, useEffect } from "react"
 
-export default function SearchBox() {
 const [search, setSearch] = useState("")
 const debouncedSearch = useDebounceValue(search, 500)
-const [results, setResults] = useState([])
-const [apiCalls, setApiCalls] = useState(0)
 
 useEffect(() => {
-if (debouncedSearch) {
-setApiCalls(prev => prev + 1)
-fetch(`/api/search?q=${debouncedSearch}`)
-.then(res => res.json())
-.then(setResults)
-}
+  if (debouncedSearch) {
+    fetch(`/api/search?q=${debouncedSearch}`).then(/* ... */)
+  }
 }, [debouncedSearch])
-
-return (
-
-
-setSearch(e.target.value)}
-placeholder="Search..."
-/>
-
-
-API calls: {apiCalls}
-
-
-)
-}
 ```
 
-### useHover Hook
-Track hover state on elements with customizable enter and leave delays for tooltip and preview functionality.
+### useHover
+
+Track hover state with configurable enter/leave delays.
 
 ```tsx
 import { useHover } from "@/hooks/use-hover"
 import { useRef } from "react"
 
-export default function ImagePreview() {
-const hoverRef = useRef(null)
-const isHovering = useHover(hoverRef, {
-enterDelay: 200,
-leaveDelay: 100
-})
-
-return (
-
-
-![Preview](http://https:%2F%2Fcontext7.com%2Fwebsites%2Fshadcn_io%2Fllms.txt/thumbnail.jpg)
-{isHovering && (
-
-
-![Full size](http://https:%2F%2Fcontext7.com%2Fwebsites%2Fshadcn_io%2Fllms.txt/full-size.jpg)
-
-)}
-
-
-)
-}
+const hoverRef = useRef<HTMLDivElement>(null)
+const isHovering = useHover(hoverRef, { enterDelay: 200, leaveDelay: 100 })
 ```
 
-### useCountdown Hook
-Countdown timer with play, pause, reset controls and completion callbacks for time-limited features.
+### useCountdown
+
+Countdown timer with play, pause, reset, and completion callback.
 
 ```tsx
 import { useCountdown } from "@/hooks/use-countdown"
 
-export default function OTPTimer() {
 const countdown = useCountdown({
-initialSeconds: 60,
-onComplete: () => alert("OTP expired! Request a new code.")
+  initialSeconds: 60,
+  onComplete: () => alert("Timer expired!")
 })
-
-return (
-
-
-{countdown.seconds}s
-
-{!countdown.isRunning ? (
-Start
-) : (
-Pause
-)}
-Reset
-
-Status: {countdown.isComplete ? "Expired" : countdown.isRunning ? "Active" : "Paused"}
-
-
-)
-}
+// countdown.seconds, countdown.isRunning, countdown.isComplete
+// countdown.start(), countdown.pause(), countdown.reset()
 ```
 
-## Installation and Usage
-
-### CLI Installation
-Install components directly into your project using the shadcn CLI for instant integration.
+## Installation
 
 ```bash
-# Initialize shadcn in your project
+# Initialise shadcn in your project
 npx shadcn@latest init
 
 # Add individual components
-npx shadcn@latest add terminal
-npx shadcn@latest add dock
-npx shadcn@latest add credit-card
+npx shadcn@latest add terminal dock credit-card
 
-# Add multiple components at once
+# Add chart components
 npx shadcn@latest add bar-chart line-chart pie-chart
 
 # Add hooks
 npx shadcn@latest add use-boolean use-counter use-local-storage
 ```
-
-### Project Configuration
-Configure your project to work with shadcn.io components using TypeScript and Tailwind CSS.
-
-```typescript
-// tailwind.config.ts
-import type { Config } from "tailwindcss"
-
-const config: Config = {
-darkMode: ["class"],
-content: [
-"./pages/**/*.{ts,tsx}",
-"./components/**/*.{ts,tsx}",
-"./app/**/*.{ts,tsx}",
-],
-theme: {
-extend: {
-colors: {
-border: "hsl(var(--border))",
-input: "hsl(var(--input))",
-ring: "hsl(var(--ring))",
-background: "hsl(var(--background))",
-foreground: "hsl(var(--foreground))",
-primary: {
-DEFAULT: "hsl(var(--primary))",
-foreground: "hsl(var(--primary-foreground))",
-},
-},
-},
-},
-plugins: [require("tailwindcss-animate")],
-}
-
-export default config
-```
-
-## Summary
-
-The shadcn.io component library serves as a comprehensive toolkit for React developers building modern web applications with Next.js and TypeScript. The library's primary use cases include rapid prototyping of user interfaces, building data-rich dashboards with interactive charts, creating engaging user experiences with animations and effects, and implementing common UI patterns without writing boilerplate code. The copy-paste approach gives developers complete ownership of their components, allowing for deep customization while maintaining consistency with shadcn/ui design principles. Components are particularly well-suited for SaaS applications, admin panels, marketing websites, and e-commerce platforms that require professional, accessible UI elements.
-
-Integration patterns center around composability and customization rather than rigid package dependencies. Developers can cherry-pick individual components using the CLI, modify them at the source level to match their design system, and combine them with existing shadcn/ui components for a cohesive interface. The library supports both light and dark themes through CSS variables, integrates seamlessly with Tailwind CSS utility classes, and follows React best practices for performance and accessibility. Custom hooks provide reusable logic patterns that complement the visual components, creating a complete ecosystem for building feature-rich applications. The TypeScript-first approach ensures type safety throughout the development process, while the Recharts integration for data visualization provides powerful charting capabilities without additional configuration overhead.

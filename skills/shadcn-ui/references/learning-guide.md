@@ -1,111 +1,37 @@
 # shadcn/ui Learning Guide
 
-This guide helps you learn shadcn/ui from basics to advanced patterns.
+## Core Patterns
 
-## Learning Path
+### CVA Variant Pattern
 
-### 1. Understanding the Philosophy
-
-shadcn/ui is different from traditional component libraries:
-
-- **Copy-paste components**: Components are copied into your project, not installed as packages
-- **Full customization**: You own the code and can modify it freely
-- **Built on Radix UI**: Provides accessibility primitives
-- **Styled with Tailwind**: Uses utility classes for consistent styling
-
-### 2. Core Concepts to Master
-
-#### Class Variance Authority (CVA)
-Most components use CVA for variant management:
+Every shadcn/ui component uses CVA for variant management:
 
 ```tsx
-const buttonVariants = cva(
-  "base-classes",
-  {
-    variants: {
-      variant: {
-        default: "variant-classes",
-        destructive: "destructive-classes",
-      },
-      size: {
-        default: "size-classes",
-        sm: "small-classes",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-)
+const buttonVariants = cva("base-classes", {
+  variants: {
+    variant: { default: "...", destructive: "..." },
+    size: { default: "...", sm: "..." },
+  },
+  defaultVariants: { variant: "default", size: "default" },
+})
 ```
 
-#### cn Utility Function
-The `cn` function combines classes and resolves conflicts:
+### Form Pattern
 
-```tsx
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+Every form follows this sequence:
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
-```
-
-### 3. Installation Checklist
-
-- [ ] Initialize a new project (Next.js, Vite, or Remix)
-- [ ] Install Tailwind CSS
-- [ ] Run `npx shadcn@latest init`
-- [ ] Configure CSS variables
-- [ ] Install first component: `npx shadcn@latest add button`
-
-### 4. Essential Components to Learn First
-
-1. **Button** - Learn variants and sizes
-2. **Input** - Form inputs with labels
-3. **Card** - Container components
-4. **Form** - Form handling with React Hook Form
-5. **Dialog** - Modal windows
-6. **Select** - Dropdown selections
-7. **Toast** - Notifications
-
-### 5. Common Patterns
-
-#### Form Pattern
-Every form follows this structure:
-
-```tsx
 1. Define Zod schema
-2. Create form with useForm
-3. Wrap with Form component
-4. Add FormField for each input
-5. Handle submission
-```
+2. Create form with `useForm({ resolver: zodResolver(schema) })`
+3. Wrap with `<Form>` component
+4. Add `<FormField>` for each input
+5. Handle submission in `form.handleSubmit(onSubmit)`
 
-#### Component Customization Pattern
-To customize a component:
+### Component Customisation
 
-1. Copy component to your project
-2. Modify the variants
-3. Add new props if needed
-4. Update types
-
-### 6. Best Practices
-
-- Always use TypeScript
-- Follow the existing component structure
-- Use semantic HTML when possible
-- Test with screen readers for accessibility
-- Keep components small and focused
-
-### 7. Advanced Topics
-
-- Creating custom components from scratch
-- Building complex forms with validation
-- Implementing dark mode
-- Optimizing for performance
-- Testing components
+1. Open the component file in `@/components/ui/`
+2. Modify the CVA variants or add new ones
+3. Add new props to the component interface
+4. Export updated types
 
 ## Practice Exercises
 
@@ -138,8 +64,4 @@ To customize a component:
 
 ## Resources
 
-- [Official Documentation](https://ui.shadcn.com)
-- [GitHub Repository](https://github.com/shadcn/ui)
-- [Examples Gallery](https://ui.shadcn.com/examples)
-- [Radix UI Primitives](https://www.radix-ui.com/primitives)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+See external links in SKILL.md.

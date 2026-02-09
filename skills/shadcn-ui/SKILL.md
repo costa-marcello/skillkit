@@ -1,16 +1,16 @@
 ---
 name: shadcn-ui
-description: "Provides installation, configuration, and implementation guidance for shadcn/ui accessible React components. Use when setting up shadcn/ui, installing components, building forms with React Hook Form and Zod, customizing themes, or implementing UI patterns like buttons, dialogs, tables, and forms."
+description: "Installs, configures, and implements shadcn/ui accessible React components. Use when setting up shadcn/ui, adding components, building forms with React Hook Form and Zod, customising themes, or implementing UI patterns like buttons, dialogs, tables, and data displays."
 language: typescript,tsx
 framework: react,nextjs,tailwindcss
 license: MIT
-allowed-tools: Read, Write, Bash, Edit, Glob
+allowed-tools: Read, Write, Bash, Edit, Glob, mcp__shadcn__search_items_in_registries, mcp__shadcn__view_items_in_registries, mcp__shadcn__get_add_command_for_items, mcp__shadcn__list_items_in_registries, mcp__shadcn__get_item_examples_from_registries, mcp__shadcn__get_project_registries, mcp__shadcn__get_audit_checklist
 context: fork
 ---
 
 # shadcn/ui Component Guide
 
-Build accessible, customizable UI components with shadcn/ui, Radix UI, and Tailwind CSS.
+Build accessible, customisable UI components with shadcn/ui, Radix UI, and Tailwind CSS.
 
 ## When to Use
 
@@ -18,10 +18,47 @@ Build accessible, customizable UI components with shadcn/ui, Radix UI, and Tailw
 - Installing or configuring components
 - Building forms with React Hook Form and Zod
 - Creating accessible UI (buttons, dialogs, dropdowns, sheets)
-- Customizing styling with Tailwind CSS
+- Customising themes with Tailwind CSS variables
 - Implementing design systems
 
-## Quick Start
+<instructions>
+
+## MCP Tools (Preferred Workflow)
+
+Use the shadcn MCP tools as the **primary method** for component discovery and installation. Fall back to CLI commands only when MCP tools are unavailable.
+
+### Discovery Workflow
+
+1. **Check project registries**: Call `mcp__shadcn__get_project_registries` to verify `components.json` exists
+2. **Search for components**: Call `mcp__shadcn__search_items_in_registries` with the registry and query
+3. **View component details**: Call `mcp__shadcn__view_items_in_registries` to see source code and dependencies
+4. **Get usage examples**: Call `mcp__shadcn__get_item_examples_from_registries` for implementation patterns
+5. **Get install command**: Call `mcp__shadcn__get_add_command_for_items` for the exact CLI command
+
+### MCP Tool Reference
+
+| Tool | Purpose |
+|------|---------|
+| `get_project_registries` | Check configured registries from `components.json` |
+| `search_items_in_registries` | Fuzzy search for components by name/description |
+| `list_items_in_registries` | List all available components in a registry |
+| `view_items_in_registries` | View source code, types, and dependencies |
+| `get_item_examples_from_registries` | Get usage examples for components |
+| `get_add_command_for_items` | Get the CLI install command for components |
+| `get_audit_checklist` | Get accessibility and quality audit checklist |
+
+<example>
+**Finding and installing a component via MCP**
+
+1. Search: `search_items_in_registries(registries: ["@shadcn"], query: "date picker")`
+2. View: `view_items_in_registries(items: ["@shadcn/date-picker"])`
+3. Examples: `get_item_examples_from_registries(items: ["@shadcn/date-picker"])`
+4. Install: `get_add_command_for_items(items: ["@shadcn/date-picker"])`
+</example>
+
+## CLI Commands
+
+### Quick Start
 
 **New project:**
 ```bash
@@ -33,31 +70,52 @@ npx shadcn@latest add button input form card dialog select
 
 **Existing project:**
 ```bash
-npm install tailwindcss-animate class-variance-authority clsx tailwind-merge lucide-react
 npx shadcn@latest init
 ```
 
-## What is shadcn/ui?
+### CLI Reference
 
-- **Not an npm package** - components you copy into your project
-- **You own the code** - full customization control
-- Built with **Radix UI** primitives for accessibility
-- Styled with **Tailwind CSS** utilities
+| Command | Purpose |
+|---------|---------|
+| `npx shadcn@latest init` | Initialise shadcn/ui in a project |
+| `npx shadcn@latest add <component>` | Add a component |
+| `npx shadcn@latest add --all` | Add all components |
+| `npx shadcn@latest search <query>` | Search registries |
+| `npx shadcn@latest list` | List available components |
+| `npx shadcn@latest view <component>` | View a component before installing |
+| `npx shadcn@latest build` | Generate registry JSON files |
+| `npx shadcn@latest migrate` | Run project migrations |
+
+See `references/cli-reference.md` for framework-specific installation and registry configuration.
+
+### Setup Verification Checklist
+
+After initialisation, verify the setup works:
+
+```
+Setup Verification:
+- [ ] `components.json` exists in project root
+- [ ] `@/components/ui/` directory created
+- [ ] `@/lib/utils.ts` contains the `cn` function
+- [ ] `globals.css` has CSS variables for theming
+- [ ] `tailwind.config` includes shadcn colour tokens
+- [ ] Test: `npx shadcn@latest add button` installs without errors
+- [ ] Test: Import and render `<Button>` compiles without errors
+```
 
 ## Component Quick Reference
 
-| Component | Install | Usage |
-|-----------|---------|-------|
-| Button | `npx shadcn@latest add button` | `<Button variant="default">Click</Button>` |
-| Input | `npx shadcn@latest add input` | `<Input type="email" placeholder="Email" />` |
-| Form | `npx shadcn@latest add form` | React Hook Form + Zod integration |
-| Card | `npx shadcn@latest add card` | `<Card><CardHeader>...</CardHeader></Card>` |
-| Dialog | `npx shadcn@latest add dialog` | Modal with `<DialogTrigger>` and `<DialogContent>` |
-| Select | `npx shadcn@latest add select` | Dropdown with `<SelectTrigger>` and `<SelectContent>` |
-| Sheet | `npx shadcn@latest add sheet` | Slide-over panel (`side="left|right|top|bottom"`) |
-| Toast | `npx shadcn@latest add toast` | Notifications via `useToast()` hook |
-| Table | `npx shadcn@latest add table` | Data tables with header/body/row components |
-| Menubar | `npx shadcn@latest add menubar` | Application menu bar |
+| Component | Install | Key Props |
+|-----------|---------|-----------|
+| Button | `add button` | `variant`, `size`, `asChild` |
+| Input | `add input` | `type`, `placeholder`, `disabled` |
+| Form | `add form` | React Hook Form + Zod integration |
+| Card | `add card` | `CardHeader`, `CardContent`, `CardFooter` |
+| Dialog | `add dialog` | `DialogTrigger`, `DialogContent` |
+| Select | `add select` | `SelectTrigger`, `SelectContent`, `SelectItem` |
+| Sheet | `add sheet` | `side="left\|right\|top\|bottom"` |
+| Toast | `add toast` | `useToast()` hook, `variant` |
+| Table | `add table` | `TableHeader`, `TableBody`, `TableRow` |
 
 **Install all:** `npx shadcn@latest add --all`
 
@@ -68,17 +126,11 @@ npx shadcn@latest init
 ```tsx
 import { Button } from "@/components/ui/button"
 
-<Button variant="default">Default</Button>
-<Button variant="destructive">Destructive</Button>
-<Button variant="outline">Outline</Button>
-<Button variant="secondary">Secondary</Button>
-<Button variant="ghost">Ghost</Button>
-<Button variant="link">Link</Button>
+// Variants: default, destructive, outline, secondary, ghost, link
+<Button variant="destructive">Delete</Button>
 
-// Sizes
-<Button size="sm">Small</Button>
-<Button size="lg">Large</Button>
-<Button size="icon"><Icon className="h-4 w-4" /></Button>
+// Sizes: default, sm, lg, icon
+<Button size="icon"><Trash className="h-4 w-4" /></Button>
 
 // Loading state
 <Button disabled>
@@ -137,7 +189,6 @@ export function LoginForm() {
 ### Dialog (Modal)
 
 ```tsx
-import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 <Dialog>
@@ -157,101 +208,21 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 </Dialog>
 ```
 
-### Select (Dropdown)
-
-```tsx
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
-<Select>
-  <SelectTrigger className="w-[180px]">
-    <SelectValue placeholder="Select option" />
-  </SelectTrigger>
-  <SelectContent>
-    <SelectItem value="one">Option One</SelectItem>
-    <SelectItem value="two">Option Two</SelectItem>
-  </SelectContent>
-</Select>
-```
-
 ### Toast Notifications
 
-Setup in root layout:
-```tsx
-import { Toaster } from "@/components/ui/toaster"
+Add `<Toaster />` to the root layout once (see `references/nextjs-integration.md`), then call `useToast` anywhere:
 
-export default function RootLayout({ children }) {
-  return (
-    <html><body>{children}<Toaster /></body></html>
-  )
-}
-```
-
-Usage:
 ```tsx
 import { useToast } from "@/components/ui/use-toast"
 
 const { toast } = useToast()
-
 toast({ title: "Success", description: "Changes saved." })
 toast({ variant: "destructive", title: "Error", description: "Something went wrong." })
 ```
 
-### Card with Form
-
-```tsx
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-
-<Card className="w-[350px]">
-  <CardHeader>
-    <CardTitle>Create project</CardTitle>
-    <CardDescription>Deploy in one click.</CardDescription>
-  </CardHeader>
-  <CardContent>
-    <div className="grid gap-4">
-      <div className="flex flex-col space-y-1.5">
-        <Label htmlFor="name">Name</Label>
-        <Input id="name" placeholder="Project name" />
-      </div>
-    </div>
-  </CardContent>
-  <CardFooter className="flex justify-between">
-    <Button variant="outline">Cancel</Button>
-    <Button>Deploy</Button>
-  </CardFooter>
-</Card>
-```
-
-### Table
-
-```tsx
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-
-<Table>
-  <TableHeader>
-    <TableRow>
-      <TableHead>Name</TableHead>
-      <TableHead>Status</TableHead>
-      <TableHead className="text-right">Amount</TableHead>
-    </TableRow>
-  </TableHeader>
-  <TableBody>
-    {data.map((row) => (
-      <TableRow key={row.id}>
-        <TableCell>{row.name}</TableCell>
-        <TableCell>{row.status}</TableCell>
-        <TableCell className="text-right">{row.amount}</TableCell>
-      </TableRow>
-    ))}
-  </TableBody>
-</Table>
-```
-
 ## Theming
 
-Customize via CSS variables in `globals.css`:
+Customise via CSS variables in `globals.css`:
 
 ```css
 :root {
@@ -265,15 +236,42 @@ Customize via CSS variables in `globals.css`:
 }
 ```
 
-See `references/configuration.md` for complete config files.
+See `references/configuration.md` for complete config files (TSConfig, Tailwind, CSS variables, dependencies).
 
 ## Best Practices
 
-1. **Accessibility**: Components use Radix UI primitives for ARIA compliance
-2. **Type Safety**: Use TypeScript with Zod schemas for validation
-3. **Customization**: Modify component files directly - you own the code
-4. **Consistency**: Reuse patterns and variants across your app
-5. **Dark Mode**: Use CSS variables with `.dark` class
+1. **Verify accessibility**: Run `get_audit_checklist` after adding components. Check keyboard navigation and screen reader output.
+2. **Validate with Zod**: Define a Zod schema for every form. Pass it to `zodResolver` in `useForm`.
+3. **Use `cn()` for all class merging**: Never concatenate class strings manually. `cn()` resolves Tailwind conflicts.
+4. **Keep server components default**: Only add `"use client"` when the component uses hooks, event handlers, or browser APIs. See `references/nextjs-integration.md`.
+5. **Theme with CSS variables**: Change colours in `globals.css` `:root` and `.dark` blocks. Do not hardcode colour values in components.
+
+<example>
+**Error handling in form submission**
+
+```tsx
+async function onSubmit(values: z.infer<typeof formSchema>) {
+  try {
+    const res = await fetch("/api/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    })
+    if (!res.ok) {
+      const data = await res.json()
+      toast({ variant: "destructive", title: "Submission failed", description: data.message ?? "Check your input and try again." })
+      return
+    }
+    toast({ title: "Saved", description: "Your changes have been saved." })
+    form.reset()
+  } catch {
+    toast({ variant: "destructive", title: "Network error", description: "Could not reach the server. Try again later." })
+  }
+}
+```
+</example>
+
+</instructions>
 
 ## References
 
@@ -281,12 +279,12 @@ All detailed documentation is in `references/`:
 
 | File | Content |
 |------|---------|
-| `configuration.md` | TSConfig, Tailwind config, CSS variables |
+| `configuration.md` | TSConfig, Tailwind config, CSS variables, dependencies |
 | `nextjs-integration.md` | App Router, Server Components, API routes |
-| `advanced-patterns.md` | Complex forms, custom variants, dialogs |
-| `cli-reference.md` | All CLI commands, installation, registries |
-| `extended-components.md` | Terminal, Dock, Credit Card, QR Code, etc. |
-| `learning-guide.md` | Learning path, exercises, best practices |
+| `advanced-patterns.md` | Complex forms, custom variants, dialog with forms, sheet nav |
+| `cli-reference.md` | All CLI commands, framework installs, registries |
+| `extended-components.md` | Terminal, Dock, Credit Card, QR Code, charts, animations, hooks |
+| `learning-guide.md` | Learning path, exercises, CVA and cn patterns |
 
 **External Links:**
 - Official Docs: https://ui.shadcn.com
