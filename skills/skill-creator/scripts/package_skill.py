@@ -14,6 +14,12 @@ import sys
 import zipfile
 import re
 from pathlib import Path
+
+# Ensure sibling scripts are importable when run from any directory
+_scripts_dir = str(Path(__file__).resolve().parent)
+if _scripts_dir not in sys.path:
+    sys.path.insert(0, _scripts_dir)
+
 from quick_validate import validate_skill
 from security_scan import calculate_skill_hash
 
@@ -86,7 +92,7 @@ def package_skill(skill_path, output_dir=None):
 
     # Step 1: Validate skill structure and metadata
     print("🔍 Step 1: Validating skill structure...")
-    valid, message = validate_skill(skill_path)
+    valid, message, _warnings = validate_skill(skill_path)
     if not valid:
         print(f"❌ FAILED: {message}")
         print("   Fix validation errors before packaging.")

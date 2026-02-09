@@ -30,7 +30,7 @@ Match instruction specificity to task fragility:
 1. **Start with a third-person verb** (e.g., "Guides...", "Provides...", "Analyzes...")
 2. **Include trigger keywords** that users might say to invoke the skill
 3. **Be specific** about what the skill does AND when to use it
-4. **Keep under 300 characters** for optimal display in skill listings
+4. **Keep under 300 characters** for optimal display in skill listings (hard limit: 1024)
 5. **Avoid generic phrases** like "helps with" or "assists in"
 
 **Good example:**

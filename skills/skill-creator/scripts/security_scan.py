@@ -124,8 +124,8 @@ def print_gitleaks_installation() -> None:
     print(f"It's used by GitHub, GitLab, and thousands of companies.\n")
     print(f"{BLUE}Installation:{RESET}")
     print(f"  macOS:     brew install gitleaks")
-    print(f"  Linux:     wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.2/gitleaks_8.18.2_linux_x64.tar.gz")
-    print(f"             tar -xzf gitleaks_8.18.2_linux_x64.tar.gz && sudo mv gitleaks /usr/local/bin/")
+    print(f"  Linux:     See https://github.com/gitleaks/gitleaks/releases/latest for the newest release")
+    print(f"             Download the tarball for your arch, extract, and move gitleaks to /usr/local/bin/")
     print(f"  Windows:   scoop install gitleaks")
     print(f"\nAfter installation, run this script again.\n")
 
@@ -205,8 +205,8 @@ def scan_file_patterns(file_path: Path, patterns: List[Dict]) -> List[SecurityIs
                             recommendation=pattern_def["recommendation"],
                         ))
 
-    except (UnicodeDecodeError, IOError):
-        pass
+    except (UnicodeDecodeError, IOError) as e:
+        print(f"  ⚠ Skipped {file_path.name}: {type(e).__name__}", file=sys.stderr)
 
     return issues
 
@@ -412,9 +412,8 @@ def calculate_skill_hash(skill_path: Path) -> str:
             content = file_path.read_bytes()
             hasher.update(content)
             hasher.update(b'\0')  # Null separator
-        except (IOError, UnicodeDecodeError):
-            # Skip files that can't be read
-            pass
+        except (IOError, UnicodeDecodeError) as e:
+            print(f"  ⚠ Skipped {file_path.name} during hashing: {type(e).__name__}", file=sys.stderr)
 
     return hasher.hexdigest()
 

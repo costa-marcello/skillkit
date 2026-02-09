@@ -3,11 +3,12 @@ name: skill-creator
 description: "Guides users through creating effective Claude Code skills with specialized knowledge, workflows, and tool integrations. Use when users want to create a new skill, update an existing skill, extract business logic into reusable packages, or ask about skill structure, frontmatter, or bundled resources."
 license: Complete terms in LICENSE.txt
 context: fork
+argument-hint: "[skill description or name]"
 ---
 
 # Skill Creator
 
-This skill provides guidance for creating effective skills.
+<context>
 
 ## About Skills
 
@@ -74,7 +75,7 @@ See `references/bundled_resources.md` for detailed guidance. Summary:
 - **`references/`**: Documentation loaded on-demand (schemas, policies, guides)
 - **`assets/`**: Output files (templates, images, fonts) not loaded into context
 
-**CRITICAL**: No absolute paths, personal info, or version numbers in SKILL.md. Use relative paths only.
+**CRITICAL** (for public distribution): No absolute paths, personal info, or version numbers in SKILL.md. Use relative paths only.
 
 ### Progressive Disclosure
 
@@ -86,44 +87,33 @@ Read `references/anthropic_best_practices_summary.md` before creating or updatin
 
 For complete official documentation: [Anthropic Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
 
+</context>
+
 ## CRITICAL: Edit Skills at Source Location
 
-**NEVER edit skills in `~/.claude/plugins/cache/`** — that's a read-only cache directory. All changes there are:
-- Lost when cache refreshes
-- Not synced to source control
-- Wasted effort requiring manual re-merge
-
-**ALWAYS verify you're editing the source repository:**
-```bash
-# WRONG - cache location (read-only copy)
-~/.claude/plugins/cache/daymade-skills/my-skill/1.0.0/my-skill/SKILL.md
-
-# RIGHT - source repository
-/path/to/your/claude-code-skills/my-skill/SKILL.md
-```
-
-**Before any edit**, confirm the file path does NOT contain `/cache/` or `/plugins/cache/`.
+**NEVER edit skills in `~/.claude/plugins/cache/`** — changes there are lost on cache refresh. Before any edit, confirm the file path does NOT contain `/cache/` or `/plugins/cache/`. Always edit the source repository copy.
 
 ## Skill Creation Process
 
 <instructions>
 
+**User input:** $ARGUMENTS
+
+If `$ARGUMENTS` is non-empty, treat it as the user's skill request. Extract the skill name, purpose, and any details provided. Skip Step 1 and proceed directly to Step 2 using the information given. Only ask clarifying questions if critical details are genuinely missing (e.g., no indication of what the skill should do at all).
+
+If `$ARGUMENTS` is empty, begin at Step 1.
+
 To create a skill, follow the "Skill Creation Process" in order, skipping steps only if there is a clear reason why they are not applicable.
 
 ### Step 1: Understanding the Skill with Concrete Examples
 
-Skip this step only when the skill's usage patterns are already clearly understood. It remains valuable even when working with an existing skill.
+**Skip this step when:** the user has already described what the skill should do (via arguments or prior context).
 
-To create an effective skill, clearly understand concrete examples of how the skill will be used. This understanding can come from either direct user examples or generated examples that are validated with user feedback.
+When the skill's usage patterns are not yet clear, gather concrete examples of how it will be used. Start with the most important question and follow up as needed:
 
-For example, when building an image-editor skill, relevant questions include:
-
-- "What functionality should the image-editor skill support? Editing, rotating, anything else?"
-- "Can you give some examples of how this skill would be used?"
-- "I can imagine users asking for things like 'Remove the red-eye from this image' or 'Rotate this image'. Are there other ways you imagine this skill being used?"
+- "What functionality should the skill support?"
+- "Can you give examples of how it would be used?"
 - "What would a user say that should trigger this skill?"
-
-To avoid overwhelming users, avoid asking too many questions in a single message. Start with the most important questions and follow up as needed for better effectiveness.
 
 Conclude this step when there is a clear sense of the functionality the skill should support.
 
@@ -150,22 +140,13 @@ At this point, it is time to actually create the skill.
 
 Skip this step only if the skill being developed already exists, and iteration or packaging is needed. In this case, continue to the next step.
 
-When creating a new skill from scratch, always run the `init_skill.py` script. The script conveniently generates a new template skill directory that automatically includes everything a skill requires, making the skill creation process much more efficient and reliable.
-
-Usage:
+When creating a new skill from scratch, run `init_skill.py` to generate a complete template:
 
 ```bash
 scripts/init_skill.py <skill-name> --path <output-directory>
 ```
 
-The script:
-
-- Creates the skill directory at the specified path
-- Generates a SKILL.md template with proper frontmatter and TODO placeholders
-- Creates example resource directories: `scripts/`, `references/`, and `assets/`
-- Adds example files in each directory that can be customized or deleted
-
-After initialization, customize or remove the generated SKILL.md and example files as needed.
+The script creates a skill directory with SKILL.md, frontmatter, resource directories, and example files. Customize or remove the generated files as needed.
 
 ### Step 4: Edit the Skill
 
@@ -247,70 +228,26 @@ Skip this step if:
    - Read through skill to ensure coherence
    - Confirm skill still functions correctly
 
-**Common replacements:**
-
-| Business-Specific | Generic Replacement |
-|-------------------|---------------------|
-| "Mercury Prepared" | "the project" |
-| "Reviewer Portal" | "the application" |
-| "Oliver will handle..." | "Alice will handle..." |
-| `REVIEW_RESULT` | `ORDER` |
-| `risk_level` | `status` |
-| "ultrathink" | "deep review" |
-| "后面再说" | "defer to later" |
+See `references/sanitization_checklist.md` for common replacement patterns.
 
 ### Step 6: Security Review
 
-Before packaging or distributing a skill, run the security scanner to detect hardcoded secrets and personal information:
+Before packaging or distributing a skill, run the security scanner:
 
 ```bash
-# Required before packaging
-python scripts/security_scan.py <path/to/skill-folder>
-
-# Verbose mode includes additional checks for paths, emails, and code patterns
-python scripts/security_scan.py <path/to/skill-folder> --verbose
+python scripts/security_scan.py <path/to/skill-folder>           # Quick scan (required)
+python scripts/security_scan.py <path/to/skill-folder> --verbose  # Detailed review
 ```
 
-**Detection coverage:**
-- Hardcoded secrets (API keys, passwords, tokens) via gitleaks
-- Personal information (usernames, emails, company names) in verbose mode
-- Unsafe code patterns (command injection risks) in verbose mode
-
-**First-time setup:** Install gitleaks if not present:
-
-```bash
-# macOS
-brew install gitleaks
-
-# Linux/Windows - see script output for installation instructions
-```
-
-**Exit codes:**
-- `0` - Clean (safe to package)
-- `1` - High severity issues
-- `2` - Critical issues (MUST fix before distribution)
-- `3` - gitleaks not installed
-- `4` - Scan error
-
-**Remediation for detected secrets:**
-
-1. Remove hardcoded secrets from all files
-2. Use environment variables: `os.environ.get("API_KEY")`
-3. Rotate credentials if previously committed to git
-4. Re-run scan to verify fixes before packaging
+Install gitleaks first if not present (`brew install gitleaks` on macOS). The script prints installation instructions and remediation guidance for any issues found.
 
 ### Step 7: Packaging a Skill
 
-Once the skill is ready, it should be packaged into a distributable zip file that gets shared with the user. The packaging process automatically validates the skill first to ensure it meets all requirements:
+Package the skill into a distributable zip. The script validates before packaging:
 
 ```bash
-scripts/package_skill.py <path/to/skill-folder>
-```
-
-Optional output directory specification:
-
-```bash
-scripts/package_skill.py <path/to/skill-folder> ./dist
+scripts/package_skill.py <path/to/skill-folder>            # Output to current dir
+scripts/package_skill.py <path/to/skill-folder> ./dist      # Output to ./dist
 ```
 
 The packaging script will:
