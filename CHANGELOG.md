@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Changed
+- Updated README to reflect 21 skills and added orla3-production skill entry to the skills table
 - Improved changelog skill with restructured SKILL.md
 - Improved docx skill with restructured SKILL.md and references
 - Improved ultrathink skill with domain-specific examples
