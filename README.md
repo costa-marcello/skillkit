@@ -4,7 +4,7 @@
   <p><strong>Skills and hooks for Claude Code</strong></p>
 
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-  [![Skills](https://img.shields.io/badge/Skills-20-8B5CF6)](skills/)
+  [![Skills](https://img.shields.io/badge/Skills-21-8B5CF6)](skills/)
   [![Hooks](https://img.shields.io/badge/Hooks-3-3B82F6)](hooks/)
 </div>
 
@@ -16,7 +16,7 @@ Claude Code is powerful out of the box. But ask it to create a Word document wit
 
 You end up writing long prompts, correcting mistakes, and re-doing work. Every session starts from zero.
 
-**Skillkit fixes this.** It gives Claude Code 20 specialist skills, each containing the exact workflows, decision trees, reference materials, and quality checks needed to do one job well. Instead of hoping Claude figures out the right approach, you give it a battle-tested playbook.
+**Skillkit fixes this.** It gives Claude Code 21 specialist skills, each containing the exact workflows, decision trees, reference materials, and quality checks needed to do one job well. Instead of hoping Claude figures out the right approach, you give it a battle-tested playbook.
 
 ## Why these skills are different
 
@@ -50,7 +50,7 @@ That is the full setup. No configuration files, no environment variables, no bui
 
 ---
 
-## All 20 skills
+## All 21 skills
 
 ### Documents and Data
 
@@ -216,7 +216,7 @@ Performs exhaustive multi-lens analysis through four universal perspectives: hum
 
 ### Meta (Skills about Skills)
 
-Six skills that manage the skillkit ecosystem itself: creating, reviewing, discovering, auditing, and documenting.
+Seven skills that manage the skillkit ecosystem itself: creating, reviewing, discovering, auditing, and documenting.
 
 <table>
 <tr>
@@ -277,6 +277,15 @@ Audits a codebase for production readiness across six dimensions: API completene
 
 </td>
 <td><code>npx skills add costa-marcello/skillkit/production-audit</code></td>
+</tr>
+<tr>
+<td><strong>orla3-production</strong></td>
+<td>
+
+A project-specific variant of the production audit skill. Audits a codebase for production readiness across the same six dimensions (API completeness, frontend-backend sync, security, scalability, infrastructure, and dead code/architecture) but tailored for project-specific conventions and tooling. Spawns parallel audit agents with detailed checklists, integrates with Semgrep MCP for automated vulnerability scanning, and produces structured reports with severity levels and file-level evidence. Use this when you need a production audit calibrated to a particular project's stack and standards.
+
+</td>
+<td><code>npx skills add costa-marcello/skillkit/orla3-production</code></td>
 </tr>
 </table>
 
