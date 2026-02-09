@@ -161,7 +161,7 @@ def markdown_to_pdf(md_file: str, pdf_file: str | None = None) -> str:
 
     # Create full HTML document
     full_html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>{md_path.stem}</title>

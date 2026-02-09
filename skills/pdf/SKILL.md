@@ -1,54 +1,134 @@
 ---
 name: pdf
-description: "Extracts text and tables from PDFs, creates new documents, merges/splits files, fills forms, and converts markdown to PDF. Use when working with PDF files, when the user mentions PDFs or document extraction, filling PDF forms, or converting markdown to PDF."
+description: "Extracts text and tables from PDFs, creates new documents, merges/splits files, fills forms, and converts markdown to PDF. Use when working with PDF files, when the user mentions PDFs, document extraction, form filling, OCR, or markdown-to-PDF conversion."
 license: MIT
 context: fork
+agent: general-purpose
 ---
 
-# PDF Processing Guide
+# PDF Processing
 
-## Workflow Decision Tree
+<instructions>
 
-### Reading/Extracting Content
-- **Text only**: Use pdfplumber or pdftotext CLI
-- **Tables to DataFrame**: Use pdfplumber with pandas
-- **Scanned PDFs (OCR)**: Use pytesseract + pdf2image
+## Step 1: Identify the Task
 
-### Creating New PDFs
-- Use reportlab (Canvas for simple, Platypus for complex)
+Match the user's request to one workflow. Default to **Extract Text** when unclear.
 
-### Modifying Existing PDFs
-- **Merge/Split/Rotate**: Use pypdf
-- **Add watermark**: Use pypdf merge_page()
-- **Password protect**: Use pypdf encrypt()
+| Task | Primary Tool | Fallback |
+|------|-------------|----------|
+| Extract text | pdfplumber | pdftotext CLI |
+| Extract tables to DataFrame | pdfplumber + pandas | -- |
+| OCR scanned PDFs | pytesseract + pdf2image | -- |
+| Create new PDF | reportlab (Platypus for complex, Canvas for simple) | -- |
+| Merge/split/rotate | pypdf | qpdf CLI |
+| Add watermark | pypdf merge_page() | -- |
+| Password protect/decrypt | pypdf encrypt()/qpdf | -- |
+| Fill PDF forms | Read `references/forms.md` and follow its steps | -- |
+| Markdown to PDF | `python scripts/md_to_pdf.py input.md output.pdf` | -- |
+| Batch markdown to PDF | `python scripts/batch_convert.py *.md --output-dir ./pdfs/` | -- |
+| Extract images | `pdfimages -j input.pdf output_prefix` (poppler-utils) | pypdfium2 |
+| Render pages to images | pypdfium2 | pdftoppm CLI |
 
-### Filling Forms
-- Read `references/forms.md` and follow its instructions
+## Step 2: Install Dependencies
 
-## Overview
+Check what is available before writing code:
 
-This guide covers essential PDF processing operations. For advanced features, JavaScript libraries, and detailed examples, see references/advanced-features.md.
-
-## Quick Start
-
-```python
-from pypdf import PdfReader, PdfWriter
-
-# Read a PDF
-reader = PdfReader("document.pdf")
-print(f"Pages: {len(reader.pages)}")
-
-# Extract text
-text = ""
-for page in reader.pages:
-    text += page.extract_text()
+```bash
+pip list 2>/dev/null | grep -iE "pypdf|pdfplumber|reportlab|pypdfium2|weasyprint|pytesseract|pdf2image"
+which pdftotext qpdf pdftk pdfimages 2>/dev/null
 ```
 
-## Python Libraries
+Install only what the task needs. Do not install everything.
 
-### pypdf - Basic Operations
+| Task | Install |
+|------|---------|
+| Text/table extraction | `pip install pdfplumber` |
+| OCR | `pip install pytesseract pdf2image` + system poppler |
+| Merge/split/rotate/encrypt | `pip install pypdf` |
+| Create PDFs | `pip install reportlab` |
+| Render to images | `pip install pypdfium2` |
+| Markdown to PDF | `pip install weasyprint markdown` |
 
-#### Merge PDFs
+## Step 3: Execute the Workflow
+
+Use the code patterns in `references/cookbook.md` for implementation details.
+Use `references/advanced-features.md` for pypdfium2, pdf-lib (JS), and advanced CLI operations.
+
+### Validation Checkpoints
+
+Run these checks at each stage:
+
+**After extraction:**
+```python
+text = page.extract_text()
+if not text or len(text.strip()) < 10:
+    # PDF may be scanned -- fall back to OCR
+    print(f"Page {i+1}: no text found, switching to OCR")
+```
+
+**After merge/split:**
+```python
+result = PdfReader("output.pdf")
+print(f"Output has {len(result.pages)} pages")
+# Verify page count matches expectation
+```
+
+**After form fill:**
+Run the validation scripts described in `references/forms.md` before delivering the output.
+
+**After markdown-to-PDF:**
+```python
+import os
+output_size = os.path.getsize("output.pdf")
+print(f"Generated PDF: {output_size} bytes")
+if output_size < 500:
+    print("Warning: PDF seems too small, check for conversion errors")
+```
+
+## Step 4: Deliver Results
+
+- Report what was done: page count, text length, file size.
+- If OCR was used, warn the user about potential accuracy issues.
+- For form fills, note which fields were populated and which were skipped.
+
+</instructions>
+
+<examples>
+
+<example>
+**User:** "Extract all the tables from this PDF and save as Excel"
+
+**Steps:**
+1. Install pdfplumber and pandas.
+2. Extract tables from each page.
+3. Validate each table has rows before saving.
+4. Combine and export to Excel.
+
+```python
+import pdfplumber
+import pandas as pd
+
+with pdfplumber.open("document.pdf") as pdf:
+    all_tables = []
+    for i, page in enumerate(pdf.pages):
+        tables = page.extract_tables()
+        for table in tables:
+            if table and len(table) > 1:
+                df = pd.DataFrame(table[1:], columns=table[0])
+                all_tables.append(df)
+                print(f"Page {i+1}: extracted table with {len(df)} rows")
+    if all_tables:
+        combined = pd.concat(all_tables, ignore_index=True)
+        combined.to_excel("tables.xlsx", index=False)
+        print(f"Saved {len(combined)} total rows to tables.xlsx")
+    else:
+        print("No tables found in this PDF")
+```
+</example>
+
+<example>
+**User:** "Merge these three PDFs into one"
+
 ```python
 from pypdf import PdfWriter, PdfReader
 
@@ -57,266 +137,78 @@ for pdf_file in ["doc1.pdf", "doc2.pdf", "doc3.pdf"]:
     reader = PdfReader(pdf_file)
     for page in reader.pages:
         writer.add_page(page)
+    print(f"Added {len(reader.pages)} pages from {pdf_file}")
 
 with open("merged.pdf", "wb") as output:
     writer.write(output)
-```
 
-#### Split PDF
+# Verify
+result = PdfReader("merged.pdf")
+print(f"Merged PDF has {len(result.pages)} pages")
+```
+</example>
+
+<example>
+**User:** "This PDF is scanned, I need the text"
+
 ```python
-reader = PdfReader("input.pdf")
-for i, page in enumerate(reader.pages):
-    writer = PdfWriter()
-    writer.add_page(page)
-    with open(f"page_{i+1}.pdf", "wb") as output:
-        writer.write(output)
-```
-
-#### Extract Metadata
-```python
-reader = PdfReader("document.pdf")
-meta = reader.metadata
-print(f"Title: {meta.title}")
-print(f"Author: {meta.author}")
-print(f"Subject: {meta.subject}")
-print(f"Creator: {meta.creator}")
-```
-
-#### Rotate Pages
-```python
-reader = PdfReader("input.pdf")
-writer = PdfWriter()
-
-page = reader.pages[0]
-page.rotate(90)  # Rotate 90 degrees clockwise
-writer.add_page(page)
-
-with open("rotated.pdf", "wb") as output:
-    writer.write(output)
-```
-
-### pdfplumber - Text and Table Extraction
-
-#### Extract Text with Layout
-```python
-import pdfplumber
-
-with pdfplumber.open("document.pdf") as pdf:
-    for page in pdf.pages:
-        text = page.extract_text()
-        print(text)
-```
-
-#### Extract Tables
-```python
-with pdfplumber.open("document.pdf") as pdf:
-    for i, page in enumerate(pdf.pages):
-        tables = page.extract_tables()
-        for j, table in enumerate(tables):
-            print(f"Table {j+1} on page {i+1}:")
-            for row in table:
-                print(row)
-```
-
-#### Advanced Table Extraction
-```python
-import pandas as pd
-
-with pdfplumber.open("document.pdf") as pdf:
-    all_tables = []
-    for page in pdf.pages:
-        tables = page.extract_tables()
-        for table in tables:
-            if table:  # Check if table is not empty
-                df = pd.DataFrame(table[1:], columns=table[0])
-                all_tables.append(df)
-
-# Combine all tables
-if all_tables:
-    combined_df = pd.concat(all_tables, ignore_index=True)
-    combined_df.to_excel("extracted_tables.xlsx", index=False)
-```
-
-### reportlab - Create PDFs
-
-#### Basic PDF Creation
-```python
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-
-c = canvas.Canvas("hello.pdf", pagesize=letter)
-width, height = letter
-
-# Add text
-c.drawString(100, height - 100, "Hello World!")
-c.drawString(100, height - 120, "This is a PDF created with reportlab")
-
-# Add a line
-c.line(100, height - 140, 400, height - 140)
-
-# Save
-c.save()
-```
-
-#### Create PDF with Multiple Pages
-```python
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
-from reportlab.lib.styles import getSampleStyleSheet
-
-doc = SimpleDocTemplate("report.pdf", pagesize=letter)
-styles = getSampleStyleSheet()
-story = []
-
-# Add content
-title = Paragraph("Report Title", styles['Title'])
-story.append(title)
-story.append(Spacer(1, 12))
-
-body = Paragraph("This is the body of the report. " * 20, styles['Normal'])
-story.append(body)
-story.append(PageBreak())
-
-# Page 2
-story.append(Paragraph("Page 2", styles['Heading1']))
-story.append(Paragraph("Content for page 2", styles['Normal']))
-
-# Build PDF
-doc.build(story)
-```
-
-## Creating PDFs from Markdown
-
-For markdown→PDF with professional typography and Chinese support:
-
-```bash
-export DYLD_LIBRARY_PATH=$(brew --prefix)/lib
-python scripts/md_to_pdf.py input.md output.pdf
-```
-
-Batch conversion:
-```bash
-python scripts/batch_convert.py *.md --output-dir ./pdfs/
-```
-
-**Requirements:** `pip install weasyprint markdown`
-
-**Features:**
-- A4 page size with proper margins
-- Chinese fonts: Songti SC (body), Heiti SC (headings)
-- Supports: tables, code blocks, TOC, fenced code
-- Professional typography with 1.8 line height
-
-## Command-Line Tools
-
-### pdftotext (poppler-utils)
-```bash
-# Extract text
-pdftotext input.pdf output.txt
-
-# Extract text preserving layout
-pdftotext -layout input.pdf output.txt
-
-# Extract specific pages
-pdftotext -f 1 -l 5 input.pdf output.txt  # Pages 1-5
-```
-
-### qpdf
-```bash
-# Merge PDFs
-qpdf --empty --pages file1.pdf file2.pdf -- merged.pdf
-
-# Split pages
-qpdf input.pdf --pages . 1-5 -- pages1-5.pdf
-qpdf input.pdf --pages . 6-10 -- pages6-10.pdf
-
-# Rotate pages
-qpdf input.pdf output.pdf --rotate=+90:1  # Rotate page 1 by 90 degrees
-
-# Remove password
-qpdf --password=mypassword --decrypt encrypted.pdf decrypted.pdf
-```
-
-### pdftk (if available)
-```bash
-# Merge
-pdftk file1.pdf file2.pdf cat output merged.pdf
-
-# Split
-pdftk input.pdf burst
-
-# Rotate
-pdftk input.pdf rotate 1east output rotated.pdf
-```
-
-## Common Tasks
-
-### Extract Text from Scanned PDFs
-```python
-# Requires: pip install pytesseract pdf2image
 import pytesseract
 from pdf2image import convert_from_path
 
-# Convert PDF to images
-images = convert_from_path('scanned.pdf')
-
-# OCR each page
+images = convert_from_path("scanned.pdf", dpi=300)
 text = ""
 for i, image in enumerate(images):
-    text += f"Page {i+1}:\n"
-    text += pytesseract.image_to_string(image)
-    text += "\n\n"
+    page_text = pytesseract.image_to_string(image)
+    text += page_text
+    print(f"Page {i+1}: extracted {len(page_text)} characters")
 
-print(text)
+with open("extracted.txt", "w") as f:
+    f.write(text)
+print(f"Total: {len(text)} characters. Review for OCR errors.")
 ```
+</example>
 
-### Add Watermark
-```python
-from pypdf import PdfReader, PdfWriter
+<example>
+**User:** "Convert this markdown file to PDF"
 
-# Create watermark (or load existing)
-watermark = PdfReader("watermark.pdf").pages[0]
-
-# Apply to all pages
-reader = PdfReader("document.pdf")
-writer = PdfWriter()
-
-for page in reader.pages:
-    page.merge_page(watermark)
-    writer.add_page(page)
-
-with open("watermarked.pdf", "wb") as output:
-    writer.write(output)
-```
-
-### Extract Images
 ```bash
-# Using pdfimages (poppler-utils)
-pdfimages -j input.pdf output_prefix
-
-# This extracts all images as output_prefix-000.jpg, output_prefix-001.jpg, etc.
+# macOS may need: export DYLD_LIBRARY_PATH=$(brew --prefix)/lib
+python scripts/md_to_pdf.py report.md report.pdf
 ```
 
-### Password Protection
-```python
-from pypdf import PdfReader, PdfWriter
+Features: A4 pages, proper margins, table/code support, Chinese font fallback.
+For batch conversion: `python scripts/batch_convert.py *.md --output-dir ./pdfs/`
+</example>
 
-reader = PdfReader("input.pdf")
-writer = PdfWriter()
+<example>
+**User:** "Fill out this PDF form with my details"
 
-for page in reader.pages:
-    writer.add_page(page)
+Follow the complete workflow in `references/forms.md`. Summary:
+1. Check if the PDF has fillable fields: `python scripts/check_fillable_fields.py form.pdf`
+2. If fillable: extract field info, create values JSON, run fill script.
+3. If not fillable: convert to images, identify fields visually, create bounding boxes, validate, fill with annotations.
+</example>
 
-# Add password
-writer.encrypt("userpassword", "ownerpassword")
+</examples>
 
-with open("encrypted.pdf", "wb") as output:
-    writer.write(output)
-```
+## References
 
-## Next Steps
+| File | Purpose |
+|------|---------|
+| `references/cookbook.md` | Python and CLI code patterns for all PDF operations |
+| `references/advanced-features.md` | pypdfium2, pdf-lib (JS), advanced CLI, performance tips |
+| `references/forms.md` | Complete form-filling workflow (fillable and non-fillable PDFs) |
 
-- For advanced pypdfium2 usage, see references/advanced-features.md
-- For JavaScript libraries (pdf-lib), see references/advanced-features.md
-- If you need to fill out a PDF form, follow the instructions in references/forms.md
-- For troubleshooting guides, see references/advanced-features.md
+## Scripts
+
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `scripts/md_to_pdf.py` | Markdown to PDF with Chinese font support | `python scripts/md_to_pdf.py input.md [output.pdf]` |
+| `scripts/batch_convert.py` | Batch markdown to PDF | `python scripts/batch_convert.py *.md [--output-dir dir]` |
+| `scripts/check_fillable_fields.py` | Check if PDF has fillable form fields | `python scripts/check_fillable_fields.py input.pdf` |
+| `scripts/extract_form_field_info.py` | Extract form field metadata to JSON | `python scripts/extract_form_field_info.py input.pdf output.json` |
+| `scripts/fill_fillable_fields.py` | Fill fillable PDF form fields | `python scripts/fill_fillable_fields.py input.pdf values.json output.pdf` |
+| `scripts/fill_pdf_form_with_annotations.py` | Fill non-fillable PDFs with text annotations | `python scripts/fill_pdf_form_with_annotations.py input.pdf fields.json output.pdf` |
+| `scripts/convert_pdf_to_images.py` | Convert PDF pages to PNG images | `python scripts/convert_pdf_to_images.py input.pdf output_dir` |
+| `scripts/create_validation_image.py` | Create bounding box validation images | `python scripts/create_validation_image.py page_num fields.json input.png output.png` |
+| `scripts/check_bounding_boxes.py` | Validate bounding boxes do not overlap | `python scripts/check_bounding_boxes.py fields.json` |
