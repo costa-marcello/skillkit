@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <filter id="s" x="-8%" y="-8%" width="116%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#4F46E5" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Hexagon: pointy-top, centred at 60,54 (shifted up slightly for visual balance with shadow) -->
+  <path d="M60 6 L106 32 L106 76 L60 102 L14 76 L14 32 Z"
+        fill="url(#g)" filter="url(#s)"/>
+
+  <!-- Subtle inner bevel -->
+  <path d="M60 14 L99 36 L99 72 L60 94 L21 72 L21 36 Z"
+        fill="none" stroke="white" stroke-opacity="0.1" stroke-width="0.8"/>
+
+  <!-- Three stacked skill-module blocks in an S-arrangement -->
+  <!-- Top module (right-aligned) -->
+  <rect x="48" y="30" width="30" height="12" rx="3.5" fill="white" fill-opacity="0.95"/>
+  <!-- Middle module (left-aligned) -->
+  <rect x="36" y="48" width="30" height="12" rx="3.5" fill="white" fill-opacity="0.85"/>
+  <!-- Bottom module (right-aligned) -->
+  <rect x="48" y="66" width="30" height="12" rx="3.5" fill="white" fill-opacity="0.75"/>
+
+  <!-- Flow connectors: curved paths linking the modules -->
+  <path d="M56 42 C56 45, 50 45, 50 48"
+        fill="none" stroke="white" stroke-opacity="0.65" stroke-width="2" stroke-linecap="round"/>
+  <path d="M54 60 C54 63, 60 63, 60 66"
+        fill="none" stroke="white" stroke-opacity="0.55" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Small dot accents on each module (like a drag handle / skill icon) -->
+  <circle cx="53" cy="36" r="1.5" fill="url(#g)" opacity="0.5"/>
+  <circle cx="58" cy="36" r="1.5" fill="url(#g)" opacity="0.5"/>
+  <circle cx="41" cy="54" r="1.5" fill="url(#g)" opacity="0.5"/>
+  <circle cx="46" cy="54" r="1.5" fill="url(#g)" opacity="0.5"/>
+  <circle cx="53" cy="72" r="1.5" fill="url(#g)" opacity="0.5"/>
+  <circle cx="58" cy="72" r="1.5" fill="url(#g)" opacity="0.5"/>
+
+  <!-- Spark diamonds: energy/extension motif -->
+  <polygon points="84,24 88,28 84,32 80,28" fill="white" fill-opacity="0.65"/>
+  <polygon points="92,17 94,19 92,21 90,19" fill="white" fill-opacity="0.4"/>
+</svg>
