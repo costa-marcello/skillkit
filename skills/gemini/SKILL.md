@@ -8,7 +8,7 @@ context: fork
 
 ## When to Use Gemini
 
-- **Frontend Development**: Building UI components and pages (Gemini 3 Pro produces exceptional frontend quality)
+- **Frontend Development**: Building UI components and pages (Gemini 3 Pro produces exceptional frontend quality). When the `frontend-design` skill is installed, load it and pass its guidelines to Gemini for design-driven results.
 - **Code Review**: Comprehensive reviews across multiple files
 - **Plan Review**: Analysing architectural plans, technical specifications, or project roadmaps
 - **Big Context Processing**: Tasks requiring >200k tokens of context (entire codebases, documentation sets)
@@ -41,6 +41,16 @@ context: fork
 5. Run the command and capture the output.
 
 6. After Gemini completes, inform the user: "The Gemini analysis is complete. You can start a new Gemini session for follow-up analysis."
+
+### Frontend Design Integration
+
+Gemini 3 Pro is exceptionally strong at frontend design. When the task involves building UI components, pages, or visual interfaces:
+
+1. Check whether the `frontend-design` skill is installed.
+2. If installed, load it and include its design guidelines (typography, colour, motion, accessibility) in the prompt sent to Gemini. This gives Gemini concrete aesthetic direction and prevents generic "AI slop" output.
+3. If not installed, proceed with Gemini alone -- it still produces high-quality frontend code, but without the opinionated design system the `frontend-design` skill provides.
+
+The combination works well because Gemini 3 Pro handles complex UI reasoning and the `frontend-design` skill supplies the design constraints that turn competent code into distinctive interfaces.
 
 ### Task Checklist
 
@@ -120,6 +130,8 @@ timeout 300 gemini -m gemini-3-pro-preview --approval-mode yolo \
 <example>
 **User**: "Build a responsive dashboard component"
 
+**Claude checks**: `frontend-design` skill is installed. Loads it and extracts design guidelines.
+
 **Claude assembles**:
 ```bash
 timeout 300 gemini -m gemini-3-pro-preview --approval-mode yolo \
@@ -127,10 +139,17 @@ timeout 300 gemini -m gemini-3-pro-preview --approval-mode yolo \
    1. Clean, modern UI design
    2. Smooth animations and transitions
    3. Accessible markup (ARIA labels, keyboard navigation)
-   4. Mobile-first responsive layout"
+   4. Mobile-first responsive layout
+
+   Design constraints (from frontend-design skill):
+   - Use distinctive typography (avoid Inter/Roboto/Arial)
+   - Define colours as CSS custom properties, no hardcoded hex
+   - Add entry animations and hover/scroll interactions
+   - Respect prefers-reduced-motion
+   - Every element must earn its place"
 ```
 
-**After completion**: Reviews generated code with `git diff`, verifies accessibility, then reports results.
+**After completion**: Reviews generated code with `git diff`, verifies accessibility and design quality, then reports results.
 </example>
 
 <example>
