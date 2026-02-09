@@ -51,7 +51,6 @@ When invoked without arguments, automatically detect and execute:
 5. Categorize commits using Conventional Commits mapping (see references/changelog_format.md)
 6. Generate CHANGELOG.md with:
    - Header explaining the format
-   - Link to Keep a Changelog
    - Unreleased section with categorized changes
    - Version sections for each existing tag (if any)
    - Footer links to GitHub comparisons
@@ -128,9 +127,6 @@ Generate changelog following this structure:
 # Changelog
 
 All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
