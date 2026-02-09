@@ -4,7 +4,7 @@ description: "Generates and updates CHANGELOG.md files from git history using Ke
 context: fork
 agent: general-purpose
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash(git *)
-argument-hint: "[version or date-range or 'update']"
+argument-hint: "[release or date-range]"
 ---
 
 # Changelog
@@ -34,11 +34,11 @@ When invoked without arguments, automatically detect and execute:
     |               +-- YES --> Update Unreleased section
     |               +-- NO  --> Report "Changelog is up to date"
     |
-/changelog [version]     --> Convert Unreleased to version release
+/changelog release       --> Auto-detect version from commits, convert Unreleased to release
 /changelog [date range]  --> Generate entries for specific period
 ```
 
-**Default behavior requires zero input** — just run `/changelog` and the right thing happens.
+**Default behaviour requires zero input.** Run `/changelog` and the correct action runs automatically.
 
 <instructions>
 
@@ -72,11 +72,16 @@ When invoked without arguments, automatically detect and execute:
 
 ## Generating a Release Entry
 
-1. Gather commits for the release range
-2. Group by change type (Added, Changed, Fixed, etc.)
-3. Filter noise (merge commits, CI/CD changes, refactors unless significant)
-4. Translate technical commits to user-friendly descriptions
-5. Format as new version section with ISO 8601 date
+When the user runs `/changelog release` or asks to create a release:
+
+1. Auto-detect the next version (see Version Auto-Detection below)
+2. Gather commits since the last tag
+3. Group by change type (Added, Changed, Fixed, etc.)
+4. Filter noise (merge commits, CI/CD changes, refactors unless significant)
+5. Translate technical commits to user-friendly descriptions
+6. Convert the Unreleased section to the auto-detected version with today's date
+7. Create a fresh empty Unreleased section above
+8. Update footer comparison links
 
 ## Git Analysis Commands
 
@@ -114,6 +119,46 @@ Map Conventional Commits prefixes to Keep a Changelog sections. See `references/
 Translate technical commits to user-friendly language:
 - `fix(auth): resolve JWT expiry edge case` -> "Fixed session timeout issues for long-running sessions"
 - `feat(api): add /users endpoint` -> "Added user management API endpoints"
+
+## Version Auto-Detection
+
+Automatically detects the next version from commits since the last tag. Runs as part of every changelog action.
+
+**Step 1: Get the current version**
+
+```bash
+git tag --sort=-v:refname | head -1
+```
+
+If no tags exist, treat the current version as `0.0.0`.
+
+**Step 2: Scan commits since last tag for the highest bump signal**
+
+Check all commits since the last tag using `git log --pretty=format:"%s%n%b" <last-tag>..HEAD`. Apply the highest-priority rule that matches:
+
+| Priority | Signal | Bump |
+|----------|--------|------|
+| 1 | Breaking change -- BREAKING CHANGE in body/footer, or type! suffix (feat!, fix!) | Major |
+| 2 | New feature -- feat or feat(scope) prefix | Minor |
+| 3 | Bug fix or improvement -- fix, perf, or other included types | Patch |
+
+If all commits were filtered (docs, test, ci, chore only), output "No release needed" instead of a version.
+
+**Step 3: Output**
+
+For `/changelog` (create/update), append a version suggestion after the changelog summary:
+
+```
+Next version: X.Y.Z (bump -- reason)
+Commits since vCURRENT: N total (N included, N filtered)
+
+To release:
+  git tag vX.Y.Z && git push --tags
+```
+
+For `/changelog release`, use the auto-detected version directly to create the release entry. Do not ask the user for a version number.
+
+See `references/changelog_format.md` for the full version detection rules and edge cases.
 
 </instructions>
 
@@ -159,9 +204,9 @@ All notable changes to this project will be documented in this file.
 </example>
 
 <example>
-**User request**: "Update changelog for v2.0.0 release"
-**Action**: Gather commits since last tag, move Unreleased to new version section, add release date
-**Output**: Updated CHANGELOG.md with new `## [2.0.0] - YYYY-MM-DD` section
+**User request**: `/changelog release`
+**Action**: Auto-detect version from commits (e.g. feat commits = minor bump), move Unreleased to new version section with today's date
+**Output**: Updated CHANGELOG.md with auto-detected version (e.g. `## [2.1.0] - 2024-03-15`)
 </example>
 
 <example>
