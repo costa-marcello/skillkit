@@ -5,7 +5,7 @@ Optional dependency for automated validation scripts.
 ## Installation
 
 ```bash
-npx skills add costa-marcello/skillkit/create-skill
+npx skills add costa-marcello/skillkit -s create-skill
 ```
 
 Check the create-skill is available after installation:
