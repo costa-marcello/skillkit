@@ -1,13 +1,13 @@
 ---
 name: claude-md
-version: 1.0.0
-description: Manages CLAUDE.md files — audits, reviews, improves, refactors, and generates subdirectory context. Discovers all CLAUDE.md files, evaluates quality against research-backed criteria, generates improvement reports, applies targeted updates, restructures using progressive disclosure, and creates contextual CLAUDE.md files for directories that benefit from instant context. Use for "audit CLAUDE.md", "review my rules", "improve instructions", "organize Claude config", "generate subdirectory context", or "CLAUDE.md maintenance".
-tools: Read, Glob, Grep, Bash, Edit
+description: Manages CLAUDE.md files. Audits, reviews, improves, refactors, and generates subdirectory context. Discovers all CLAUDE.md files, evaluates quality against research-backed criteria, generates improvement reports, applies targeted updates, restructures using progressive disclosure, and creates contextual CLAUDE.md files for directories that benefit from instant context. Use when the user says "audit CLAUDE.md", "review my rules", "improve instructions", "organize Claude config", "generate subdirectory context", or "CLAUDE.md maintenance".
+allowed-tools: Read, Glob, Grep, Bash, Edit
 license: MIT
 context: fork
+agent: general-purpose
 ---
 
-<!-- v1.0.0 | 2026-01-30 -->
+<!-- v1.1.0 | 2026-02-09 -->
 
 # Claude MD
 
@@ -378,7 +378,7 @@ Express routes with Zod validation. All routes require auth middleware.
 
 #### Phase G5: User Approval
 
-**CRITICAL:** Never create files without user confirmation.
+Never create files without user confirmation.
 
 Present options:
 1. Approve all proposed files
@@ -401,142 +401,19 @@ See [references/generation-workflow.md](references/generation-workflow.md) for d
 
 ---
 
-## Research-Backed Principles
-
-See [references/research-principles.md](references/research-principles.md) for detailed research findings on:
-- Anthropic's preference for reasoning over rules
-- Academic evidence that hybrid format (directive + reasoning) is optimal
-- The optimal table format with Rule | Bad | Good | Why columns
-
----
-
-## Rule Quality Standards
-
-### What Makes a High-Quality Rule
-
-| Dimension | Bad | Good |
-|-----------|-----|------|
-| **Clarity** | "Be careful with auth" | "Auth errors fail immediately—retrying won't fix and wastes quota" |
-| **Reasoning** | "Never use any" | "Use `unknown` + narrowing—preserves type safety through the codebase" |
-| **Positive framing** | "Don't hardcode URLs" | "Read URLs from config—avoids hitting wrong environment" |
-| **Specificity** | "Write good tests" | "Test behavior, not implementation—tests should survive refactoring" |
-| **Examples** | (abstract) | Include Bad/Good columns in tables |
-
-### The Hybrid Format
-
-Anthropic research shows this format is most effective:
-
-```
-Directive + Brief Reasoning (1-2 sentences)
-```
-
-**Patterns that work:**
-
-| Pattern | Example | Best For |
-|---------|---------|----------|
-| **Table with Why** | `\| Rule \| Why \|` | Hard rules, reference docs |
-| **Inline dash** | "Prefer X — it provides Y benefit" | Principles, guidelines |
-| **Because clause** | "Do X because Y" | Prose instructions |
-| **Bad/Good/Why table** | Full 4-column table | Complex patterns with anti-patterns |
-
-### Transformation Examples
-
-| Before (Rule-only) | After (Hybrid) |
-|--------------------|----------------|
-| "Never commit secrets" | "Never commit secrets — in git history forever; rotation expensive" |
-| "Use TypeScript" | "Use TypeScript — static types catch errors at compile time" |
-| "Don't use any" | "Use `unknown` + narrowing — preserves type safety" |
-| "Write tests" | "Test behavior, not implementation — tests should survive refactoring" |
-| "Handle errors" | "Catch at boundaries (API routes, handlers) — bubble up otherwise" |
-
-### Positive Reframing
-
-| Negative (Less Effective) | Positive (More Effective) |
-|---------------------------|---------------------------|
-| "Don't hardcode URLs" | "Read URLs from config — avoids wrong environment" |
-| "Never use console.log" | "Use structured logger — enables filtering and persistence" |
-| "Avoid magic numbers" | "Extract constants with descriptive names — self-documenting" |
-| "Don't skip tests" | "Run quality gate after changes — format → lint → typecheck → test" |
-
----
-
-## What Makes a Great CLAUDE.md
-
-**Key principles:**
-- Concise and human-readable
-- Actionable commands that can be copy-pasted
-- Project-specific patterns, not generic advice
-- Non-obvious gotchas and warnings
-- Rules include reasoning ("why")
-
-**Recommended sections** (use only what's relevant):
-- Commands (build, test, dev, lint)
-- Architecture (directory structure)
-- Key Files (entry points, config)
-- Code Style (project conventions)
-- Environment (required vars, setup)
-- Testing (commands, patterns)
-- Gotchas (quirks, common mistakes)
-- Workflow (when to do what)
-- Hard Rules (with reasoning)
-- Core Principles (with reasoning)
-
----
-
-## Common Issues to Flag
-
-1. **Stale commands**: Build commands that no longer work
-2. **Missing dependencies**: Required tools not mentioned
-3. **Outdated architecture**: File structure that's changed
-4. **Missing environment setup**: Required env vars or config
-5. **Broken test commands**: Test scripts that have changed
-6. **Undocumented gotchas**: Non-obvious patterns not captured
-7. **Rules without reasoning**: "Do X" without "because Y"
-8. **Vague instructions**: "Be careful" without specifics
-9. **Negative-only framing**: "Don't X" without positive alternative
-10. **Conflicting rules**: Two rules that contradict each other
-
----
-
-## IMPORTANT — What to NEVER Delete
-
-| Keep | Why (Research-backed) |
-|------|----------------------|
-| Safety reminders ("never commit secrets") | Repetition improves compliance (industry research, as of v1.0) |
-| Rules with reasoning ("X — because Y") | Context improves generalization (Anthropic documentation) |
-| Priority hierarchies | Models struggle with implicit priority (LLM prompting research) |
-| Critical rules even if "obvious" | Training patterns need override reinforcement |
-
----
-
-## Execution Checklists
-
-See [references/execution-checklists.md](references/execution-checklists.md) for mode-specific execution checklists (Audit, Review, Improve, Refactor).
-
----
-
-## Anti-Patterns
-
-See [references/anti-patterns.md](references/anti-patterns.md) for common mistakes to avoid.
-
----
-
-## User Tips to Share
-
-See [references/user-tips.md](references/user-tips.md) for shortcuts and features to share with users.
-
----
-
 ## References
 
-See `references/` for detailed documentation:
-- `research-principles.md` — Anthropic and academic research findings
-- `quality-criteria.md` — Detailed quality assessment criteria
-- `templates.md` — CLAUDE.md templates for various project types
-- `examples.md` — Before/after transformation examples
-- `anti-patterns.md` — Common mistakes to avoid
-- `user-tips.md` — Shortcuts and features to share
-- `execution-checklists.md` — Mode-specific execution checklists
-- `generation-workflow.md` — Detailed Generate mode algorithm and heuristics
-- `subfolder-examples.md` — Real-world subfolder CLAUDE.md examples
-- `changelog.md` — Version history and update protocol
+| File | Purpose |
+|------|---------|
+| `references/research-principles.md` | Anthropic and academic research findings on reasoning vs rules |
+| `references/rule-quality-standards.md` | Hybrid format, transformation examples, positive reframing, preservation rules |
+| `references/quality-criteria.md` | 100-point scoring rubric and rule quality dimensions |
+| `references/templates.md` | CLAUDE.md templates for root, subfolder, monorepo, and rule files |
+| `references/examples.md` | Before/after refactoring transformations |
+| `references/anti-patterns.md` | Common mistakes to avoid when writing CLAUDE.md files |
+| `references/user-tips.md` | Shortcuts and features to share with users |
+| `references/execution-checklists.md` | Mode-specific progress checklists (Audit, Review, Improve, Refactor, Generate) |
+| `references/generation-workflow.md` | Detailed Generate mode scoring algorithm and extraction heuristics |
+| `references/subfolder-examples.md` | Real-world subfolder CLAUDE.md examples |
+| `references/update-guidelines.md` | What to add vs what to skip when updating CLAUDE.md files |
+| `references/changelog.md` | Version history and update protocol |

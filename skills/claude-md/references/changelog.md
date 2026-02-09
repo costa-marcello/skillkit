@@ -4,6 +4,22 @@ All notable changes to the claude-md skill are documented here.
 
 ---
 
+## [1.1.0] - 2026-02-09
+
+### Changed
+- Extracted "Rule Quality Standards", "What Makes a Great CLAUDE.md", "Common Issues to Flag", and "What to NEVER Delete" sections from SKILL.md to `references/rule-quality-standards.md`. Reduced line count from 542 to 419.
+- Replaced `tools` with `allowed-tools` in frontmatter (correct field name).
+- Removed non-standard `version` field from frontmatter.
+- Added `agent: general-purpose` to frontmatter (required with `context: fork` for write-capable skills).
+- Fixed description: replaced em dash with period, added "Use when" trigger phrasing.
+- Replaced `CRITICAL:` over-specification with natural language.
+- Consolidated References section into a single table with file purposes.
+
+### Added
+- `references/rule-quality-standards.md` -- hybrid format, transformation examples, positive reframing, preservation rules.
+
+---
+
 ## [1.0.0] - 2026-01-30
 
 ### Initial Release
@@ -41,7 +57,7 @@ Before releasing updates:
 1. Run the skill against a sample CLAUDE.md file
 2. Verify all four modes produce expected output
 3. Check that references load correctly
-4. Validate line counts remain under targets (SKILL.md < 450 lines)
+4. Validate line counts remain under targets (SKILL.md < 500 lines)
 
 ### Documenting Changes
 - Add entry at top of this file (newest first)
