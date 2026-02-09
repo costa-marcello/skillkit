@@ -8,7 +8,7 @@ context: fork
 
 ## When to Use
 
-- **Pre-launch assessment**: Codebase is 60-90% complete and needs gap analysis before production
+- **Pre-launch assessment**: Codebase has core features working and needs gap analysis before production
 - **Multi-agent cleanup**: Project built across multiple AI sessions with likely accumulated patchwork
 - **Security review**: Auth, validation, and injection audit before exposing to real users
 - **Scalability check**: Preparing for significant user load and need to find query issues, missing indexes, caching gaps
@@ -179,7 +179,7 @@ When the user specifies a target user count (e.g., "10k users"), pass that to th
 
 ## Tips
 
-1. **Run at 60% completion.** Catches architectural issues before they compound. The audit is read-only.
+1. **Run early.** Catches architectural issues before they compound. The audit is read-only and works at any stage.
 2. **Commit the report.** `PRODUCTION-AUDIT.md` is designed for team review. Finding IDs (B-001, W-001) work as ticket references.
 3. **Pair with Semgrep.** If the Semgrep MCP server is available, the security agent can run `semgrep_scan` for automated vulnerability detection alongside manual pattern matching.
 4. **Re-audit after fixes.** Verify blockers are resolved and no new issues were introduced.
