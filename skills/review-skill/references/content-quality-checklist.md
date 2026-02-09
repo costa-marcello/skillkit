@@ -320,31 +320,9 @@ This endpoint is no longer supported.
 
 ---
 
-## Grading Rubric
+## Grading
 
-| Grade | Criteria |
-|-------|----------|
-| **A** | All 8 sections pass, excellent examples, tight feedback loops |
-| **B** | 1-2 minor issues (slight verbosity, missing default) |
-| **C** | 1 major issue (wrong freedom level, no feedback loop for complex task) |
-| **D** | 2+ major issues (options overload AND contradictions across files) |
-| **F** | Fundamentally unactionable OR scripts punt all problems to Claude |
-
-### Major vs Minor Issues
-
-**Major Issues** (grade drops to C or below):
-- Wrong degrees of freedom for task type
-- No feedback loop for destructive/complex operations
-- Scripts with bare except or voodoo constants
-- Fundamentally vague/unactionable core instructions
-- Contradictions between SKILL.md and references
-
-**Minor Issues** (grade drops to B):
-- Slightly verbose explanations
-- Missing default for one decision point
-- One piece of time-sensitive content
-- Minor magic numbers without documentation
-- Inconsistent terminology (minor, same concept different words)
+Use the **Unified Grading Rubric** in `evaluation_checklist.md`. Content quality findings feed into the same grade as structural findings.
 
 ---
 

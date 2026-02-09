@@ -64,8 +64,8 @@ Install any skill with `npx skills add costa-marcello/skillkit/<name>`, then inv
 |-------|-------------|---------|
 | claude-md | Audits, reviews, improves, and generates CLAUDE.md configuration files | `npx skills add costa-marcello/skillkit/claude-md` |
 | readme-md | Guides README creation and improvement with audience-matched templates | `npx skills add costa-marcello/skillkit/readme-md` |
-| skill-creator | Guides creation of new Claude Code skills with best practices | `npx skills add costa-marcello/skillkit/skill-creator` |
-| skill-reviewer | Reviews and automatically fixes skills against Anthropic best practices | `npx skills add costa-marcello/skillkit/skill-reviewer` |
+| create-skill | Guides creation of new Claude Code skills with best practices | `npx skills add costa-marcello/skillkit/create-skill` |
+| review-skill | Reviews and automatically fixes skills against Anthropic best practices | `npx skills add costa-marcello/skillkit/review-skill` |
 | find-skills | Helps discover and install skills from the marketplace | `npx skills add costa-marcello/skillkit/find-skills` |
 
 ## Hooks
@@ -110,7 +110,7 @@ Contributions are welcome. To add or improve a skill:
 1. Fork the repository.
 2. Create a new directory under `skills/<name>/` or edit an existing one.
 3. Each skill needs a `SKILL.md` with frontmatter (name, description, licence) and prompt content.
-4. Run the skill-reviewer skill on your changes: `/skill-reviewer`
+4. Run the review-skill skill on your changes: `/review-skill`
 5. Open a pull request.
 
 See the existing skills for examples of the expected format and structure.

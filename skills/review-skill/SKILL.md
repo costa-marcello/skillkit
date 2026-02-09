@@ -1,26 +1,35 @@
 ---
-name: skill-reviewer
-version: 1.1.0
-description: Reviews and automatically fixes Claude Code skills against official Anthropic best practices. Use when checking skill quality, refactoring bloated skills, improving discoverability, or contributing to open-source skills. Supports review, auto-fix, and PR modes.
+name: review-skill
+description: "Reviews and automatically fixes Claude Code skills against official Anthropic best practices. Use when checking skill quality, refactoring bloated skills, improving discoverability, or contributing to open-source skills. Supports review, auto-fix, external review, and PR modes."
+license: MIT
 context: fork
+agent: general-purpose
 ---
 
 # Skill Reviewer
 
+## Target Skill
+
+The target skill to review is: `$ARGUMENTS`
+
+If `$ARGUMENTS` is empty, ask the user which skill to review.
+
+## Mode Selection
+
+| Mode | Trigger | Action |
+|------|---------|--------|
+| **Review** (default) | User says "review", "check", "grade", or gives no mode | Generate quality report |
+| **Auto-Fix** | User says "fix", "improve", "refactor", "auto-fix" | Read, evaluate, then apply fixes |
+| **External Review** | User says "external", target is a GitHub URL | Clone to /tmp/, report only (read-only) |
+| **Auto-PR** | User says "PR", "contribute", "auto-pr" | Fork, fix, submit PR |
+
+When no mode keyword is present, default to **Review**.
+
 ## Setup (Optional)
 
-Install `skill-creator` for automated validation: see `references/setup.md`
+Install `create-skill` for automated validation: see `references/setup.md`
 
 All modes work without it using manual evaluation.
-
-## Four Modes
-
-| Mode | Use Case | Action |
-|------|----------|--------|
-| **Review** | Check skill quality | Generate report with grade |
-| **Auto-Fix** | Fix your own skills | Automatically refactor |
-| **External Review** | Evaluate others' skills | Report only (read-only) |
-| **Auto-PR** | Contribute to open-source | Fork, fix, submit PR |
 
 ---
 
@@ -30,39 +39,28 @@ All modes work without it using manual evaluation.
 
 Evaluate a skill and generate a quality report.
 
-**Automated validation** (if skill-creator installed):
+**Step 1: Run automated validation** (if create-skill installed):
 ```bash
-python3 "$SKILL_CREATOR"/*/quick_validate.py <target-skill>
-python3 "$SKILL_CREATOR"/*/security_scan.py <target-skill> --verbose
+python3 "$SKILL_CREATOR"/scripts/quick_validate.py <target-skill>
+python3 "$SKILL_CREATOR"/scripts/security_scan.py <target-skill> --verbose
 ```
 
-**Manual evaluation**: See `references/evaluation_checklist.md`
+**Step 2: Manual evaluation** against `references/evaluation_checklist.md`
 
-**Deep review**: For thorough analysis, also consult `references/research-backed-criteria.md`
+**Step 3: Content quality check** against `references/content-quality-checklist.md`
 
-**Report Format**: Output as markdown with:
+**Step 4: (Optional) Deep review** using `references/research-backed-criteria.md`
+
+**Step 5: Generate report** as markdown with:
 - Executive summary table (aspect, grade, notes)
-- Section-by-section findings
-- Issues found with file paths and line numbers
-- Recommended fixes
+- Section-by-section findings with file paths and line numbers
+- Combined grade using the unified rubric from `references/evaluation_checklist.md`
+- Recommended fixes ranked by severity
 
-**Structural Checklist:**
-
-| Category | Check | Required |
-|----------|-------|----------|
-| **Frontmatter** | `name` present (lowercase, hyphens) | Yes |
-| | `description` in third-person verb | Yes |
-| | `description` includes trigger conditions | Yes |
-| | `context: fork` present | **Mandatory** |
-| **Structure** | SKILL.md under 500 lines | Yes |
-| | Only SKILL.md in root (no loose files) | Yes |
-| | Reference files in `references/` folder | Yes |
-| **Formatting** | Uses XML tags for structure (`<example>`, `<instructions>`) | Recommended |
-| | Examples wrapped in `<example>` blocks | Recommended |
-
-**Content Quality Checklist:** See `references/content-quality-checklist.md`
-
-Key areas: Degrees of Freedom, Conciseness, Actionability, Options Overload, Script Quality, Feedback Loops, Consistency, Time-Sensitive Content
+**Step 6: Verify report** before presenting:
+- [ ] Every finding has a file path and line number
+- [ ] Grade matches rubric criteria
+- [ ] Fixes are actionable (no "consider" or "ensure")
 
 </instructions>
 
@@ -214,44 +212,18 @@ Respect Check:
 
 ---
 
-## Common Issues & Fixes
-
-<example>
-**Description Not Third-Person**
-- Before: `description: Complete PDF manipulation toolkit for...`
-- After: `description: "Extracts text from PDFs, creates documents. Use when working with PDF files."`
-</example>
-
-<example>
-**Missing context: fork**
-- Before: frontmatter with only `name` and `description`
-- After: add `context: fork` to frontmatter
-</example>
-
-<example>
-**SKILL.md Over 500 Lines**
-- Before: `SKILL.md (1500 lines)` with loose `.md` files in root
-- After: `SKILL.md (~300 lines)` with content extracted to `references/`
-
-**Extract**: configs, detailed examples, API docs → `references/`
-**Keep**: quick start, reference table, core patterns, references section
-</example>
-
----
-
 ## References
 
-### Core Checklists
-- `references/evaluation_checklist.md` - Structural validation
-- `references/content-quality-checklist.md` - Content effectiveness
+| File | Purpose | Used By |
+|------|---------|---------|
+| `references/evaluation_checklist.md` | Structural validation + unified grading rubric | Review, Auto-Fix |
+| `references/content-quality-checklist.md` | Content effectiveness (8 dimensions) | Review, Auto-Fix |
+| `references/research-backed-criteria.md` | Deep review with academic citations | Review (deep) |
+| `references/script-quality.md` | Script error handling, constants | Review, Auto-Fix |
+| `references/feedback-loops.md` | Multi-step workflow validation | Review, Auto-Fix |
+| `references/pr_template.md` | PR description template | Auto-PR |
+| `references/marketplace_template.json` | marketplace.json template | Auto-PR |
+| `references/sources.md` | Bibliography | Review (deep) |
+| `references/setup.md` | create-skill installation | Setup |
 
-### Specialized Guides
-- `references/script-quality.md` - Script error handling, constants
-- `references/feedback-loops.md` - Multi-step workflow validation
-- `references/research-backed-criteria.md` - Deep review with citations
-
-### Templates & Sources
-- `references/pr_template.md` - PR description template
-- `references/marketplace_template.json` - marketplace.json template
-- `references/sources.md` - Bibliography
-- [Official Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
+[Official Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)

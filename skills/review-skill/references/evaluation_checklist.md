@@ -10,7 +10,7 @@ Complete checklist based on [official Anthropic best practices](https://platform
   - Max 64 characters
   - Lowercase letters, numbers, hyphens only
   - No reserved words (anthropic, claude)
-  - Gerund form recommended (processing-pdfs)
+  - Noun or short-phrase form preferred (pdf, changelog, smart-merge)
 
 - [ ] `description` field present and valid
   - Non-empty
@@ -116,23 +116,31 @@ There are many libraries available for PDF processing...
 - [ ] No hardcoded secrets or paths
 - [ ] Required packages listed
 
-## Grading Rubric
+## Unified Grading Rubric
+
+This is the single grading rubric for the entire skill. Combine findings from this checklist and `content-quality-checklist.md` into one grade.
 
 | Grade | Criteria |
 |-------|----------|
-| **A** | All checks pass, under 300 lines, excellent structure |
-| **B** | Minor issues (1-2 warnings), under 500 lines |
-| **C** | Critical issues (over 500 lines OR missing context: fork) |
-| **D** | Multiple critical issues |
-| **F** | Missing description OR broken structure |
+| **A** | All structural and content checks pass. Under 300 lines. 3-5 diverse examples. Tight feedback loops. No contradictions. |
+| **B** | 1-2 minor issues: slight verbosity, one missing default, minor inconsistent terminology, one piece of time-sensitive content. Under 500 lines. |
+| **C** | 1 major issue: over 500 lines, missing `context: fork`, wrong degrees of freedom for task type, no feedback loop for destructive operations, or contradictions between files. |
+| **D** | 2+ major issues from different categories. |
+| **F** | Missing description, broken structure, or fundamentally unactionable instructions. |
 
-## Quick Auto-Fix Reference
+### Major vs Minor Issues
 
-| Issue | Auto-Fix Action |
-|-------|-----------------|
-| Noun phrase description | Rewrite with verb ("Processes...", "Extracts...") |
-| Missing trigger | Add "Use when..." clause |
-| Missing `context: fork` | Add to frontmatter |
-| Over 500 lines | Extract to `references/` |
-| Loose files | Move to `references/` with clear names |
-| Duplicate refs | Merge into single file |
+**Major** (drops to C or below):
+- Over 500 lines or missing `context: fork`
+- Wrong degrees of freedom for the task type
+- No feedback loop for destructive or complex operations
+- Scripts with bare `except:` or undocumented constants
+- Contradictions between SKILL.md and references
+- Fundamentally vague or unactionable core instructions
+
+**Minor** (drops to B):
+- Slightly verbose explanations
+- One missing default for a decision point
+- One piece of time-sensitive content
+- Minor undocumented constants
+- Inconsistent terminology (same concept, different words)

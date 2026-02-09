@@ -104,7 +104,7 @@ ccpm install pdf-processor
 
 | Skill | Purpose |
 |-------|---------|
-| `skill-creator` | Create new Claude Code skills |
+| `create-skill` | Create new Claude Code skills |
 | `pdf-processor` | PDF manipulation and analysis |
 | `docx` | Word document processing |
 | `xlsx` | Excel spreadsheet operations |
@@ -139,7 +139,7 @@ ccpm install pdf-processor
 2. Offer to help with the task directly
 3. Suggest creating a custom skill:
    - Open Ecosystem: `npx skills init my-skill`
-   - CCPM: Use the `skill-creator` skill
+   - CCPM: Use the `create-skill` skill
 
 ## Troubleshooting
 

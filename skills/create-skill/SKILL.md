@@ -1,5 +1,5 @@
 ---
-name: skill-creator
+name: create-skill
 description: "Guides users through creating effective Claude Code skills with specialized knowledge, workflows, and tool integrations. Use when users want to create a new skill, update an existing skill, extract business logic into reusable packages, or ask about skill structure, frontmatter, or bundled resources."
 license: Complete terms in LICENSE.txt
 context: fork

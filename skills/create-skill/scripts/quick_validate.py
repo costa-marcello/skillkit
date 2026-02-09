@@ -101,7 +101,7 @@ def validate_path_references(skill_path: Path, content: str) -> tuple[bool, list
 
 def validate_skill(skill_path):
     """
-    Validate a skill against skill-reviewer requirements.
+    Validate a skill against review-skill requirements.
 
     Returns:
         (valid, message, warnings) - valid is bool, message is str, warnings is list of str
@@ -158,9 +158,9 @@ def validate_skill(skill_path):
 
     # === SKILL-REVIEWER CHECKS ===
 
-    # Check context: fork (MANDATORY per skill-reviewer)
+    # Check context: fork (MANDATORY per review-skill)
     if 'context:' not in frontmatter or 'context: fork' not in frontmatter:
-        warnings.append("⚠️  Missing 'context: fork' in frontmatter (MANDATORY for skill-reviewer)")
+        warnings.append("⚠️  Missing 'context: fork' in frontmatter (MANDATORY for review-skill)")
 
     # Extract and validate description
     desc_match = re.search(r'description:\s*["\']?(.+?)["\']?\s*$', frontmatter, re.MULTILINE)
@@ -170,7 +170,7 @@ def validate_skill(skill_path):
         if '<' in description or '>' in description:
             return False, "Description cannot contain angle brackets (< or >)", warnings
 
-        # Check third-person voice (skill-reviewer requirement)
+        # Check third-person voice (review-skill requirement)
         # Bad: starts with imperative verb or second person
         imperative_patterns = [
             r'^(Extract|Process|Create|Build|Generate|Handle|Manage|Run|Execute|Use|Get|Set|Add|Remove|Delete|Update|Search|Find|Load|Save|Read|Write|Check|Validate|Format|Parse|Convert|Transform|Browse|Complete|Help|Assist)\s',
@@ -182,16 +182,16 @@ def validate_skill(skill_path):
                 warnings.append(f"⚠️  Description should use third-person verb (e.g., 'Processes...', 'Extracts...')")
                 break
 
-        # Check trigger conditions (skill-reviewer requirement)
+        # Check trigger conditions (review-skill requirement)
         trigger_patterns = ['use when', 'use this when', 'should be used when', 'invoke when', 'triggers when']
         has_trigger = any(p in description.lower() for p in trigger_patterns)
         if not has_trigger:
             warnings.append("⚠️  Description should include trigger conditions (e.g., 'Use when...')")
 
-    # Check SKILL.md line count (skill-reviewer: under 500 lines)
+    # Check SKILL.md line count (review-skill: under 500 lines)
     body_lines = len(body.strip().splitlines())
     if body_lines > 500:
-        warnings.append(f"⚠️  SKILL.md body is {body_lines} lines (should be under 500 for skill-reviewer)")
+        warnings.append(f"⚠️  SKILL.md body is {body_lines} lines (should be under 500 for review-skill)")
     elif body_lines > 300:
         warnings.append(f"ℹ️  SKILL.md body is {body_lines} lines (under 300 recommended for Grade A)")
 
