@@ -49,4 +49,7 @@
 
 ## Prose Quality
 
-For general writing advice — clear prose, Strunk's rules, and AI patterns to avoid — use the `writing-clearly-and-concisely` skill.
+- Write short sentences. One idea per sentence.
+- Cut filler words: "basically", "actually", "in order to", "it should be noted that".
+- Use active voice: "The script creates a backup" not "A backup is created by the script".
+- Show, don't tell: code examples beat prose explanations.

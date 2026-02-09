@@ -1,7 +1,9 @@
 ---
 name: readme-md
 description: Guides README creation and improvement with audience-matched templates. Use when writing READMEs for open source, personal, internal, or config projects, or when the user mentions documentation, README, or project setup.
+license: MIT
 context: fork
+agent: general-purpose
 ---
 
 # Crafting Effective READMEs
@@ -73,10 +75,10 @@ After drafting, ask: **"Anything else to highlight or include that I might have 
 
 | Type | Audience | Key Sections | Template |
 |------|----------|--------------|----------|
-| **Open Source** | Contributors, users worldwide | Install, Usage, Contributing, License | `templates/oss.md` |
-| **Personal** | Future you, portfolio viewers | What it does, Tech stack, Learnings | `templates/personal.md` |
-| **Internal** | Teammates, new hires | Setup, Architecture, Runbooks | `templates/internal.md` |
-| **Config** | Future you (confused) | What's here, Why, How to extend, Gotchas | `templates/xdg-config.md` |
+| **Open Source** | Contributors, users worldwide | Install, Usage, Contributing, License | `assets/templates/oss.md` |
+| **Personal** | Future you, portfolio viewers | What it does, Tech stack, Learnings | `assets/templates/personal.md` |
+| **Internal** | Teammates, new hires | Setup, Architecture, Runbooks | `assets/templates/internal.md` |
+| **Config** | Future you (confused) | What's here, Why, How to extend, Gotchas | `assets/templates/xdg-config.md` |
 
 **Ask the user** if unclear. Don't assume OSS defaults for everything.
 
@@ -192,6 +194,13 @@ My config files.
 
 ## References
 
-- `references/section-checklist.md` - Which sections to include by project type
-- `references/style-guide.md` - Common README mistakes and prose guidance
-- `references/using-references.md` - Guide to deeper reference materials
+| File | Purpose |
+|------|---------|
+| `references/section-checklist.md` | Which sections to include by project type |
+| `references/style-guide.md` | Common README mistakes and prose guidance |
+| `references/art-of-readme.md` | Philosophy: cognitive funneling, brevity, key elements |
+| `references/make-a-readme.md` | Section-by-section guidance for what to include |
+| `references/standard-readme-spec.md` | Formal spec for standardised README format |
+| `references/standard-readme-example-minimal.md` | Minimal compliant README example |
+| `references/standard-readme-example-maximal.md` | Full-featured README example |
+| `assets/templates/` | Ready-to-use templates: oss, personal, internal, xdg-config |
