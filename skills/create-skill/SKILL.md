@@ -143,7 +143,7 @@ Skip this step only if the skill being developed already exists, and iteration o
 When creating a new skill from scratch, run `init_skill.py` to generate a complete template:
 
 ```bash
-scripts/init_skill.py <skill-name> --path <output-directory>
+python3 scripts/init_skill.py <skill-name> --path <output-directory>
 ```
 
 The script creates a skill directory with SKILL.md, frontmatter, resource directories, and example files. Customize or remove the generated files as needed.
@@ -235,8 +235,8 @@ See `references/sanitization_checklist.md` for common replacement patterns.
 Before packaging or distributing a skill, run the security scanner:
 
 ```bash
-python scripts/security_scan.py <path/to/skill-folder>           # Quick scan (required)
-python scripts/security_scan.py <path/to/skill-folder> --verbose  # Detailed review
+python3 scripts/security_scan.py <path/to/skill-folder>           # Quick scan (required)
+python3 scripts/security_scan.py <path/to/skill-folder> --verbose  # Detailed review
 ```
 
 Install gitleaks first if not present (`brew install gitleaks` on macOS). The script prints installation instructions and remediation guidance for any issues found.
@@ -246,8 +246,8 @@ Install gitleaks first if not present (`brew install gitleaks` on macOS). The sc
 Package the skill into a distributable zip. The script validates before packaging:
 
 ```bash
-scripts/package_skill.py <path/to/skill-folder>            # Output to current dir
-scripts/package_skill.py <path/to/skill-folder> ./dist      # Output to ./dist
+python3 scripts/package_skill.py <path/to/skill-folder>            # Output to current dir
+python3 scripts/package_skill.py <path/to/skill-folder> ./dist      # Output to ./dist
 ```
 
 The packaging script will:

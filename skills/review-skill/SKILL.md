@@ -41,8 +41,8 @@ Evaluate a skill and generate a quality report.
 
 **Step 1: Run automated validation** (if create-skill installed):
 ```bash
-python3 "$SKILL_CREATOR"/scripts/quick_validate.py <target-skill>
-python3 "$SKILL_CREATOR"/scripts/security_scan.py <target-skill> --verbose
+python3 "$CREATE_SKILL"/scripts/quick_validate.py <target-skill>
+python3 "$CREATE_SKILL"/scripts/security_scan.py <target-skill> --verbose
 ```
 
 **Step 2: Manual evaluation** against `references/evaluation_checklist.md`

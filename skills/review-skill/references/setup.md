@@ -25,11 +25,11 @@ If installation fails, use manual evaluation via `references/evaluation_checklis
 Once installed, set the path and run:
 
 ```bash
-SKILL_CREATOR=~/.claude/skills/create-skill
+CREATE_SKILL=~/.claude/skills/create-skill
 
 # Quick structural validation
-python3 "$SKILL_CREATOR"/scripts/quick_validate.py <target-skill>
+python3 "$CREATE_SKILL"/scripts/quick_validate.py <target-skill>
 
 # Security scan
-python3 "$SKILL_CREATOR"/scripts/security_scan.py <target-skill> --verbose
+python3 "$CREATE_SKILL"/scripts/security_scan.py <target-skill> --verbose
 ```
