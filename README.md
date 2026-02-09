@@ -1,7 +1,7 @@
 <div align="center">
   <img src="assets/logo.svg" alt="skillkit" width="80" />
   <h1>skillkit</h1>
-  <p><strong>Skills and hooks for Claude Code</strong></p>
+  <p><strong>Skills for AI coding agents</strong></p>
 
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
   [![Skills](https://img.shields.io/badge/Skills-21-8B5CF6)](skills/)
@@ -10,17 +10,17 @@
 
 ---
 
-## The problem with vanilla Claude Code
+## The problem with AI coding agents
 
-Claude Code is powerful out of the box. But ask it to create a Word document with tracked changes, build a CI/CD pipeline, generate a PowerPoint deck from a topic, or audit your codebase for production readiness, and you will run into the same wall: Claude has general knowledge about these tasks but lacks the deep, step-by-step workflows that produce professional results.
+AI coding agents are powerful out of the box. But ask one to create a Word document with tracked changes, build a CI/CD pipeline, generate a PowerPoint deck from a topic, or audit your codebase for production readiness, and you hit the same wall: the agent has general knowledge about these tasks but lacks the deep, step-by-step workflows that produce professional results.
 
 You end up writing long prompts, correcting mistakes, and re-doing work. Every session starts from zero.
 
-**Skillkit fixes this.** It gives Claude Code 21 specialist skills, each containing the exact workflows, decision trees, reference materials, and quality checks needed to do one job well. Instead of hoping Claude figures out the right approach, you give it a battle-tested playbook.
+**Skillkit fixes this.** It gives your agent 21 specialist skills, each containing the exact workflows, decision trees, reference materials, and quality checks needed to do one job well. Instead of hoping the agent figures out the right approach, you give it a battle-tested playbook. Works with Claude Code, Cursor, Windsurf, and any agent that supports the skills protocol.
 
 ## Why these skills are different
 
-Most Claude Code skills are thin wrappers around a single prompt. Skillkit skills are structured knowledge packages built to a strict quality standard:
+Most agent skills are thin wrappers around a single prompt. Skillkit skills are structured knowledge packages built to a strict quality standard:
 
 | What makes them different | Why it matters |
 |--------------------------|----------------|
@@ -40,7 +40,7 @@ npx skills add costa-marcello/skillkit/changelog
 # Install several at once
 npx skills add costa-marcello/skillkit/pdf costa-marcello/skillkit/docx costa-marcello/skillkit/ci-cd
 
-# Use it in Claude Code
+# Use it in your agent
 /changelog
 /pdf
 /ci-cd
@@ -54,7 +54,7 @@ That is the full setup. No configuration files, no environment variables, no bui
 
 ### Documents and Data
 
-These four skills turn Claude Code into a document processing engine. They handle the Office formats that most AI tools struggle with, going beyond simple text extraction into full creation, editing, and format-aware manipulation.
+These four skills turn your agent into a document processing engine. They handle the Office formats that most AI tools struggle with, going beyond simple text extraction into full creation, editing, and format-aware manipulation.
 
 <table>
 <tr>
@@ -123,7 +123,7 @@ Creates production-ready GitHub Actions workflows. Covers test workflows, matrix
 <td><strong>changelog</strong></td>
 <td>
 
-Generates and updates CHANGELOG.md files from git history following the Keep a Changelog format and Conventional Commits conventions. Auto-detects whether to create a new changelog, update an existing one, or add entries for a specific version. Translates developer commit messages into user-friendly descriptions. Works with date ranges, tag ranges, or "since last release" periods.
+Generates and updates CHANGELOG.md files from git history following Keep a Changelog format and Conventional Commits conventions. Auto-detects whether to create a new changelog, update an existing one, or add entries for a specific version. Translates developer commit messages into user-friendly descriptions. Suggests the next semantic version based on commit types (breaking, feat, fix) with copy-paste release commands. Works with date ranges, tag ranges, or "since last release" periods.
 
 </td>
 <td><code>npx skills add costa-marcello/skillkit/changelog</code></td>
@@ -168,7 +168,7 @@ Creates professional software diagrams using Mermaid syntax. Covers class diagra
 
 ### AI and Research
 
-Four skills that connect Claude Code to other AI models and deep research workflows. These turn Claude into an orchestrator that delegates to the best tool for each job.
+Four skills that connect your agent to other AI models and deep research workflows. These turn your agent into an orchestrator that delegates to the best tool for each job.
 
 <table>
 <tr>
@@ -291,11 +291,11 @@ A project-specific variant of the production audit skill. Audits a codebase for 
 
 ---
 
-## Hooks: persistent memory for Claude Code
+## Hooks: persistent memory across sessions
 
-Skills give Claude expertise. Hooks give it memory.
+Skills give your agent expertise. Hooks give it memory.
 
-The three hooks in this repository connect Claude Code to a Qdrant vector store and claude-mem so that every prompt benefits from prior knowledge and every commit keeps the index current. Without hooks, each Claude Code session starts from zero. With hooks, Claude remembers your codebase, past decisions, and patterns across sessions.
+The three hooks in this repository connect your agent to a Qdrant vector store and claude-mem so that every prompt benefits from prior knowledge and every commit keeps the index current. Without hooks, each session starts from zero. With hooks, your agent remembers your codebase, past decisions, and patterns across sessions.
 
 | Hook | Lifecycle event | What it does |
 |------|----------------|--------------|
@@ -303,7 +303,7 @@ The three hooks in this repository connect Claude Code to a Qdrant vector store 
 | **post-commit-index.mjs** | PostToolUse (Bash) | Detects git commits and re-indexes changed files into Qdrant. Handles both code files and documentation. Your vector store stays current after every commit. |
 | **pre-tool-context.mjs** | PreToolUse | Injects additional context before tool execution. |
 
-Hooks run in dual mode: they respond to Claude Code lifecycle events automatically, and they work as standalone CLI tools (`node hooks/context.mjs "query"`) for manual searches.
+Hooks run in dual mode: they respond to lifecycle events automatically, and they work as standalone CLI tools (`node hooks/context.mjs "query"`) for manual searches.
 
 **Prerequisites:** A Qdrant Cloud account (free tier works) and a Voyage AI API key for embeddings (also free tier). See [hooks/README.md](hooks/README.md) for full setup instructions.
 
@@ -333,7 +333,7 @@ skills/
 
 Each skill lives in its own directory under `skills/`. The `SKILL.md` file contains YAML frontmatter (name, description, licence, context mode) followed by the prompt content. Supporting materials go in `references/`, scripts in `scripts/`, and templates in `assets/`.
 
-When you install a skill with `npx skills add`, it copies into your project's `.claude/skills/` directory. Claude Code loads installed skills automatically and makes each one available as a slash command matching its name.
+When you install a skill with `npx skills add`, it copies into your project's skills directory. Your agent loads installed skills automatically and makes each one available as a slash command matching its name.
 
 The `references/` pattern is what keeps skills fast. The SKILL.md stays under 500 lines (the enforced limit), while deep reference materials load only when the skill needs them. The frontend-design skill, for example, has 99 UX rules and 25+ chart types available, but they only enter the context window when the skill reaches for them.
 
@@ -341,7 +341,7 @@ The `references/` pattern is what keeps skills fast. The SKILL.md stays under 50
 
 ## Prerequisites
 
-- **Claude Code** (the CLI)
+- **An AI coding agent** that supports the skills protocol (Claude Code, Cursor, Windsurf, etc.)
 - **Node.js 18+**
 - For hooks: a **Qdrant Cloud** account and a **Voyage AI** API key
 
