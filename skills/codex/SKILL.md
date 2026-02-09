@@ -17,7 +17,7 @@ context: fork
 
 ## Running a Task
 
-1. Use `gpt-5.2-codex` model. Ask the user (via `AskUserQuestion`) which reasoning effort to use (`xhigh`, `high`, `medium`, or `low`). Default to `medium` if the user does not specify.
+1. Use `gpt-5.3-codex` model. Ask the user (via `AskUserQuestion`) which reasoning effort to use (`xhigh`, `high`, `medium`, or `low`). Default to `medium` if the user does not specify.
 2. Select the sandbox mode required for the task; default to `--sandbox read-only` unless edits or network access are necessary.
 3. Assemble the command with the appropriate options:
    - `-m, --model <MODEL>`
@@ -38,7 +38,7 @@ context: fork
 ### Task Checklist
 
 ```
-- [ ] 1. Select model (default: gpt-5.2-codex) and reasoning effort
+- [ ] 1. Select model (default: gpt-5.3-codex) and reasoning effort
 - [ ] 2. Select sandbox mode (default: read-only)
 - [ ] 3. Assemble command with flags
 - [ ] 4. Get permission for high-impact flags (if --full-auto or danger-full-access)
@@ -66,7 +66,7 @@ context: fork
 
 **Claude assembles**:
 ```bash
-codex exec --skip-git-repo-check -m gpt-5.2-codex --config model_reasoning_effort="high" --sandbox read-only 2>/dev/null
+codex exec --skip-git-repo-check -m gpt-5.3-codex --config model_reasoning_effort="high" --sandbox read-only 2>/dev/null
 ```
 
 **After completion**: "Analysis complete. Found 2 potential SQL injection vulnerabilities in `db/queries.ts`. You can resume this Codex session at any time by saying 'codex resume' or asking me to continue with additional analysis."
@@ -77,7 +77,7 @@ codex exec --skip-git-repo-check -m gpt-5.2-codex --config model_reasoning_effor
 
 **Claude assembles**:
 ```bash
-codex exec --skip-git-repo-check -m gpt-5.2-codex --config model_reasoning_effort="high" --sandbox workspace-write --full-auto 2>/dev/null
+codex exec --skip-git-repo-check -m gpt-5.3-codex --config model_reasoning_effort="high" --sandbox workspace-write --full-auto 2>/dev/null
 ```
 
 **After edits**: Runs `git diff` to show changes, runs `npm test` to verify fix, then: "Fixed the race condition by adding mutex locks. Tests pass. You can resume this session with 'codex resume'."
@@ -96,7 +96,7 @@ echo "Continue the security analysis, focusing on authentication flows" | codex 
 
 ## Reasoning Effort Levels
 
-Model: `gpt-5.2-codex` (400K input / 128K output). Check [Codex releases](https://github.com/openai/codex/releases) for current pricing and benchmarks.
+Model: `gpt-5.3-codex` (400K input / 128K output). Check [Codex releases](https://github.com/openai/codex/releases) for current pricing and benchmarks.
 
 | Reasoning | Best for |
 | --- | --- |
@@ -119,6 +119,6 @@ Cached input tokens receive a significant discount. Repeated context within 24 h
 
 ## CLI Version
 
-Requires a recent Codex CLI version for gpt-5.2-codex model support (check: `codex --version`). See [Codex releases](https://github.com/openai/codex/releases) for latest. The CLI defaults to `gpt-5.2-codex` on all platforms.
+Requires a recent Codex CLI version for gpt-5.3-codex model support (check: `codex --version`). See [Codex releases](https://github.com/openai/codex/releases) for latest. The CLI defaults to `gpt-5.3-codex` on all platforms.
 
 Use `/model` slash command within a Codex session to switch models, or configure default in `~/.codex/config.toml`.
