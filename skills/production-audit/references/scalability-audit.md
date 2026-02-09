@@ -54,6 +54,8 @@ List each table and its indexed vs un-indexed columns that appear in `WHERE` cla
 | Auth routes (`/auth/*`, `/login`) | Brute-force prevention | 5-10 req/min per IP |
 | Payment routes | Abuse prevention | 10-20 req/min per user |
 | Upload routes | Resource exhaustion | 5-10 req/min per user |
+| Standard API endpoints | General protection | 100 req/15 min per IP |
+| Expensive operations (search, export, report generation) | Resource protection | 10 req/min per user |
 | Webhook routes | Verify signatures instead | N/A if signature-verified |
 
 ## Caching

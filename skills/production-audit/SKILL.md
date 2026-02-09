@@ -1,6 +1,6 @@
 ---
 name: production-audit
-description: "Audits a codebase for production readiness across six dimensions: API completeness, frontend-backend sync, security, scalability, infrastructure, and dead code. Use when the user requests a launch assessment, production readiness check, pre-deployment audit, or multi-agent patchwork cleanup."
+description: "Audits a codebase for production readiness across six dimensions: API completeness, frontend-backend sync, security, scalability, infrastructure, and dead code/architecture. Use when the user requests a launch assessment, production readiness check, pre-deployment audit, or multi-agent patchwork cleanup."
 context: fork
 ---
 
@@ -42,9 +42,9 @@ Spawn 4 agents in parallel. Each agent handles one or two audit dimensions and w
 | Agent | Dimensions | Reference |
 | --- | --- | --- |
 | Agent 1: API & Sync | API endpoint mapping + frontend-backend sync | `references/api-audit.md` |
-| Agent 2: Security | Auth coverage, validation, CORS, secrets, injection | `references/security-audit.md` |
+| Agent 2: Security | Auth coverage, validation, CORS, secrets, injection, CSRF, CSP, dependency vulnerabilities, cookie security, password hashing | `references/security-audit.md` |
 | Agent 3: Scalability & Infra | Query performance, indexes, caching, CI/CD, monitoring | `references/scalability-audit.md` + `references/infrastructure-audit.md` |
-| Agent 4: Dead Code | Unused files, orphaned components, duplicate utilities, patchwork, stale config | `references/dead-code-audit.md` |
+| Agent 4: Dead Code & Architecture | Unused files, orphaned components, duplicate utilities, patchwork, stale config, architectural quality, code complexity | `references/dead-code-audit.md` |
 
 If the project does not have a frontend (e.g., API-only service, CLI tool), merge Agent 1's scope into Agent 3 and spawn 3 agents instead.
 
