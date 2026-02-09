@@ -58,9 +58,9 @@ user = db.user.find(id=params["id"])  # might throw on malformed id
 
 ### What to Check
 
-1. **CORS headers**: Check framework config and middleware for `Access-Control-Allow-Origin` settings.
-2. **Wildcard origins**: `Access-Control-Allow-Origin: *` on authenticated routes is a vulnerability.
-3. **Credentials mode**: If using cookies/tokens, `Allow-Credentials: true` must pair with specific origins (not `*`).
+1. **CORS headers**: Check framework config and middleware for `Access-Control-Allow-Origin`.
+2. **Wildcard origins**: `*` on authenticated routes is a vulnerability.
+3. **Credentials mode**: `Allow-Credentials: true` must pair with specific origins (not `*`).
 
 ## Secrets Exposure
 
@@ -175,9 +175,9 @@ npm audit --audit-level=high
 
 ### What to Check
 
-1. **Weak hashing algorithms**: Search for MD5, SHA1, or SHA256 used for password storage. These are too fast for password hashing and vulnerable to brute-force.
-2. **Proper password hashing**: Verify bcrypt, argon2, or scrypt is used for password storage.
-3. **Missing salt**: Check for custom hashing implementations that do not use a salt.
+1. **Weak hashing algorithms**: Search for MD5, SHA1, or SHA256 used for password storage (too fast, vulnerable to brute-force).
+2. **Proper password hashing**: Verify bcrypt, argon2, or scrypt is used.
+3. **Missing salt**: Check for custom hashing without a salt.
 4. **Plaintext storage**: Search for passwords stored directly in database columns without hashing.
 
 ### Patterns That Indicate Weak Password Hashing
@@ -199,10 +199,10 @@ sha256(password)  # no salt
 
 ### What to Check
 
-1. **httpOnly flag**: Session and auth cookies must have `httpOnly: true` to prevent JavaScript access (XSS theft).
-2. **Secure flag**: Cookies must have `Secure: true` so they are only sent over HTTPS.
-3. **SameSite attribute**: Cookies should use `SameSite=Strict` or `SameSite=Lax` (see CSRF section).
-4. **Row Level Security (RLS)**: For Postgres/Supabase projects with user data, check that RLS policies are enabled and configured on tables containing user-specific data.
+1. **httpOnly flag**: Session and auth cookies must have `httpOnly: true`.
+2. **Secure flag**: Cookies must have `Secure: true`.
+3. **SameSite attribute**: Must be `Strict` or `Lax` (see CSRF section).
+4. **Row Level Security (RLS)**: For Postgres/Supabase projects, check RLS policies are enabled on user-data tables.
 
 ### Patterns That Indicate Weak Cookie Security
 

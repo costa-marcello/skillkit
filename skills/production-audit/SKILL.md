@@ -1,6 +1,6 @@
 ---
 name: production-audit
-description: "Audits a codebase for production readiness across six dimensions: API completeness, frontend-backend sync, security, scalability, infrastructure, and dead code/architecture. Use when the user requests a launch assessment, production readiness check, pre-deployment audit, or multi-agent patchwork cleanup."
+description: "Audits a codebase for production readiness across six dimensions: API completeness, frontend-backend sync, security, scalability, infrastructure, and dead code/architecture. Use when asked for a launch assessment, production readiness check, pre-deployment audit, or multi-agent patchwork cleanup."
 context: fork
 ---
 
@@ -42,7 +42,7 @@ Spawn 4 agents in parallel. Each agent handles one or two audit dimensions and w
 | Agent | Dimensions | Reference |
 | --- | --- | --- |
 | Agent 1: API & Sync | API endpoint mapping + frontend-backend sync | `references/api-audit.md` |
-| Agent 2: Security | Auth coverage, validation, CORS, secrets, injection, CSRF, CSP, dependency vulnerabilities, cookie security, password hashing | `references/security-audit.md` |
+| Agent 2: Security | Auth coverage, validation, CORS, secrets, injection, CSRF, CSP, dependency vulnerabilities, cookie security, password hashing. If Semgrep MCP is available, run `semgrep_scan` alongside manual checks. | `references/security-audit.md` |
 | Agent 3: Scalability & Infra | Query performance, indexes, caching, CI/CD, monitoring | `references/scalability-audit.md` + `references/infrastructure-audit.md` |
 | Agent 4: Dead Code & Architecture | Unused files, orphaned components, duplicate utilities, patchwork, stale config, architectural quality, code complexity | `references/dead-code-audit.md` + `references/architecture-audit.md` |
 
@@ -87,6 +87,19 @@ After all agents complete, the lead assembles the final report:
 4. Add an executive summary with counts per severity and dimension
 5. Add a recommended fix order (blockers grouped by dependency -- fix auth middleware before individual route fixes)
 
+### Step 5: Customise Scope
+
+Users can narrow the audit scope by specifying dimensions:
+- "audit security only" -- spawn only the security agent
+- "audit everything except dead code" -- skip Agent 4
+- "focus on API completeness" -- spawn only Agent 1
+
+When the user specifies a target user count (e.g., "10k users"), pass that to the scalability agent as a sizing constraint.
+
+### Report Output
+
+Save the report to `PRODUCTION-AUDIT.md` in the project root. Follow the full template in `references/report-template.md` (executive summary, findings by severity, findings by dimension, recommended fix order).
+
 ### Task Checklist
 
 ```
@@ -102,10 +115,6 @@ After all agents complete, the lead assembles the final report:
 ```
 
 </instructions>
-
-## Report Output Format
-
-Save the report to `PRODUCTION-AUDIT.md` in the project root. Follow the full template in `references/report-template.md` (executive summary, findings by severity, findings by dimension, recommended fix order).
 
 <examples>
 
@@ -167,15 +176,6 @@ Save the report to `PRODUCTION-AUDIT.md` in the project root. Follow the full te
 </example>
 
 </examples>
-
-## Customisation
-
-Users can narrow the audit scope by specifying dimensions:
-- "audit security only" -- spawn only the security agent
-- "audit everything except dead code" -- skip Agent 4
-- "focus on API completeness" -- spawn only Agent 1
-
-When the user specifies a target user count (e.g., "10k users"), pass that to the scalability agent as a sizing constraint.
 
 ## Tips
 

@@ -4,9 +4,9 @@
 
 ### How to Detect
 
-1. **Find all source files** in the project (excluding dependency directories, build output, and caches).
-2. **For each file, check if it is imported anywhere.** A file imported nowhere is a candidate for removal.
-3. **Exceptions.** These files are entry points and will not have importers:
+1. **Find all source files** (exclude dependencies, build output, caches).
+2. **Check if each file is imported anywhere.** No importers = removal candidate.
+3. **Exceptions** (entry points that will not have importers):
    - Framework convention files (Next.js `page.tsx`/`layout.tsx`/`route.ts`, Django `views.py`/`models.py`, Rails controllers)
    - Middleware and config files
    - Test files (`*.test.*`, `*.spec.*`, `*_test.*`)
@@ -28,9 +28,9 @@ __old__/, _archived/, tmp/, scratch/
 
 ### How to Detect
 
-1. **List all UI component files** (files exporting JSX, template functions, or partials).
-2. **Search for each component name** across the codebase. If never referenced, it is orphaned.
-3. **Check for indirect usage.** Some components are loaded dynamically. Search for the file path in dynamic imports.
+1. **List all UI component files** (JSX exports, template functions, partials).
+2. **Search for each component name** across the codebase. Never referenced = orphaned.
+3. **Check dynamic imports.** Search for the file path in `lazy()`, `dynamic()`, or similar loaders.
 
 ## Duplicate Utilities
 
@@ -90,10 +90,10 @@ public/api/users.json  # was used for frontend development, now stale
 
 ### How to Detect
 
-1. **Conflicting implementations.** Two or more files that solve the same problem differently. This happens when separate AI sessions do not share context.
-2. **Inconsistent patterns.** One module uses structured error handling while another uses bare catches with logging. Look for style drift across directories.
-3. **Partial refactors.** A file was updated to use a new pattern, but callers still use the old pattern.
-4. **Orphaned migration steps.** A feature was half-migrated: new table exists, but old table is still queried by some routes.
+1. **Conflicting implementations.** Two or more files solving the same problem differently (common when separate AI sessions lack shared context).
+2. **Inconsistent patterns.** Style drift across directories (e.g., structured error handling in one module, bare catches in another).
+3. **Partial refactors.** New pattern in some files, old pattern still used by callers.
+4. **Orphaned migration steps.** Half-migrated features: new table exists but old table still queried.
 
 ### Patterns That Indicate Patchwork
 
@@ -122,9 +122,9 @@ For each patchwork finding:
 
 ### How to Detect
 
-1. **Search for large comment blocks.** Multi-line comments or consecutive single-line comments that contain code syntax (function declarations, import statements).
-2. **Search for common markers.** `TODO`, `FIXME`, `HACK`, `TEMP`, `DEPRECATED`, `OLD`.
-3. **Threshold.** Flag blocks of 5+ consecutive commented-out lines. Single-line explanatory comments are normal.
+1. **Large comment blocks.** Multi-line comments containing code syntax (function declarations, imports).
+2. **Common markers.** `TODO`, `FIXME`, `HACK`, `TEMP`, `DEPRECATED`, `OLD`.
+3. **Threshold.** Flag 5+ consecutive commented-out lines. Single-line comments are normal.
 
 ## Broken Imports
 

@@ -5,9 +5,9 @@
 ### What to Check
 
 1. **List query followed by loop queries.** Fetch a list, then query related data inside a loop.
-2. **Missing eager loading.** ORM queries that fetch a list but do not include relations accessed later (Prisma `include`, Django `select_related`/`prefetch_related`, Rails `includes`).
-3. **Sequential queries in request handlers.** Multiple `await` calls that could run in parallel.
-4. **Queries inside iteration.** Route handlers or services that iterate over IDs and query each one individually.
+2. **Missing eager loading.** ORM queries without relations (Prisma `include`, Django `select_related`/`prefetch_related`, Rails `includes`).
+3. **Sequential queries in handlers.** Multiple `await` calls that could run in parallel.
+4. **Queries inside iteration.** Handlers that iterate over IDs and query each individually.
 
 ### What to Report
 
@@ -84,10 +84,10 @@ For each rate limiting finding:
 ### What to Report
 
 For each uncached resource:
-- The endpoint or component
-- How frequently the data changes
+- Endpoint or component path
+- Data change frequency (real-time, hourly, daily, rarely)
 - Estimated request volume
-- Suggested caching strategy (revalidate interval, CDN, key-value store)
+- Suggested strategy: revalidate interval, CDN, or key-value store
 
 ## Output Format
 
