@@ -29,7 +29,6 @@ How the 4 universal lenses apply to software engineering:
 ### Sustainability
 - Maintenance burden: lines of code, abstraction layers, documentation needs
 - Modularity: can components be extracted and reused?
-- Onboarding complexity: how long until a new developer is productive?
 - Extensibility: what changes require rewrites vs. configuration?
 
 ## Augmentation Lens: Adversarial/Security

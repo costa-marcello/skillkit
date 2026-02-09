@@ -18,12 +18,13 @@ If `$ARGUMENTS` is empty, ask the user which skill to review.
 
 | Mode | Trigger | Action |
 |------|---------|--------|
-| **Review** (default) | User says "review", "check", "grade", or gives no mode | Generate quality report |
-| **Auto-Fix** | User says "fix", "improve", "refactor", "auto-fix" | Read, evaluate, then apply fixes |
-| **External Review** | User says "external", target is a GitHub URL | Clone to /tmp/, report only (read-only) |
-| **Auto-PR** | User says "PR", "contribute", "auto-pr" | Fork, fix, submit PR |
+| **Review + Auto-Fix** (default) | User says "review", "check", "grade", or gives no mode | Run full deep review, then auto-fix all findings |
+| **Review Only** | User says "report only", "no fix", "read-only" | Run full deep review, report only, no changes |
+| **Auto-Fix Only** | User says "fix", "improve", "refactor", "auto-fix" | Skip report, apply fixes directly |
+| **External Review** | User says "external", target is a GitHub URL | Clone to /tmp/, full deep review, report only (read-only) |
+| **Auto-PR** | User says "PR", "contribute", "auto-pr" | Fork, full deep review, fix, submit PR |
 
-When no mode keyword is present, default to **Review**.
+When no mode keyword is present, default to **Review + Auto-Fix**. The deep review always runs in every mode. Auto-fix always follows the deep review unless the user explicitly requests report-only output.
 
 ## Setup (Optional)
 
@@ -35,9 +36,9 @@ All modes work without it using manual evaluation.
 
 <instructions>
 
-## Mode 1: Review (Default)
+## Mode 1: Review + Auto-Fix (Default)
 
-Evaluate a skill and generate a quality report.
+Run a full deep review across every evaluation dimension, then automatically fix all findings.
 
 **Step 1: Run automated validation** (if create-skill installed):
 ```bash
@@ -49,11 +50,18 @@ python3 "$CREATE_SKILL"/scripts/security_scan.py <target-skill> --verbose
 
 **Step 3: Content quality evaluation** -- Read `references/content-quality-checklist.md` and evaluate all 8 dimensions (degrees of freedom, conciseness, actionability, options overload, script quality, feedback loops, consistency, time-sensitive content). Record findings per dimension.
 
-**Step 4: Deep review** (run when the skill targets open-source distribution, production use, or the user requests thorough analysis) -- Read `references/research-backed-criteria.md` and check XML tag usage, example quality, defect taxonomy, anti-patterns, formatting, and HELM-inspired metrics.
+**Step 4: Deep review** -- Read `references/research-backed-criteria.md` and check all 6 criteria. Record a pass/fail verdict for each:
+1. XML tag usage
+2. Example quality (3-5 diverse examples)
+3. Defect taxonomy (specification, input, structure, context, performance, maintainability)
+4. Anti-patterns (OWASP, vendor docs, academic)
+5. Formatting effectiveness
+6. HELM-inspired metrics (clarity, actionability, robustness, maintainability, safety)
 
 **Step 5: Generate report** as markdown with:
 - Executive summary table (aspect, grade, notes)
 - Section-by-section findings with file paths and line numbers
+- Deep review results table (criterion, verdict, evidence)
 - Combined grade using the unified rubric from `references/evaluation_checklist.md`
 - Recommended fixes ranked by severity (major first, then minor)
 
@@ -61,9 +69,12 @@ python3 "$CREATE_SKILL"/scripts/security_scan.py <target-skill> --verbose
 - [ ] Every finding has a file path and line number
 - [ ] Grade matches rubric criteria
 - [ ] Fixes are actionable (no "consider" or "ensure")
+- [ ] Deep review covers all 6 criteria from `references/research-backed-criteria.md`
+
+**Step 7: Present report, then proceed to auto-fix.** After showing the full review report, automatically apply all recommended fixes using the Auto-Fix procedure (Mode 2). Do not wait for user confirmation. The review informs the fix -- every finding from Steps 2-4 becomes a fix target.
 
 <example>
-**Review Report Format:**
+**Review + Auto-Fix Report Format:**
 
 # Skill Review: pdf
 
@@ -74,8 +85,20 @@ python3 "$CREATE_SKILL"/scripts/security_scan.py <target-skill> --verbose
 | Frontmatter | A | Third-person description with triggers |
 | Structure | B | 487 lines -- close to 500-line limit |
 | Content Quality | B | One decision point missing a default |
+| Deep Review | B | Missing 2 example tags, no defect in other criteria |
 | Scripts | A | Proper error handling throughout |
 | **Combined** | **B** | One minor structural issue |
+
+## Deep Review Results
+
+| Criterion | Verdict | Evidence |
+|-----------|---------|----------|
+| XML tag usage | Pass | `<instructions>` and `<example>` tags present |
+| Example quality | Fail | Only 2 examples, need 3-5 diverse cases |
+| Defect taxonomy | Pass | No specification, input, structure, context, performance, or maintainability defects |
+| Anti-patterns | Pass | No OWASP, vendor, or academic anti-patterns |
+| Formatting | Pass | Consistent Markdown + XML structure |
+| HELM metrics | Pass | Clarity 5/5, Actionability pass, Robustness pass, Maintainability pass, Safety pass |
 
 ## Findings
 
@@ -92,17 +115,23 @@ python3 "$CREATE_SKILL"/scripts/security_scan.py <target-skill> --verbose
 
 1. Extract advanced section to references (structural)
 2. Add default output format recommendation (content)
+
+---
+
+## Auto-Fix Applied
+
+Proceeding to fix all findings above...
+
+**Changes summary:** 2 issues fixed, 1 file reorganised, line count reduced from 487 to 395.
 </example>
 
 </instructions>
-
----
 
 <instructions>
 
 ## Mode 2: Auto-Fix
 
-Automatically refactor a skill to meet best practices.
+Automatically refactor a skill to meet best practices. When triggered by Mode 1 (Review + Auto-Fix), use the review findings as the fix list. When triggered standalone, run Steps 1-2 below to identify issues first.
 
 ```
 Auto-Fix Progress:
@@ -187,133 +216,21 @@ agent: general-purpose
 
 </instructions>
 
----
-
 <instructions>
 
 ## Mode 3: External Review
 
-Evaluate someone else's skill repository (read-only). Do not modify any files.
-
-**Step 1: Clone the repository:**
-```bash
-git clone <github-url> /tmp/review-target
-```
-
-**Step 2: Read all files** in the skill directory. Start with SKILL.md, then read every file in `references/`, `scripts/`, and `assets/`.
-
-**Step 3: Identify the author's intent** by answering:
-- What problem does this skill solve?
-- Who is the target user?
-- What workflow does it automate?
-
-**Step 4: Run evaluation** -- Follow the same evaluation sequence as Mode 1 (Steps 2-4): structural checks via `references/evaluation_checklist.md`, content quality via `references/content-quality-checklist.md`, and deep review via `references/research-backed-criteria.md` for open-source or production skills.
-
-**Step 5: Generate improvement report** as markdown. Include:
-- What the skill does well (acknowledge strengths first)
-- Findings with file paths and line numbers
-- Suggested improvements ranked by severity
-- Do not make changes -- report only
-
-**Step 6: Verify report** before presenting:
-- [ ] Every finding has a file path and line number
-- [ ] Grade matches rubric criteria
-- [ ] Fixes are actionable (no "consider" or "ensure")
-
-**Step 7: Clean up:**
-```bash
-rm -rf /tmp/review-target
-```
-
-<example>
-**External Review Summary:**
-
-The `data-pipeline` skill handles CSV-to-database ingestion with retry logic and schema validation.
-
-**Strengths:**
-- Clear step-by-step workflow with validation checkpoints
-- Scripts have proper error handling
-
-**Findings:**
-1. (Major) SKILL.md at 620 lines -- exceeds 500-line limit. Move lines 400-580 to `references/schema-validation.md`.
-2. (Minor) Description uses imperative voice ("Browse data..."). Change to "Browses data sources and ingests..."
-3. (Minor) No `context: fork` despite having `<instructions>` tags and script references.
-</example>
+Read `references/mode-external-review.md` for the full procedure. Clone the target to `/tmp/review-target`, run the same three evaluation checks as Mode 1 Steps 2-4, generate a read-only improvement report, then clean up.
 
 </instructions>
-
----
 
 <instructions>
 
 ## Mode 4: Auto-PR
 
-Fork, improve, and submit PR to external skill repository.
-
-```
-Auto-PR Workflow:
-- [ ] Fork repository (gh repo fork)
-- [ ] Create feature branch
-- [ ] Run Auto-Fix mode
-- [ ] Self-review: respect check passed?
-- [ ] Create PR with detailed explanation
-```
-
-### Core Principle: Additive Only
-
-When improving external skills, do not:
-- Delete existing files
-- Remove functionality
-- Change the primary language
-- Rename components
-
-Instead:
-- Add new capabilities alongside existing ones
-- Preserve original content intact
-- Explain every change in the PR description
-
-<example>
-**Additive Changes**
-- BAD: "Removed metadata.json (non-standard)"
-- GOOD: "Added marketplace.json (metadata.json preserved)"
-- BAD: "Rewrote README in English"
-- GOOD: "Added README.en.md (Chinese preserved as default)"
-</example>
-
-### PR Tone Guidelines
-
-<example>
-**Respectful Framing**
-- BAD: "Your skill doesn't follow best practices"
-- GOOD: "This PR aligns with best practices for better discoverability"
-- BAD: "Fixed the incorrect description"
-- GOOD: "Improved description with trigger conditions"
-</example>
-
-### PR Required Sections
-
-1. **Summary** - What this PR does
-2. **What's NOT Changed** - Show respect for original
-3. **Rationale** - Why each change helps
-4. **Test Plan** - How to verify
-
-Template: `references/pr_template.md`
-
-### Self-Review Before Submitting
-
-```
-Respect Check:
-- [ ] No files deleted?
-- [ ] No functionality removed?
-- [ ] Original language preserved?
-- [ ] Author's design decisions respected?
-- [ ] All changes are additive?
-- [ ] PR explains the "why"?
-```
+Read `references/mode-auto-pr.md` for the full procedure. Fork the repository, run a full deep review, apply auto-fix, pass the self-review respect check, then submit a PR using `references/pr_template.md`.
 
 </instructions>
-
----
 
 ## References
 
@@ -321,9 +238,11 @@ Respect Check:
 |------|---------|---------|
 | `references/evaluation_checklist.md` | Structural validation + unified grading rubric | Review, Auto-Fix |
 | `references/content-quality-checklist.md` | Content effectiveness (8 dimensions) | Review, Auto-Fix |
-| `references/research-backed-criteria.md` | Deep review with academic citations | Review (deep) |
+| `references/research-backed-criteria.md` | Deep review with academic citations | All modes (always runs) |
 | `references/script-quality.md` | Script error handling, constants | Review, Auto-Fix |
 | `references/feedback-loops.md` | Multi-step workflow validation | Review, Auto-Fix |
+| `references/mode-external-review.md` | Full External Review procedure | External Review |
+| `references/mode-auto-pr.md` | Full Auto-PR procedure with respect checks | Auto-PR |
 | `references/pr_template.md` | PR description template | Auto-PR |
 | `references/marketplace_template.json` | marketplace.json template | Auto-PR |
 | `references/sources.md` | Bibliography | Review (deep) |

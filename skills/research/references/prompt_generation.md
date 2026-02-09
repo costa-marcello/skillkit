@@ -8,7 +8,7 @@ Based on what they want to create, write a **single, highly-tailored prompt** us
 
 ### Match the FORMAT the Research Recommends
 
-**If research says to use a specific prompt FORMAT, you MUST use that format:**
+**If research says to use a specific prompt format, use that format:**
 
 - Research says "JSON prompts" -> Write the prompt AS JSON
 - Research says "structured parameters" -> Use structured key: value format
@@ -35,7 +35,7 @@ This uses [brief 1-line explanation of which research insight you applied — ci
 
 ### Quality Checklist
 
-- [ ] **FORMAT MATCHES RESEARCH** — If research said JSON/structured/etc, prompt IS that format
+- [ ] **Format matches research** -- If research said JSON/structured/etc, prompt uses that format
 - [ ] Directly addresses what the user said they want to create
 - [ ] Uses specific patterns/keywords discovered in research (from BOTH community and official sources)
 - [ ] Ready to paste with zero edits (or minimal [PLACEHOLDERS] clearly marked)

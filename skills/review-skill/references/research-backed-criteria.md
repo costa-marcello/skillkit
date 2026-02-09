@@ -137,17 +137,6 @@ For comprehensive skill assessment, evaluate across multiple dimensions.
 
 ---
 
-## 7. When to Use Deep Review
-
-| Scenario | Use Deep Review |
-|----------|-----------------|
-| Open-source contribution | Yes - higher bar for community skills |
-| Production skill | Yes - reliability matters |
-| Personal/experimental | No - standard review sufficient |
-| User requests thorough review | Yes - consult this file |
-
----
-
 ## Quick Checklist for Deep Review
 
 ```

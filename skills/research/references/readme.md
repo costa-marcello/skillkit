@@ -49,6 +49,8 @@ Examples:
 
 ---
 
+> **Note:** The examples below are point-in-time snapshots showing real outputs from when each query was run. Specific chart positions, engagement numbers, and trending topics will differ when you run the same queries today.
+
 ## Example: Legal Prompting (Hallucination Prevention)
 
 **Query:** `/research prompting techniques for chatgpt for legal questions`

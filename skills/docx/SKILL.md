@@ -7,182 +7,228 @@ context: fork
 
 # DOCX Creation, Editing, and Analysis
 
-> **Required Reading**: Before creating or editing documents, read the referenced files completely (`docx-js.md` for creation, `ooxml.md` for editing). These contain critical syntax and patterns.
+Read the relevant reference file completely before starting work:
+- **Creating** a new document: read `references/docx-js.md`
+- **Editing** an existing document: read `references/ooxml.md`
 
 ## Workflow Decision Tree
 
-| Task | Workflow |
-|------|----------|
-| Read/analyze content | Text extraction or Raw XML access |
-| Create new document | docx-js workflow (read `docx-js.md` first) |
-| Edit your own doc (simple) | Basic OOXML editing |
-| Edit someone else's doc | Redlining workflow (recommended) |
-| Legal/business/government | Redlining workflow (required) |
+| Task | Workflow | Reference |
+|------|----------|-----------|
+| Read/analyse content | Text extraction (pandoc) or Raw XML | None needed |
+| Create new document | docx-js (JavaScript) | `references/docx-js.md` |
+| Edit your own doc (simple) | OOXML editing | `references/ooxml.md` |
+| Edit someone else's doc | Redlining workflow (recommended) | `references/ooxml.md` |
+| Legal/business/government | Redlining workflow (required) | `references/ooxml.md` |
 
-## Reading and analyzing content
+---
 
-### Text extraction
-If you just need to read the text contents of a document, you should convert the document to markdown using pandoc. Pandoc provides excellent support for preserving document structure and can show tracked changes:
+<instructions>
+
+## Reading and Analysing Content
+
+### Text Extraction (Default)
+
+Convert the document to markdown with pandoc:
 
 ```bash
-# Convert document to markdown with tracked changes
 pandoc --track-changes=all path-to-file.docx -o output.md
-# Options: --track-changes=accept/reject/all
+# Options: --track-changes=accept (default) / reject / all
 ```
 
-### Raw XML access
-You need raw XML access for: comments, complex formatting, document structure, embedded media, and metadata. For any of these features, you'll need to unpack a document and read its raw XML contents.
+Default to `--track-changes=all` to preserve revision history. Use `accept` only when the user wants clean text without markup.
 
-#### Unpacking a file
-`python ooxml/scripts/unpack.py <office_file> <output_directory>`
+### Raw XML Access
 
-#### Key file structures
-* `word/document.xml` - Main document contents
-* `word/comments.xml` - Comments referenced in document.xml
-* `word/media/` - Embedded images and media files
-* Tracked changes use `<w:ins>` (insertions) and `<w:del>` (deletions) tags
+Use raw XML when you need: comments, complex formatting, document structure, embedded media, or metadata.
 
-## Creating a new Word document
+```bash
+python ooxml/scripts/unpack.py <office_file> <output_directory>
+```
 
-When creating a new Word document from scratch, use **docx-js**, which allows you to create Word documents using JavaScript/TypeScript.
+Key files after unpacking:
+- `word/document.xml` -- main document body
+- `word/comments.xml` -- comments referenced in document.xml
+- `word/media/` -- embedded images and media
+- Tracked changes use `<w:ins>` (insertions) and `<w:del>` (deletions) tags
 
-### Workflow
-1. Read [`docx-js.md`](docx-js.md) completely (~500 lines)
-2. Create JavaScript/TypeScript using Document, Paragraph, TextRun components
-3. Export as .docx using Packer.toBuffer()
+</instructions>
 
-## Editing an existing Word document
+---
 
-When editing an existing Word document, use the **Document library** (a Python library for OOXML manipulation). The library automatically handles infrastructure setup and provides methods for document manipulation. For complex scenarios, you can access the underlying DOM directly through the library.
+<instructions>
 
-### Workflow
-1. Read [`ooxml.md`](ooxml.md) completely (~600 lines)
-2. Unpack: `python ooxml/scripts/unpack.py <office_file> <output_directory>`
-3. Edit using Document library (see "Document Library" section in ooxml.md)
-4. Pack: `python ooxml/scripts/pack.py <input_directory> <office_file>`
+## Creating a New Word Document
 
-The Document library provides both high-level methods for common operations and direct DOM access for complex scenarios.
+Use **docx-js** (JavaScript/TypeScript) for new documents.
 
-## Redlining workflow for document review
+1. Read `references/docx-js.md` completely
+2. Write a script using Document, Paragraph, TextRun components
+3. Export with `Packer.toBuffer()`
+4. Verify the output opens in Word/LibreOffice without errors
 
-This workflow allows you to plan comprehensive tracked changes using markdown before implementing them in OOXML. **CRITICAL**: For complete tracked changes, you must implement ALL changes systematically.
+<example>
+**Task:** User says "Create a one-page memo with a title and two bullet points"
 
-**Batching Strategy**: Group related changes into batches of 3-10 changes. This makes debugging manageable while maintaining efficiency. Test each batch before moving to the next.
+**Action:**
+1. Read `references/docx-js.md`
+2. Create script with Document, Paragraph, TextRun, numbering config for bullets
+3. Run: `node memo.js`
+4. Verify: `soffice --headless --convert-to pdf memo.docx && pdftoppm -jpeg -r 150 memo.pdf preview`
+</example>
 
-**Principle: Minimal, Precise Edits**
-When implementing tracked changes, only mark text that actually changes. Repeating unchanged text makes edits harder to review and appears unprofessional. Break replacements into: [unchanged text] + [deletion] + [insertion] + [unchanged text]. Preserve the original run's RSID for unchanged text by extracting the `<w:r>` element from the original and reusing it.
+</instructions>
 
-Example - Changing "30 days" to "60 days" in a sentence:
+---
+
+<instructions>
+
+## Editing an Existing Word Document
+
+Use the **Document library** (Python) from `scripts/document.py`. It handles infrastructure setup automatically (people.xml, RSIDs, settings.xml, comments, relationships, content types).
+
+### Standard Editing Workflow
+
+1. Read `references/ooxml.md` completely (focus on "Document Library" section)
+2. Unpack: `python ooxml/scripts/unpack.py <file.docx> <output_dir>`
+3. Edit using Document library methods
+4. Pack: `python ooxml/scripts/pack.py <output_dir> <result.docx>`
+5. Verify: convert to markdown and check output
+
+<example>
+**Task:** User says "Change '30 days' to '60 days' in this contract"
+
+**Action:**
 ```python
-# BAD - Replaces entire sentence
-'<w:del><w:r><w:delText>The term is 30 days.</w:delText></w:r></w:del><w:ins><w:r><w:t>The term is 60 days.</w:t></w:r></w:ins>'
-
-# GOOD - Only marks what changed, preserves original <w:r> for unchanged text
-'<w:r w:rsidR="00AB12CD"><w:t>The term is </w:t></w:r><w:del><w:r><w:delText>30</w:delText></w:r></w:del><w:ins><w:r><w:t>60</w:t></w:r></w:ins><w:r w:rsidR="00AB12CD"><w:t> days.</w:t></w:r>'
+from scripts.document import Document
+doc = Document('unpacked', track_revisions=True)
+node = doc["word/document.xml"].get_node(tag="w:r", contains="30 days")
+rpr = tags[0].toxml() if (tags := node.getElementsByTagName("w:rPr")) else ""
+replacement = (
+    f'<w:r w:rsidR="ORIGINAL">{rpr}<w:t>within </w:t></w:r>'
+    f'<w:del><w:r>{rpr}<w:delText>30</w:delText></w:r></w:del>'
+    f'<w:ins><w:r>{rpr}<w:t>60</w:t></w:r></w:ins>'
+    f'<w:r w:rsidR="ORIGINAL">{rpr}<w:t> days</w:t></w:r>'
+)
+doc["word/document.xml"].replace_node(node, replacement)
+doc.save()
 ```
+</example>
 
-### Tracked changes workflow
+</instructions>
 
-1. **Get markdown representation**: Convert document to markdown with tracked changes preserved:
+---
+
+<instructions>
+
+## Redlining Workflow (Document Review with Tracked Changes)
+
+Plan tracked changes in markdown before implementing in OOXML. Group related changes into batches of 3-10 for manageable debugging.
+
+**Principle: Minimal, Precise Edits.** Only mark text that actually changes. Repeating unchanged text makes edits harder to review. Break replacements into: [unchanged text] + [deletion] + [insertion] + [unchanged text]. Preserve the original run's RSID for unchanged text.
+
+### Step-by-Step
+
+1. **Get markdown representation:**
    ```bash
    pandoc --track-changes=all path-to-file.docx -o current.md
    ```
 
-2. **Identify and group changes**: Review the document and identify ALL changes needed, organizing them into logical batches:
-
-   **Location methods** (for finding changes in XML):
-   - Section/heading numbers (e.g., "Section 3.2", "Article IV")
-   - Paragraph identifiers if numbered
+2. **Identify and group changes.** Organise into batches by section, type, or proximity. Use these location methods for finding text in XML:
+   - Section/heading numbers (e.g., "Section 3.2")
    - Grep patterns with unique surrounding text
-   - Document structure (e.g., "first paragraph", "signature block")
-   - **DO NOT use markdown line numbers** - they don't map to XML structure
+   - Document structure (e.g., "first paragraph after Heading 2")
+   - Do NOT use markdown line numbers -- they do not map to XML structure
 
-   **Batch organization** (group 3-10 related changes per batch):
-   - By section: "Batch 1: Section 2 amendments", "Batch 2: Section 5 updates"
-   - By type: "Batch 1: Date corrections", "Batch 2: Party name changes"
-   - By complexity: Start with simple text replacements, then tackle complex structural changes
-   - Sequential: "Batch 1: Pages 1-3", "Batch 2: Pages 4-6"
-
-3. **Read documentation and unpack**:
-   - Read [`ooxml.md`](ooxml.md) (~600 lines) - focus on "Document Library" and "Tracked Change Patterns"
+3. **Read documentation and unpack:**
+   - Read `references/ooxml.md` -- focus on "Document Library" and "Tracked Change Patterns"
    - Unpack: `python ooxml/scripts/unpack.py <file.docx> <dir>`
-   - Note the suggested RSID from unpack script for tracked changes
+   - Note the suggested RSID from unpack script
 
-4. **Implement changes in batches**: Group changes logically (by section, by type, or by proximity) and implement them together in a single script. This approach:
-   - Makes debugging easier (smaller batch = easier to isolate errors)
-   - Allows incremental progress
-   - Maintains efficiency (batch size of 3-10 changes works well)
+4. **Implement changes in batches.** For each batch:
+   - Grep `word/document.xml` to verify current text and line numbers (they shift after each script)
+   - Write a script using `get_node` to find nodes, then `replace_node`, `suggest_deletion`, or `insert_after`
+   - Run the script and verify with `doc.save()`
 
-   **Suggested batch groupings:**
-   - By document section (e.g., "Section 3 changes", "Definitions", "Termination clause")
-   - By change type (e.g., "Date changes", "Party name updates", "Legal term replacements")
-   - By proximity (e.g., "Changes on pages 1-3", "Changes in first half of document")
-
-   For each batch of related changes:
-
-   **a. Map text to XML**: Grep for text in `word/document.xml` to verify how text is split across `<w:r>` elements.
-
-   **b. Create and run script**: Use `get_node` to find nodes, implement changes, then `doc.save()`. See **"Document Library"** section in ooxml.md for patterns.
-
-   **Note**: Always grep `word/document.xml` immediately before writing a script to get current line numbers and verify text content. Line numbers change after each script run.
-
-5. **Pack the document**: After all batches are complete, convert the unpacked directory back to .docx:
+5. **Pack the document:**
    ```bash
    python ooxml/scripts/pack.py unpacked reviewed-document.docx
    ```
 
-6. **Final verification**: Do a comprehensive check of the complete document:
-   - Convert final document to markdown:
-     ```bash
-     pandoc --track-changes=all reviewed-document.docx -o verification.md
-     ```
-   - Verify ALL changes were applied correctly:
-     ```bash
-     grep "original phrase" verification.md  # Should NOT find it
-     grep "replacement phrase" verification.md  # Should find it
-     ```
-   - Check that no unintended changes were introduced
+6. **Final verification:**
+   ```bash
+   pandoc --track-changes=all reviewed-document.docx -o verification.md
+   grep "original phrase" verification.md   # Should NOT match
+   grep "replacement phrase" verification.md # Should match
+   ```
 
+<example>
+**Task:** User says "Review this NDA and suggest changing the non-compete period from 2 years to 1 year, and update the jurisdiction from New York to Delaware"
+
+**Batch plan:**
+- Batch 1 (Term changes): "2 years" to "1 year" in Section 5
+- Batch 2 (Jurisdiction): "New York" to "Delaware" in Section 8
+
+**Per batch:** grep for text, write script, run, verify. After all batches, pack and do final verification.
+</example>
+
+### Method Selection Guide
+
+| Scenario | Method |
+|----------|--------|
+| Change part of regular text | `replace_node()` with `<w:del>`/`<w:ins>` |
+| Delete entire run or paragraph | `suggest_deletion()` |
+| Reject another author's insertion | `revert_insertion()` (NOT `suggest_deletion()`) |
+| Restore another author's deletion | `revert_deletion()` |
+| Partially modify another author's change | `replace_node()` with nested `<w:ins>`/`<w:del>` |
+
+</instructions>
+
+---
+
+<instructions>
 
 ## Converting Documents to Images
 
-To visually analyze Word documents, convert them to images using a two-step process:
+Two-step process for visual analysis:
 
-1. **Convert DOCX to PDF**:
-   ```bash
-   soffice --headless --convert-to pdf document.docx
-   ```
-
-2. **Convert PDF pages to JPEG images**:
-   ```bash
-   pdftoppm -jpeg -r 150 document.pdf page
-   ```
-   This creates files like `page-1.jpg`, `page-2.jpg`, etc.
-
-Options:
-- `-r 150`: Sets resolution to 150 DPI (adjust for quality/size balance)
-- `-jpeg`: Output JPEG format (use `-png` for PNG if preferred)
-- `-f N`: First page to convert (e.g., `-f 2` starts from page 2)
-- `-l N`: Last page to convert (e.g., `-l 5` stops at page 5)
-- `page`: Prefix for output files
-
-Example for specific range:
 ```bash
-pdftoppm -jpeg -r 150 -f 2 -l 5 document.pdf page  # Converts only pages 2-5
+# Step 1: DOCX to PDF
+soffice --headless --convert-to pdf document.docx
+
+# Step 2: PDF pages to JPEG
+pdftoppm -jpeg -r 150 document.pdf page
+# Creates page-1.jpg, page-2.jpg, etc.
+
+# For specific pages only:
+pdftoppm -jpeg -r 150 -f 2 -l 5 document.pdf page
 ```
 
-## Code Style Guidelines
-**IMPORTANT**: When generating code for DOCX operations:
-- Write concise code
-- Avoid verbose variable names and redundant operations
-- Avoid unnecessary print statements
+Use `-r 150` for a good quality/size balance. Increase to 300 for print-quality output.
+
+</instructions>
+
+---
+
+## Code Style
+
+Write concise code. Avoid verbose variable names, redundant operations, and unnecessary print statements.
 
 ## Dependencies
 
-Required dependencies (install if not available):
+Install if not available:
 
-- **pandoc**: `sudo apt-get install pandoc` (for text extraction)
-- **docx**: `npm install -g docx` (for creating new documents)
-- **LibreOffice**: `sudo apt-get install libreoffice` (for PDF conversion)
-- **Poppler**: `sudo apt-get install poppler-utils` (for pdftoppm to convert PDF to images)
-- **defusedxml**: `pip install defusedxml` (for secure XML parsing)
+| Dependency | Install | Purpose |
+|------------|---------|---------|
+| pandoc | `brew install pandoc` or `apt-get install pandoc` | Text extraction |
+| docx | `npm install -g docx` | Creating new documents |
+| LibreOffice | `brew install --cask libreoffice` or `apt-get install libreoffice` | PDF conversion |
+| Poppler | `brew install poppler` or `apt-get install poppler-utils` | PDF to images |
+| defusedxml | `pip install defusedxml` | Secure XML parsing |
+
+## References
+
+| File | Purpose |
+|------|---------|
+| `references/docx-js.md` | docx-js API patterns for creating new documents |
+| `references/ooxml.md` | OOXML XML patterns, Document library API, tracked changes |

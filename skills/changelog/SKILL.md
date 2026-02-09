@@ -1,7 +1,8 @@
 ---
 name: changelog
-description: Generates and updates CHANGELOG.md files from git history using Keep a Changelog format. Triggers on /changelog command OR when user mentions changelog, release notes, what changed, version history, update changelog, generate changelog, create changelog, add to changelog, changelog entry, release documentation.
+description: "Generates and updates CHANGELOG.md files from git history using Keep a Changelog format. Use when creating changelogs, adding release notes, documenting version history, or preparing release documentation."
 context: fork
+agent: general-purpose
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash(git *)
 argument-hint: "[version or date-range or 'update']"
 ---
@@ -96,46 +97,28 @@ git tag --sort=-v:refname | head -10
 
 ## Commit Categorization
 
-Map Conventional Commits prefixes to Keep a Changelog sections:
+Map Conventional Commits prefixes to Keep a Changelog sections. See `references/changelog_format.md` for the full type-to-section mapping, writing style guidelines, and anti-patterns.
+
+**Quick reference:**
 
 | Commit Prefix | Changelog Section |
 |---------------|-------------------|
-| `feat:`, `feature:` | Added |
-| `fix:`, `bugfix:` | Fixed |
-| `change:`, `refactor:` (user-visible) | Changed |
-| `deprecate:`, `deprecated:` | Deprecated |
-| `remove:`, `removed:` | Removed |
-| `security:`, `sec:` | Security |
-| `perf:` (user-visible) | Changed |
-| `docs:`, `test:`, `ci:`, `chore:` | Usually filtered |
+| `feat:` | Added |
+| `fix:` | Fixed |
+| `refactor:` (user-visible) | Changed |
+| `security:` | Security |
+| `docs:`, `test:`, `ci:`, `chore:` | Filter out |
 
-## Filtering Guidelines
+**Always include:** features, user-facing bug fixes, breaking changes, security fixes.
+**Always filter:** merge commits, internal refactors, test changes, CI config, typos.
 
-**Include:**
-- New features users can use
-- Bug fixes affecting user experience
-- Breaking changes (mark prominently)
-- Security fixes
-- Significant performance improvements
-
-**Filter:**
-- Merge commits
-- Internal refactors (unless affecting API)
-- Test additions/changes
-- CI/CD configuration
-- Documentation updates (unless user-facing)
-- Typo fixes
-
-## Translation Examples
-
-| Technical Commit | User-Friendly Entry |
-|------------------|---------------------|
-| `fix(auth): resolve JWT expiry edge case` | Fixed session timeout issues for long-running sessions |
-| `feat(api): add /users endpoint` | Added user management API endpoints |
-| `perf(db): optimize query N+1` | Improved page load performance |
-| `fix: handle null pointer in parser` | Fixed crash when processing empty input |
+Translate technical commits to user-friendly language:
+- `fix(auth): resolve JWT expiry edge case` -> "Fixed session timeout issues for long-running sessions"
+- `feat(api): add /users endpoint` -> "Added user management API endpoints"
 
 </instructions>
+
+<formatting>
 
 ## Output Format
 
@@ -169,6 +152,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.0.0]: https://github.com/owner/repo/releases/tag/v1.0.0
 ```
 
+</formatting>
+
 ## Examples
 
 <example>
@@ -201,12 +186,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Output**: Clean, non-technical release notes suitable for end users
 </example>
 
-## Resources
+## References
 
-See `references/changelog_format.md` for:
-- Keep a Changelog specification and section definitions
-- Conventional Commits type-to-section mapping
-- Writing style guidelines for different audiences
-- Anti-patterns to avoid
-- Complete changelog example
-- Git commands for commit analysis
+| File | Content |
+|------|---------|
+| `references/changelog_format.md` | Full Keep a Changelog spec, Conventional Commits mapping, writing style guide, anti-patterns, complete example |
