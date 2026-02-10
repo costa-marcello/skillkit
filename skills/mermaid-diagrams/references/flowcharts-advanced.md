@@ -250,15 +250,13 @@ flowchart TD
 
 ## Best Practices
 
-1. **Use meaningful labels** - Node text should be clear and action-oriented
-2. **Consistent node shapes** - Same shapes for same types of actions
-3. **Decision nodes as diamonds** - Standard convention for yes/no decisions
-4. **Flow top-to-bottom or left-to-right** - Natural reading direction
-5. **Start and end nodes** - Use stadium/pill shapes to mark entry/exit
-6. **Group related steps** - Use subgraphs for logical groupings
-7. **Color code** - Use colors to highlight different types of actions
-8. **Minimize crossing lines** - Reorganize for clarity
-9. **Keep it focused** - One process per diagram
+1. **Write action-oriented labels** - "Validate input" not "Validation". Every node should read as a step someone performs.
+2. **Use the same shape for the same type of action** - Rectangles for process steps, diamonds for decisions, stadiums `([...])` for start/end.
+3. **Default to `TD` (top-down) or `LR` (left-right)** - These match natural reading direction. Use `BT` or `RL` only when the flow requires it.
+4. **Mark start and end nodes** with stadium/pill shapes `([Start])` and `([End])`.
+5. **Group 3+ related steps in a `subgraph`** - Name the subgraph after the phase (e.g., "Validation", "Deployment").
+6. **Apply `classDef` for colour coding** - Define reusable classes (`success`, `error`, `warning`) rather than styling individual nodes.
+7. **Limit to one process per diagram** - If you need to show two processes, create two diagrams and link them with a parent overview.
 
 ## Common Patterns
 

@@ -49,7 +49,6 @@ erDiagram
 - `PK` - Primary Key
 - `FK` - Foreign Key
 - `UK` - Unique Key
-- `NN` - Not Null
 
 </example>
 
@@ -60,7 +59,7 @@ erDiagram
 **Cardinality indicators:**
 - `||` - Exactly one
 - `|o` - Zero or one
-- `}{` - One or many
+- `}|` / `|{` - One or many
 - `}o` - Zero or many
 
 **Relationship line:**

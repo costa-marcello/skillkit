@@ -426,37 +426,12 @@ sequenceDiagram
 
 ## Best Practices
 
-1. **Order participants logically** - Typically: User → Frontend → Backend → Database
-2. **Use activations** - Shows when components are actively processing
-3. **Group related logic** - Use alt/opt/par to organize conditional flows
-4. **Add descriptive notes** - Explain complex logic or important details
-5. **Keep diagrams focused** - One scenario per diagram
-6. **Number messages** - Use autonumber for complex flows
-7. **Show error paths** - Document failure scenarios with alt/else
-8. **Indicate async operations** - Use open arrows for fire-and-forget messages
+1. **Order participants left-to-right by call chain** - User, Frontend, Backend, Database. This minimises arrow crossings.
+2. **Add `+`/`-` activations** on every request/response pair to show processing duration.
+3. **Wrap conditional logic in `alt`/`opt`/`par` blocks** - Never show branching without a control structure.
+4. **Add `Note over` to explain non-obvious logic** - e.g., "Validates JWT signature before forwarding".
+5. **One scenario per diagram** - Split "happy path" and "error path" into separate diagrams when combined length exceeds 20 messages.
+6. **Add `autonumber`** for any diagram with more than 6 messages.
+7. **Show every error response with `alt`/`else`** - Undocumented failure modes are the top cause of integration surprises.
+8. **Use open arrows (`-)`) for fire-and-forget** and solid arrows (`->>`) for request/response.
 
-## Common Use Cases
-
-### Authentication
-- Login flows
-- OAuth/SSO flows
-- Token refresh
-- Password reset
-
-### API Operations
-- CRUD operations
-- Search and filtering
-- Batch processing
-- Webhook handling
-
-### System Integration
-- Microservice communication
-- Third-party API calls
-- Message queue processing
-- Event-driven architecture
-
-### Business Processes
-- Order fulfillment
-- Payment processing
-- Approval workflows
-- Notification chains

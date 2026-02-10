@@ -199,16 +199,12 @@ erDiagram
 
 ## Best Practices
 
-1. **Name entities in UPPERCASE** - Convention for clarity
-2. **Use singular names** - `USER` not `USERS`, `ORDER` not `ORDERS`
-3. **Define all constraints** - Document PKs, FKs, UKs, NOT NULL
-4. **Show cardinality accurately** - Be precise about one-to-many vs many-to-many
-5. **Include timestamps** - created_at, updated_at for auditing
-6. **Document computed columns** - Mark calculated/derived values
-7. **Add meaningful comments** - Use quotes for constraints and descriptions
-8. **Consider junction tables** - Explicitly model many-to-many relationships
-9. **Use appropriate types** - Match database-specific types
-10. **Show indexes** - Document UK (unique keys) beyond PKs
+1. **Name entities in UPPERCASE singular** - `USER` not `USERS`, `ORDER` not `ORDERS`.
+2. **Mark every constraint** - Add `PK`, `FK`, `UK`, and `"NOT NULL"` on every column that has them. Missing constraints are invisible bugs.
+3. **Specify exact cardinality** - Use `||--o{` (one-to-many) vs `}o--o{` (many-to-many). Wrong cardinality misleads schema reviews.
+4. **Add `created_at` and `updated_at` timestamps** to every table for audit trails.
+5. **Model many-to-many with an explicit junction table** - Show the join entity with its own attributes (e.g., `enrolled_date` on `ENROLLMENT`).
+6. **Mark computed columns with `"COMPUTED"`** so readers know they are derived, not stored.
 
 ## Common Patterns
 
@@ -243,8 +239,8 @@ erDiagram
     }
 
     ENROLLMENT {
-        uuid student_id FK PK
-        uuid course_id FK PK
+        uuid student_id PK, FK
+        uuid course_id PK, FK
         date enrolled_date
         varchar grade
     }
@@ -323,13 +319,3 @@ erDiagram
 
 </example>
 
-## Tips for Database Design
-
-1. **Normalize appropriately** - Balance normalization with query performance
-2. **Use surrogate keys** - UUID or auto-increment integers as PKs
-3. **Index foreign keys** - Essential for join performance
-4. **Plan for soft deletes** - Add deleted_at columns instead of hard deletes
-5. **Version critical data** - Maintain history for important entities
-6. **Set appropriate defaults** - created_at, status, boolean flags
-7. **Consider denormalization** - Counts and cached values for performance
-8. **Use enum/check constraints** - Enforce valid values at database level

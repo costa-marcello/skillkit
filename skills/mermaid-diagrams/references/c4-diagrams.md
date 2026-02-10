@@ -310,7 +310,7 @@ C4Container
 
     Container_Boundary(services, "Microservices") {
         Container(auth, "Auth Service", "Go", "Authentication & authorization")
-        Container(user, "User Service", "Node.js", "User profiles & preferences")
+        Container(user_svc, "User Service", "Node.js", "User profiles & preferences")
         Container(video, "Video Service", "Python", "Video metadata & management")
         Container(recommendation, "Recommendation Engine", "Python/ML", "Content recommendations")
         Container(analytics, "Analytics Service", "Go", "View tracking & metrics")
@@ -337,7 +337,7 @@ C4Container
 
     Rel(api_gateway, auth, "Authenticates", "gRPC")
     Rel(graphql, video, "Gets videos", "gRPC")
-    Rel(graphql, user, "Gets users", "gRPC")
+    Rel(graphql, user_svc, "Gets users", "gRPC")
     Rel(graphql, recommendation, "Gets recommendations", "gRPC")
 
     Rel(video, storage, "Stores videos", "S3 API")
@@ -345,7 +345,7 @@ C4Container
     Rel(video, cdn, "Publishes to", "API")
 
     Rel(auth, user_db, "Manages credentials", "SQL")
-    Rel(user, user_db, "Stores profiles", "SQL")
+    Rel(user_svc, user_db, "Stores profiles", "SQL")
     Rel(video, video_db, "Stores metadata", "MongoDB")
     Rel(analytics, analytics_db, "Stores metrics", "SQL")
 
@@ -363,16 +363,14 @@ C4Container
 
 ## Best Practices
 
-1. **Use appropriate level** - Context for stakeholders, Container for architects, Component for developers
-2. **Keep it focused** - One system per Context diagram, one container per Component diagram
-3. **Show key relationships** - Don't clutter with every possible connection
-4. **Use consistent naming** - Same names across all diagram levels
-5. **Add technology details** - Specify frameworks, languages, protocols at Container/Component level
-6. **Update regularly** - Keep diagrams in sync with architecture
-7. **Use boundaries** - Group related containers/components logically
-8. **Document protocols** - Show communication methods (REST, gRPC, messaging)
-9. **Highlight external systems** - Use *_Ext variants for clarity
-10. **Start simple** - Begin with Context, drill down as needed
+1. **Match diagram level to audience** - Context for stakeholders, Container for architects, Component for developers. Pick one level per diagram.
+2. **Limit to one system per Context diagram** and one container per Component diagram.
+3. **Show only relationships that affect design decisions** - Omit trivial connections.
+4. **Reuse the same names across all C4 levels** - If the Context diagram says "Payment Gateway", the Container diagram must match.
+5. **Add technology and protocol to every Container/Component** - Write `Container(api, "API", "Node.js/Express", "Handles routing")` not just `Container(api, "API")`.
+6. **Wrap related containers in `Container_Boundary`** - Name boundaries after the deployment unit or team.
+7. **Mark external systems with `*_Ext` variants** - `System_Ext`, `Container_Ext` make trust boundaries visible.
+8. **Start at Context level** and drill down only when the audience needs internal detail.
 
 ## Common Architecture Patterns
 

@@ -170,14 +170,14 @@ For in-depth guidance on specific diagram types, see:
 
 ## Best Practices
 
-1. **Start Simple** - Begin with core entities/components, add details incrementally
-2. **Use Meaningful Names** - Clear labels make diagrams self-documenting
-3. **Comment Extensively** - Use `%%` comments to explain complex relationships
-4. **Keep Focused** - One diagram per concept; split large diagrams into multiple focused views
-5. **Version Control** - Store `.mmd` files alongside code for easy updates
-6. **Add Context** - Include titles and notes to explain diagram purpose
-7. **Iterate** - Refine diagrams as understanding evolves
-8. **Ensure Accessibility** - Use high-contrast colors, don't rely on color alone to convey meaning, include descriptive labels
+1. **Draft core entities first** - Add 3-5 main nodes, then connect. Add attributes and detail in a second pass.
+2. **Label every node and edge** - Unlabelled arrows force readers to guess the relationship.
+3. **Add `%%` comments above complex sections** - Explain why, not what. Future editors read comments before syntax.
+4. **Split at 15 nodes** - Diagrams with more than 15 nodes lose clarity. Break into focused views linked by a parent diagram.
+5. **Store `.mmd` files next to the code they describe** - Keep diagrams and source in the same PR so they stay in sync.
+6. **Set a title on every diagram** - Use the `title` keyword or a Markdown heading directly above the code block.
+7. **Test in Mermaid Live before committing** - Paste the diagram into [mermaid.live](https://mermaid.live) to catch silent failures.
+8. **Check colour contrast** - Verify foreground/background pairs meet WCAG AA (4.5:1 ratio). Do not rely on colour alone to convey meaning.
 
 </best-practices>
 
@@ -240,7 +240,7 @@ flowchart LR
     A --> B
 ```
 
-**Available themes:** default, forest, dark, neutral, base
+**Available themes:** default (recommended), forest, dark, neutral, base (for full colour control)
 
 **Layout options:**
 - `layout: dagre` (default) - Classic balanced layout

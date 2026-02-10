@@ -11,7 +11,7 @@ Add YAML configuration at the top of diagrams:
 ```mermaid
 ---
 config:
-  theme: dark
+  theme: base
   themeVariables:
     primaryColor: "#ff6b6b"
     primaryTextColor: "#fff"
@@ -37,12 +37,12 @@ config:
 ---
 ```
 
-**Available themes:**
-- `default` - Standard blue theme
+**Available themes (default to `default`; use `base` when you need full colour control):**
+- `default` - Standard blue theme (recommended)
 - `forest` - Green earth tones
 - `dark` - Dark mode friendly
 - `neutral` - Grayscale professional
-- `base` - Minimal base theme for customization
+- `base` - Minimal base theme for full customisation
 
 <example name="Default Theme">
 
@@ -183,6 +183,10 @@ flowchart LR
 ### Sequence Diagram Styling
 
 ```mermaid
+---
+config:
+  theme: forest
+---
 sequenceDiagram
     participant A
     participant B
@@ -192,8 +196,6 @@ sequenceDiagram
     B->>C: Message 2
 
     Note over A,C: Styled note
-
-    %%{init: {'theme':'forest'}}%%
 ```
 
 </example>
@@ -203,6 +205,10 @@ sequenceDiagram
 ### Class Diagram Styling
 
 ```mermaid
+---
+config:
+  theme: dark
+---
 classDiagram
     class User {
         +String name
@@ -214,8 +220,6 @@ classDiagram
     }
 
     User <|-- Admin
-
-    %%{init: {'theme':'dark'}}%%
 ```
 
 </example>
@@ -326,8 +330,8 @@ flowchart TD
 
 ## Best Practices for Theming
 
-1. **Use themes consistently** - Pick one theme for related diagrams
-2. **Don't over-style** - Too many colors can reduce clarity
-3. **Test hand-drawn look** - Some diagrams work better with classic look
-4. **Keep it accessible** - Ensure sufficient color contrast
-5. **Version control configs** - Track theme changes in your repository
+1. **Pick one theme per document** - All diagrams in the same page or README should share the same theme for visual consistency.
+2. **Limit custom colours to 3-4** - More than that creates visual noise. Use `classDef` to apply them consistently.
+3. **Try `look: handDrawn` for informal docs** and `look: classic` for technical specifications. Match the tone to the audience.
+4. **Check WCAG AA contrast** (4.5:1 ratio) for every `primaryTextColor`/`primaryColor` pair. Test with a colour contrast checker.
+5. **Put config frontmatter in the diagram** rather than global CSS so each diagram is self-contained and portable.

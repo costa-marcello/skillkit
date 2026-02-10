@@ -220,7 +220,7 @@ classDiagram
         <<abstract>>
         +int x
         +int y
-        +draw()* abstract
+        +draw()*
         +move(x, y)
     }
 
@@ -381,12 +381,12 @@ classDiagram
 
 ## Tips for Effective Class Diagrams
 
-1. **Start with core entities** - Add attributes and methods incrementally
-2. **Show only relevant details** - Omit obvious getters/setters unless important
-3. **Use appropriate relationships** - Choose between association, aggregation, and composition carefully
-4. **Add multiplicity** - Clarifies how many instances participate
-5. **Group related classes** - Use notes or visual proximity
-6. **Document invariants** - Use notes to explain business rules
+1. **Draft 3-5 core entities first** - Add attributes and methods in a second pass after relationships are clear.
+2. **Omit getters/setters** - Only show methods that represent domain behaviour (e.g., `placeOrder()`, not `getName()`).
+3. **Pick the right relationship arrow** - Composition (`*--`) when the child dies with the parent, aggregation (`o--`) when it survives, association (`--`) for loose links.
+4. **Add multiplicity to every relationship** - `"1" --> "0..*"` removes ambiguity about cardinality.
+5. **Place related classes near each other** - Visual proximity signals cohesion.
+6. **Add `Note` annotations for business invariants** - e.g., "An order cannot have zero line items".
 
 ## Common Patterns
 

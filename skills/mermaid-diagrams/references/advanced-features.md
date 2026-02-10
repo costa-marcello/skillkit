@@ -136,7 +136,7 @@ flowchart LR
 
 ## Tooltips
 
-Add hover information:
+Add hover text to nodes using the `click` callback syntax:
 
 ```mermaid
 flowchart LR
@@ -145,9 +145,8 @@ flowchart LR
 
     A -.->|REST API| B
 
-    %% Tooltips are defined with links
-    link A: API Documentation @ https://api.example.com
-    link B: Service Dashboard @ https://dashboard.example.com
+    click A href "https://api.example.com" "API Documentation" _blank
+    click B href "https://dashboard.example.com" "Service Dashboard" _blank
 ```
 
 </example>
@@ -182,17 +181,23 @@ flowchart TD
 
 ## Directional Hints
 
-Control layout direction for specific nodes:
+Override layout direction within subgraphs to mix horizontal and vertical flows:
 
 ```mermaid
-flowchart TB
-    A --> B
-    B --> C
-    B --> D
-    C --> E
-    D --> E
+flowchart LR
+    subgraph Frontend
+        direction TB
+        A[React App] --> B[State Manager]
+        B --> C[API Client]
+    end
 
-    %% This is a comment - helps organize complex diagrams
+    subgraph Backend
+        direction TB
+        D[Router] --> E[Controller]
+        E --> F[Service]
+    end
+
+    C --> D
 ```
 
 </example>
@@ -278,7 +283,7 @@ flowchart LR
 <html>
 <head>
     <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
         mermaid.initialize({
             startOnLoad: true,
             theme: 'dark',
@@ -328,8 +333,8 @@ function DiagramComponent() {
 
 ## Best Practices for Advanced Features
 
-1. **Use ELK for complex layouts** - When dagre creates crossed lines
-2. **Comment complex configurations** - Explain non-obvious styling choices
-3. **Test exports** - Verify diagrams render correctly in target format
-4. **Use subgraphs** - Organize complexity into logical groups
-5. **Keep configs versioned** - Track configuration changes in your repository
+1. **Switch to ELK when dagre produces crossed lines** - Add `layout: elk` to the config frontmatter. ELK handles 20+ node diagrams better.
+2. **Add a `%%` comment above every `themeVariables` block** explaining the colour rationale.
+3. **Export to PNG/SVG and open the file** before committing -- renderer differences between platforms are common.
+4. **Group related nodes in subgraphs** when a diagram has more than 8 nodes. Name each subgraph after the bounded context it represents.
+5. **Commit config frontmatter alongside the diagram** so theme changes appear in code review diffs.

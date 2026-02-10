@@ -81,6 +81,7 @@ stateDiagram-v2
 
     state Checkout {
         [*] --> fork_state
+        state fork_state <<fork>>
         fork_state --> ValidateCart
         fork_state --> ValidatePayment
         fork_state --> ValidateShipping
@@ -88,6 +89,7 @@ stateDiagram-v2
         ValidateCart --> join_state
         ValidatePayment --> join_state
         ValidateShipping --> join_state
+        state join_state <<join>>
 
         join_state --> ProcessOrder
     }
@@ -374,25 +376,23 @@ quadrantChart
 ## Best Practices by Diagram Type
 
 ### State Diagrams
-- Start from `[*]` (initial state) and end at `[*]` (final state)
-- Use clear transition labels describing the trigger
-- Group related states with composite states
-- Add notes for complex state logic
+- Begin every diagram with `[*] --> InitialState` and end with `FinalState --> [*]`.
+- Label every transition with the trigger event name (e.g., `: submit`, `: cancel`).
+- Wrap 3+ related states in a `state` composite block and name it after the lifecycle phase.
+- Add `note right of StateName` to explain non-obvious transition guards.
 
 ### Git Graphs
-- Use meaningful commit IDs for documentation
-- Tag releases on main branch
-- Show merge directions clearly
-- Keep branch names descriptive
+- Set `id:` on every commit to a short descriptive label (e.g., `id: "add auth"`).
+- Tag release commits on main with `tag: "v1.0.0"`.
+- Name branches with the `type/name` convention (e.g., `feature/auth`, `hotfix/security`).
 
 ### Gantt Charts
-- Use `excludes weekends` for realistic timelines
-- Mark critical path items with `crit`
-- Use `milestone` for key dates
-- Group tasks into logical sections
+- Add `excludes weekends` for realistic timelines.
+- Mark critical path tasks with `crit` and key dates with `milestone`.
+- Group tasks into `section` blocks named after project phases.
+- Use `after taskId` for dependencies rather than hardcoded dates where possible.
 
 ### Pie/Quadrant Charts
-- Limit pie charts to 5-7 segments
-- Use `showData` to display values
-- Label quadrants clearly
-- Position items thoughtfully on quadrant axes
+- Cap pie charts at 5-7 segments. Merge small slices into "Other".
+- Add `showData` to every pie chart so values are visible.
+- Label all four quadrants with actionable names (e.g., "Do First", "Eliminate").

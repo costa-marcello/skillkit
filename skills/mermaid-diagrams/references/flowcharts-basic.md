@@ -31,19 +31,19 @@ flowchart LR
 
 </example>
 
-<example name="Rounded Rectangle">
+<example name="Stadium">
 
-### Rounded Rectangle
+### Stadium/Pill Shape
 ```mermaid
 flowchart LR
-    B([Rounded process])
+    B([Stadium process])
 ```
 
 </example>
 
-<example name="Stadium">
+<example name="Rounded Rectangle">
 
-### Stadium/Pill Shape
+### Rounded Rectangle
 ```mermaid
 flowchart LR
     C(Start or End)
