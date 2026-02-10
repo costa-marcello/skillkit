@@ -324,7 +324,7 @@ flowchart TD
 - Don't rely solely on color to convey meaning
 - Include descriptive text labels
 - Test with color blindness simulators
-- Consider dark mode alternatives
+- Provide a dark mode alternative when the target page supports it
 
 </example>
 

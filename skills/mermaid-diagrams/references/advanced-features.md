@@ -252,7 +252,7 @@ flowchart TD
 - Use ELK layout for diagrams with >20 nodes
 - Enable edge merging for simplified connections
 - Split very large diagrams into multiple focused views
-- Consider using subgraphs to organize complexity
+- Group related nodes in subgraphs to reduce visual complexity
 - Limit styling to essential elements
 
 </example>
