@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 - Added push-state detection to changelog skill to choose between Unreleased and versioned release automatically
 - Added validation loop and platform-specific rendering guidance to mermaid-diagrams skill
 - Added `agent` field to mermaid-diagrams skill for subagent context support
+- Added `argument-hint` and `$ARGUMENTS` support to readme-md and review-skill for direct slash command input
+- Added argument usage examples to README showing how skills accept inline parameters
 - Added install docs reference to research skill for clearer onboarding
 
 ### Changed
