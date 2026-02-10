@@ -2,6 +2,7 @@
 name: mermaid-diagrams
 description: "Creates professional software diagrams using Mermaid's text-based syntax. Use when users request diagrams, visualizations, or documentation of software architecture including class diagrams, sequence diagrams, flowcharts, ERDs, C4 architecture diagrams, state machines, git graphs, or gantt charts. Triggers: 'diagram', 'visualize', 'model', 'map out', 'show the flow', database design, code structure."
 context: fork
+agent: general-purpose
 ---
 
 # Mermaid Diagramming
@@ -184,7 +185,7 @@ For in-depth guidance on specific diagram types, see:
 
 ## Validation Loop (Required)
 
-Every diagram MUST pass through this generate-validate-repair cycle before output.
+Every diagram passes through this generate-validate-repair cycle before output.
 
 ### Step 1: Generate
 Write the diagram using strict Mermaid syntax. Apply these rules during generation:
