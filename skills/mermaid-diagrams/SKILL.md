@@ -182,13 +182,45 @@ For in-depth guidance on specific diagram types, see:
 
 <validation>
 
-## Before Finalizing Diagrams
+## Validation Loop (Required)
 
-1. **Render in [Mermaid Live](https://mermaid.live)** - Verify syntax renders correctly
-2. **Check relationships** - Ensure all connections are accurate and complete
-3. **Verify readability** - Labels should be clear at target display size
-4. **Test with theme** - Confirm appearance with intended theme/styling
-5. **Review node names** - Check for typos that silently break diagrams
+Every diagram MUST pass through this generate-validate-repair cycle before output.
+
+### Step 1: Generate
+Write the diagram using strict Mermaid syntax. Apply these rules during generation:
+
+| Rule | Wrong | Correct | Why |
+|------|-------|---------|-----|
+| Escape parentheses in labels | `node[Node (example)]` | `node["Node (example)"]` | Bare parentheses crash the parser |
+| Quote text with special characters | `A[Price: $100]` | `A["Price: $100"]` | `$`, `%`, `&`, `<`, `>` break parsing |
+| Quote the reserved word `end` | `A --> end` | `A --> End["end"]` | Unquoted `end` silently breaks diagrams |
+| Use HTML entities when quotes fail | `A["alert()"]` | `A["alert&lpar;&rpar;"]` | Nested parens inside quotes still fail |
+| Avoid `{}` in comments | `%% config: {dark}` | `%% config dark theme` | Curly braces in comments break parsing |
+| Use unique node IDs | Reusing `A` across subgraphs | `A1`, `A2` for distinct nodes | Duplicate IDs cause silent overwrites |
+
+### Step 2: Validate
+Self-check the generated diagram against these failure patterns:
+
+1. **Scan all node labels** for unescaped special characters: `( ) { } $ % & < > #`
+2. **Check for bare `end`** used as a node name or label (not as a block closer)
+3. **Verify arrow syntax** matches the diagram type (e.g., `-->` for flowchart, `->>` for sequence)
+4. **Confirm diagram type keyword** is spelled correctly on line 1
+5. **Check participant/actor names** for spaces (wrap in quotes if present)
+
+If any issue is found, fix it before output. Do not ask the user to fix syntax.
+
+### Step 3: Render verification
+After outputting the diagram, recommend the user verify rendering:
+- **Quick check**: paste into [Mermaid Live](https://mermaid.live)
+- **CLI validation**: `npx @mermaid-js/mermaid-cli -i diagram.mmd -o test.png`
+- **MCP tools**: if a Mermaid MCP server is available, use it for in-session validation
+
+### Step 4: Repair (if rendering fails)
+If the user reports a rendering failure:
+1. Read the error message (if available) and identify the failing line
+2. Check the syntax rules table above for the matching pattern
+3. Fix and re-output the corrected diagram
+4. Never output the same broken syntax twice
 
 </validation>
 
@@ -219,10 +251,13 @@ flowchart LR
 
 ## Exporting and Rendering
 
-**Native support in:**
-- GitHub/GitLab - Automatically renders in Markdown
-- VS Code - With Markdown Mermaid extension
-- Notion, Obsidian, Confluence - Built-in support
+**Native support (with caveats):**
+- GitHub README/Issues - Renders in Markdown. Wiki rendering is broken. C4 diagrams often fail.
+- GitLab - Renders reliably. May need cache refresh after adding new diagrams.
+- VS Code - With Markdown Mermaid extension. Known bug with "No diagram type detected" on first open.
+- Obsidian - Desktop works. iOS rendering fails entirely. Pie charts render as empty boxes.
+- Notion, Confluence - Built-in support. Feature coverage varies by Mermaid version.
+- Azure DevOps - Requires `::: mermaid` syntax instead of ` ```mermaid ` backticks.
 
 **Export options:**
 - [Mermaid Live Editor](https://mermaid.live) - Online editor with PNG/SVG export
@@ -231,10 +266,23 @@ flowchart LR
 
 ## Common Pitfalls
 
-- **Breaking characters** - Avoid `{}` in comments, use proper escape sequences for special characters
-- **Syntax errors** - Misspellings break diagrams; validate syntax in Mermaid Live
-- **Overcomplexity** - Split complex diagrams into multiple focused views
-- **Missing relationships** - Document all important connections between entities
+**Syntax failures (most frequent):**
+- **Unescaped special characters** - Parentheses, brackets, `$`, `%` in node labels crash the parser. Always quote labels containing these characters.
+- **Reserved word `end`** - Using `end` as a node name breaks diagrams silently. Wrap in quotes or rename.
+- **Misspelled diagram types** - `classDiagram` not `classdiagram`. Case matters for the type keyword.
+- **Wrong arrow syntax** - Each diagram type uses different arrows. Flowcharts use `-->`, sequence uses `->>`, class uses `..>`.
+
+**Platform-specific failures:**
+- **GitHub Wiki** - Mermaid rendering is broken despite documentation claiming support. Use README or Pages instead.
+- **Azure DevOps** - Requires `::: mermaid` syntax, not standard ` ```mermaid ` backticks.
+- **Obsidian iOS** - Mermaid fails to render entirely on iOS. Desktop works.
+- **C4 diagrams on GitHub** - C4 is experimental in Mermaid. Renders in mermaid.live but often fails on GitHub.
+- **PDF export** - Most tools render Mermaid as plain text. Export as PNG/SVG from mermaid.live first.
+
+**Structural issues:**
+- **Overcomplexity** - Split diagrams with more than 15 nodes into multiple focused views.
+- **Nested subgraphs** - Deep nesting fails on some platforms. Keep to 2 levels maximum.
+- **Missing relationships** - Document all important connections between entities.
 
 ## When to Create Diagrams
 
