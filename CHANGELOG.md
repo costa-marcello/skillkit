@@ -2,13 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.2.1] - 2026-02-09
+## [0.3.0] - 2026-02-10
+
+### Added
+- Added `$ARGUMENTS` support to research skill for passing user input directly to research queries
+- Added version auto-detection to changelog skill so releases no longer require a manual version number
+- Added push-state detection to changelog skill to choose between Unreleased and versioned release automatically
+- Added validation loop and platform-specific rendering guidance to mermaid-diagrams skill
+- Added `agent` field to mermaid-diagrams skill for subagent context support
+- Added install docs reference to research skill for clearer onboarding
 
 ### Changed
 - Broadened README and project language from Claude Code-only to support all AI coding agents
+- Hardened research skill internals with named constants, rationale comments, and debug logging
+- Replaced weak verbs with direct action verbs across mermaid-diagrams reference docs
+- Updated changelog skill examples and reordered automation tools to recommend git-cliff as the default
+- Softened directive tone in mermaid-diagrams skill for better readability
 
 ### Fixed
+- Fixed 13 Mermaid syntax errors across 10 reference files including flowchart labels, ERD constraints, and deprecated directives
 - Fixed install commands across README and review-skill to use documented `-s` flag format
+- Fixed missing `license` field in mermaid-diagrams SKILL.md frontmatter
 
 ## [0.2.0] - 2026-02-09
 
@@ -61,6 +75,6 @@ All notable changes to this project will be documented in this file.
 - Fixed script invocations and variable names after skill rename
 - Fixed review-skill over-specification and deduplicated steps
 
-[0.2.1]: https://github.com/costa-marcello/skillkit/compare/v0.2.0...v0.2.1
+[0.3.0]: https://github.com/costa-marcello/skillkit/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/costa-marcello/skillkit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/costa-marcello/skillkit/releases/tag/v0.1.0

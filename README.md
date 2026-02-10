@@ -335,6 +335,14 @@ Each skill lives in its own directory under `skills/`. The `SKILL.md` file conta
 
 When you install a skill with `npx skills add`, it copies into your project's skills directory. Your agent loads installed skills automatically and makes each one available as a slash command matching its name.
 
+Some skills accept arguments directly after the slash command. For example:
+
+```bash
+/research quantum computing        # Researches quantum computing
+/changelog 2025-01-01..2025-02-01  # Changelog for a date range
+/review-skill skills/my-skill      # Review a specific skill
+```
+
 The `references/` pattern is what keeps skills fast. The SKILL.md stays under 500 lines (the enforced limit), while deep reference materials load only when the skill needs them. The frontend-design skill, for example, has 99 UX rules and 25+ chart types available, but they only enter the context window when the skill reaches for them.
 
 ---
