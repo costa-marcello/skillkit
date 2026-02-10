@@ -101,8 +101,8 @@ git rev-list --count origin/$(git branch --show-current)..HEAD
 # Commits between tags
 git log --oneline v1.0.0..v1.1.0
 
-# Commits in date range
-git log --oneline --since="2024-01-01" --until="2024-01-31"
+# Commits in date range (adjust dates to match the requested period)
+git log --oneline --since="2025-01-01" --until="2025-01-31"
 
 # Get current tags
 git tag --sort=-v:refname | head -10
@@ -212,7 +212,7 @@ All notable changes to this project will be documented in this file.
 <example>
 **User request**: `/changelog` (all commits pushed)
 **Action**: Detect all commits are pushed, auto-detect version (e.g. feat commits = minor bump), create versioned release with today's date
-**Output**: Updated CHANGELOG.md with `## [2.1.0] - 2024-03-15` (no Unreleased section)
+**Output**: Updated CHANGELOG.md with `## [2.1.0] - 2026-02-10` (no Unreleased section)
 </example>
 
 <example>

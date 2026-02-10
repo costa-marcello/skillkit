@@ -38,12 +38,12 @@ Use only these six section headers, in this order:
 ```
 
 Examples:
-- `## [1.0.0] - 2024-01-15` (use actual release date)
-- `## [2.3.1] - 2024-03-22`
+- `## [1.0.0] - 2025-09-15` (use actual release date)
+- `## [2.3.1] - 2025-11-22`
 
 For yanked (recalled) releases:
 ```markdown
-## [1.0.1] - 2024-01-16 [YANKED]
+## [1.0.1] - 2025-09-16 [YANKED]
 ```
 
 **Note:** All dates must be actual release dates in ISO 8601 format, never placeholders in the final output.
@@ -208,7 +208,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - GraphQL API support (experimental)
 
-## [2.1.0] - 2024-03-15
+## [2.1.0] - 2025-11-15
 
 ### Added
 - Dark mode theme support
@@ -223,7 +223,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed crash when processing files over 100MB
 - Resolved timezone display issues in reports
 
-## [2.0.0] - 2024-02-01
+## [2.0.0] - 2025-10-01
 
 ### Added
 - New plugin architecture for extensions
@@ -240,9 +240,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for Internet Explorer 11
 
 ### Security
-- Fixed XSS vulnerability in comment rendering (CVE-2024-1234)
+- Fixed XSS vulnerability in comment rendering (CVE-2025-1234)
 
-## [1.5.0] - 2024-01-15
+## [1.5.0] - 2025-09-15
 
 ### Added
 - Initial public release
@@ -274,10 +274,12 @@ git log --oneline v1.0.0..HEAD | grep -E "#[0-9]+"
 
 ### Automation Tools
 
+The `/changelog` skill handles generation natively. Use external tools only when you need CI/CD integration or team-wide automation:
+
 | Tool | Purpose | Configuration |
 |------|---------|---------------|
-| **standard-version** | Bump version + generate changelog | `.versionrc.js` |
+| **git-cliff** | Fast, customizable generation (default choice for automation) | `cliff.toml` |
 | **semantic-release** | Fully automated CI/CD releases | `.releaserc` |
-| **git-cliff** | Fast, customizable generation | `cliff.toml` |
+| **standard-version** | Bump version + generate changelog | `.versionrc.js` |
 | **conventional-changelog** | Generate from conventional commits | CLI options |
 
