@@ -4,6 +4,7 @@ description: Guides README creation and improvement with audience-matched templa
 license: MIT
 context: fork
 agent: general-purpose
+argument-hint: "[task] [project-type]"
 ---
 
 # Crafting Effective READMEs
@@ -15,6 +16,14 @@ READMEs answer questions your audience will have. Different audiences need diffe
 **Always ask:** Who will read this, and what do they need to know?
 
 <instructions>
+
+## User Input
+
+**User request:** $ARGUMENTS
+
+If `$ARGUMENTS` is non-empty, extract the task type (creating, adding, updating, reviewing) and project type (OSS, personal, internal, config) from it. Skip Step 1 and proceed to Step 2. Only ask clarifying questions if the task or project type is entirely unclear.
+
+If `$ARGUMENTS` is empty, begin at Step 1.
 
 ## Quick Workflow
 

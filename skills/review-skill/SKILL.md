@@ -2,6 +2,7 @@
 name: review-skill
 description: "Reviews and automatically fixes Claude Code skills against official Anthropic best practices. Use when checking skill quality, refactoring bloated skills, improving discoverability, or contributing to open-source skills. Supports review, auto-fix, external review, and PR modes."
 license: MIT
+argument-hint: "[skill-path] [mode]"
 context: fork
 agent: general-purpose
 ---
