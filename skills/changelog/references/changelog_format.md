@@ -50,7 +50,7 @@ For yanked (recalled) releases:
 
 ### Unreleased Section
 
-Always maintain an Unreleased section at the top:
+Use an Unreleased section at the top to accumulate changes between releases:
 
 ```markdown
 ## [Unreleased]
@@ -62,7 +62,7 @@ Always maintain an Unreleased section at the top:
 - Bug fixes not yet released
 ```
 
-When releasing, rename Unreleased to the new version and create a fresh Unreleased section.
+When releasing, rename Unreleased to the new version and remove the Unreleased section entirely. A new Unreleased section is added later by `/changelog` (update) when new commits appear after the release.
 
 ### Footer Links
 

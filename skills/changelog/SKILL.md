@@ -4,7 +4,7 @@ description: "Generates and updates CHANGELOG.md files from git history using Ke
 context: fork
 agent: general-purpose
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash(git *)
-argument-hint: "[release or date-range]"
+argument-hint: "[date-range]"
 ---
 
 # Changelog
@@ -20,7 +20,7 @@ Generates human-readable changelogs from git commit history following Keep a Cha
 
 ## Auto-Detection Workflow
 
-When invoked without arguments, automatically detect and execute:
+When invoked, detect the git state and act accordingly:
 
 ```
 /changelog (no args)
@@ -29,14 +29,20 @@ When invoked without arguments, automatically detect and execute:
     |       |
     |       +-- NO  --> Create New Changelog (full git history)
     |       |
-    |       +-- YES --> Check: Are there new commits since last entry?
+    |       +-- YES --> Check: Are there commits since last tag?
     |               |
-    |               +-- YES --> Update Unreleased section
     |               +-- NO  --> Report "Changelog is up to date"
+    |               |
+    |               +-- YES --> Are all commits pushed to remote?
+    |                       |
+    |                       +-- NO  --> Update/create Unreleased section
+    |                       +-- YES --> Auto-detect version, create release entry
+    |                                   (no Unreleased section in output)
     |
-/changelog release       --> Auto-detect version from commits, convert Unreleased to release
 /changelog [date range]  --> Generate entries for specific period
 ```
+
+**Detection logic:** Compare `git log <last-tag>..HEAD` with `git log <last-tag>..origin/<branch>`. If HEAD matches the remote, all commits are pushed and the changelog creates a versioned release. If HEAD is ahead of origin, unpushed commits go into Unreleased.
 
 **Default behaviour requires zero input.** Run `/changelog` and the correct action runs automatically.
 
@@ -72,15 +78,15 @@ When invoked without arguments, automatically detect and execute:
 
 ## Generating a Release Entry
 
-When the user runs `/changelog release` or asks to create a release:
+Triggered automatically when `/changelog` detects all commits since the last tag are pushed to remote:
 
 1. Auto-detect the next version (see Version Auto-Detection below)
 2. Gather commits since the last tag
 3. Group by change type (Added, Changed, Fixed, etc.)
 4. Filter noise (merge commits, CI/CD changes, refactors unless significant)
 5. Translate technical commits to user-friendly descriptions
-6. Convert the Unreleased section to the auto-detected version with today's date
-7. Create a fresh empty Unreleased section above
+6. Create a versioned section with the auto-detected version and today's date
+7. Remove any existing Unreleased section and its footer link
 8. Update footer comparison links
 
 ## Git Analysis Commands
@@ -88,6 +94,9 @@ When the user runs `/changelog release` or asks to create a release:
 ```bash
 # All commits since last tag
 git log --oneline $(git describe --tags --abbrev=0 2>/dev/null || echo "")..HEAD
+
+# Check if HEAD is pushed (0 = all pushed, >0 = unpushed commits)
+git rev-list --count origin/$(git branch --show-current)..HEAD
 
 # Commits between tags
 git log --oneline v1.0.0..v1.1.0
@@ -146,17 +155,14 @@ If all commits were filtered (docs, test, ci, chore only), output "No release ne
 
 **Step 3: Output**
 
-For `/changelog` (create/update), append a version suggestion after the changelog summary:
+When commits are unpushed (Unreleased path), append a version suggestion:
 
 ```
 Next version: X.Y.Z (bump -- reason)
 Commits since vCURRENT: N total (N included, N filtered)
-
-To release:
-  git tag vX.Y.Z && git push --tags
 ```
 
-For `/changelog release`, use the auto-detected version directly to create the release entry. Do not ask the user for a version number.
+When all commits are pushed (release path), use the auto-detected version directly to create the versioned release entry. Do not ask the user for a version number.
 
 See `references/changelog_format.md` for the full version detection rules and edge cases.
 
@@ -204,9 +210,9 @@ All notable changes to this project will be documented in this file.
 </example>
 
 <example>
-**User request**: `/changelog release`
-**Action**: Auto-detect version from commits (e.g. feat commits = minor bump), move Unreleased to new version section with today's date
-**Output**: Updated CHANGELOG.md with auto-detected version (e.g. `## [2.1.0] - 2024-03-15`)
+**User request**: `/changelog` (all commits pushed)
+**Action**: Detect all commits are pushed, auto-detect version (e.g. feat commits = minor bump), create versioned release with today's date
+**Output**: Updated CHANGELOG.md with `## [2.1.0] - 2024-03-15` (no Unreleased section)
 </example>
 
 <example>

@@ -2,8 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-
 ## [0.2.1] - 2026-02-09
 
 ### Changed
@@ -63,7 +61,6 @@ All notable changes to this project will be documented in this file.
 - Fixed script invocations and variable names after skill rename
 - Fixed review-skill over-specification and deduplicated steps
 
-[Unreleased]: https://github.com/costa-marcello/skillkit/compare/v0.2.1...HEAD
 [0.2.1]: https://github.com/costa-marcello/skillkit/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/costa-marcello/skillkit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/costa-marcello/skillkit/releases/tag/v0.1.0
