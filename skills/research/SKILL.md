@@ -49,6 +49,8 @@ Cross-reference: Mark as "Divergent" with both views attributed.
 
 ## Parse User Intent
 
+**User input:** $ARGUMENTS
+
 Extract four variables from user input before proceeding:
 
 | Variable | Extract | Example |
