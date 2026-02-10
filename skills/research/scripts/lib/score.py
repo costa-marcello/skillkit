@@ -19,9 +19,21 @@ WEBSEARCH_SOURCE_PENALTY = 15  # Points deducted for lacking engagement
 WEBSEARCH_VERIFIED_BONUS = 10   # Bonus for URL-verified recent date (high confidence)
 WEBSEARCH_NO_DATE_PENALTY = 20  # Heavy penalty for no date signals (low confidence)
 
-# Default engagement score for unknown
+# Default engagement score for unknown engagement data.
+# 35 places unknown items in the lower-middle of the 0-100 scale,
+# below most items with real engagement but above zero.
 DEFAULT_ENGAGEMENT = 35
+# Penalty for items where we could not verify engagement at all.
+# 10 points is enough to rank them below similar verified items
+# without burying them entirely.
 UNKNOWN_ENGAGEMENT_PENALTY = 10
+
+# Date confidence penalties applied to Reddit/X items.
+# Low confidence (no verified date): -10 points nudges items down
+# without excluding them. Med confidence (partial date): -5 points,
+# a lighter nudge for dates extracted from snippets.
+DATE_CONFIDENCE_LOW_PENALTY = 10
+DATE_CONFIDENCE_MED_PENALTY = 5
 
 
 def log1p_safe(x: Optional[int]) -> float:
@@ -152,9 +164,9 @@ def score_reddit_items(items: List[schema.RedditItem]) -> List[schema.RedditItem
 
         # Apply penalty for low date confidence
         if item.date_confidence == "low":
-            overall -= 10
+            overall -= DATE_CONFIDENCE_LOW_PENALTY
         elif item.date_confidence == "med":
-            overall -= 5
+            overall -= DATE_CONFIDENCE_MED_PENALTY
 
         item.score = max(0, min(100, int(overall)))
 
@@ -212,9 +224,9 @@ def score_x_items(items: List[schema.XItem]) -> List[schema.XItem]:
 
         # Apply penalty for low date confidence
         if item.date_confidence == "low":
-            overall -= 10
+            overall -= DATE_CONFIDENCE_LOW_PENALTY
         elif item.date_confidence == "med":
-            overall -= 5
+            overall -= DATE_CONFIDENCE_MED_PENALTY
 
         item.score = max(0, min(100, int(overall)))
 

@@ -3,13 +3,19 @@
 import hashlib
 import json
 import os
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
 CACHE_DIR = Path.home() / ".cache" / "last30days"
+# 24 hours matches the research window granularity. Queries for the
+# same topic within a day reuse cached results instead of re-calling APIs.
 DEFAULT_TTL_HOURS = 24
+# Model lists change infrequently. 7 days avoids repeated model
+# listing API calls while still catching new model releases.
 MODEL_CACHE_TTL_DAYS = 7
+DEBUG = os.environ.get("LAST30DAYS_DEBUG", "").lower() in ("1", "true", "yes")
 
 
 def ensure_cache_dir():
@@ -98,8 +104,9 @@ def save_cache(cache_key: str, data: dict):
     try:
         with open(cache_path, 'w') as f:
             json.dump(data, f)
-    except OSError:
-        pass  # Silently fail on cache write errors
+    except OSError as e:
+        if DEBUG:
+            sys.stderr.write(f"[DEBUG] Cache write failed for {cache_key}: {e}\n")
 
 
 def clear_cache():
@@ -134,8 +141,9 @@ def save_model_cache(data: dict):
     try:
         with open(MODEL_CACHE_FILE, 'w') as f:
             json.dump(data, f)
-    except OSError:
-        pass
+    except OSError as e:
+        if DEBUG:
+            sys.stderr.write(f"[DEBUG] Model cache write failed: {e}\n")
 
 
 def get_cached_model(provider: str) -> Optional[str]:

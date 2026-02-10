@@ -288,4 +288,8 @@ See `references/prompt_generation.md` for the full prompt writing protocol, qual
 
 After research completes, retain topic expertise for follow-up questions. See `references/context_memory.md` for full context retention protocol.
 
+## Installation and Usage
+
+For installation steps, API key setup, usage examples, and CLI options, see `references/readme.md`.
+
 </instructions>
