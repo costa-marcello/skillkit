@@ -1,4 +1,4 @@
-"""Output rendering for last30days skill."""
+"""Output rendering for research skill."""
 
 import json
 from pathlib import Path
@@ -6,7 +6,7 @@ from typing import List, Optional
 
 from . import schema
 
-OUTPUT_DIR = Path.home() / ".local" / "share" / "last30days" / "out"
+OUTPUT_DIR = Path.home() / ".local" / "share" / "research" / "out"
 
 
 def ensure_output_dir():
@@ -15,7 +15,7 @@ def ensure_output_dir():
 
 
 def _assess_data_freshness(report: schema.Report) -> dict:
-    """Assess how much data is actually from the last 30 days."""
+    """Assess how much data is actually recent."""
     reddit_recent = sum(1 for r in report.reddit if r.date and r.date >= report.range_from)
     x_recent = sum(1 for x in report.x if x.date and x.date >= report.range_from)
     web_recent = sum(1 for w in report.web if w.date and w.date >= report.range_from)
@@ -54,7 +54,7 @@ def render_compact(report: schema.Report, limit: int = 15, missing_keys: str = "
     # Assess data freshness and add honesty warning if needed
     freshness = _assess_data_freshness(report)
     if freshness["is_sparse"]:
-        lines.append("**⚠️ LIMITED RECENT DATA** - Few discussions from the last 30 days.")
+        lines.append("**⚠️ LIMITED RECENT DATA** - Few discussions from the research window.")
         lines.append(f"Only {freshness['total_recent']} item(s) confirmed from {report.range_from} to {report.range_to}.")
         lines.append("Results below may include older/evergreen content. Be transparent with the user about this.")
         lines.append("")
@@ -67,7 +67,7 @@ def render_compact(report: schema.Report, limit: int = 15, missing_keys: str = "
         lines.append("**⚡ Want better results?** Add API keys to unlock Reddit & X data:")
         lines.append("- `OPENAI_API_KEY` → Reddit threads with real upvotes & comments")
         lines.append("- `XAI_API_KEY` → X posts with real likes & reposts")
-        lines.append("- Edit `~/.config/last30days/.env` to add keys")
+        lines.append("- Edit `~/.config/research/.env` to add keys")
         lines.append("---")
         lines.append("")
 
@@ -203,7 +203,7 @@ def render_context_snippet(report: schema.Report) -> str:
         Context markdown string
     """
     lines = []
-    lines.append(f"# Context: {report.topic} (Last 30 Days)")
+    lines.append(f"# Context: {report.topic} (Recent Research)")
     lines.append("")
     lines.append(f"*Generated: {report.generated_at[:10]} | Sources: {report.mode}*")
     lines.append("")
@@ -245,7 +245,7 @@ def render_full_report(report: schema.Report) -> str:
     lines = []
 
     # Title
-    lines.append(f"# {report.topic} - Last 30 Days Research Report")
+    lines.append(f"# {report.topic} - Research Report")
     lines.append("")
     lines.append(f"**Generated:** {report.generated_at}")
     lines.append(f"**Date Range:** {report.range_from} to {report.range_to}")
@@ -360,8 +360,8 @@ def write_outputs(
     with open(OUTPUT_DIR / "report.md", 'w') as f:
         f.write(render_full_report(report))
 
-    # last30days.context.md
-    with open(OUTPUT_DIR / "last30days.context.md", 'w') as f:
+    # research.context.md
+    with open(OUTPUT_DIR / "research.context.md", 'w') as f:
         f.write(render_context_snippet(report))
 
     # Raw responses
@@ -380,4 +380,4 @@ def write_outputs(
 
 def get_context_path() -> str:
     """Get path to context file."""
-    return str(OUTPUT_DIR / "last30days.context.md")
+    return str(OUTPUT_DIR / "research.context.md")

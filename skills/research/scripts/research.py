@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-last30days - Research a topic from the last 30 days on Reddit + X.
+research - Research a topic on Reddit + X.
 
 Usage:
-    python3 last30days.py <topic> [options]
+    python3 research.py <topic> [options]
 
 Options:
     --mock              Use fixtures instead of real API calls
@@ -276,7 +276,7 @@ def run_research(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Research a topic from the last 30 days on Reddit + X"
+        description="Research a topic on Reddit + X"
     )
     parser.add_argument("topic", nargs="?", help="Topic to research")
     parser.add_argument("--mock", action="store_true", help="Use fixtures")
@@ -317,7 +317,7 @@ def main():
 
     # Enable debug logging if requested
     if args.debug:
-        os.environ["LAST30DAYS_DEBUG"] = "1"
+        os.environ["RESEARCH_DEBUG"] = "1"
         # Re-import http to pick up debug flag
         from lib import http as http_module
         http_module.DEBUG = True
@@ -335,7 +335,7 @@ def main():
 
     if not args.topic:
         print("Error: Please provide a topic to research.", file=sys.stderr)
-        print("Usage: python3 last30days.py <topic> [options]", file=sys.stderr)
+        print("Usage: python3 research.py <topic> [options]", file=sys.stderr)
         sys.exit(1)
 
     # Load config
@@ -362,7 +362,7 @@ def main():
                 sys.exit(1)
 
     # Get date range
-    from_date, to_date = dates.get_date_range(30)
+    from_date, to_date = dates.get_date_range(60)
 
     # Check what keys are missing for promo messaging
     missing_keys = env.get_missing_keys(config)
@@ -509,7 +509,7 @@ def output_result(
         print("")
         print("Claude: Use your WebSearch tool to find 8-15 relevant web pages.")
         print("EXCLUDE: reddit.com, x.com, twitter.com (already covered above)")
-        print("INCLUDE: blogs, docs, news, tutorials from the last 30 days")
+        print("INCLUDE: blogs, docs, news, tutorials from the research window")
         print("")
         print("After searching, synthesize WebSearch results WITH the Reddit/X")
         print("results above. WebSearch items should rank LOWER than comparable")

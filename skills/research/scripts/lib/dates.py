@@ -1,11 +1,11 @@
-"""Date utilities for last30days skill."""
+"""Date utilities for research skill."""
 
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Tuple
 
 
-def get_date_range(days: int = 30) -> Tuple[str, str]:
-    """Get the date range for the last N days.
+def get_date_range(days: int = 60) -> Tuple[str, str]:
+    """Get the date range for the last N days (default: 60).
 
     Returns:
         Tuple of (from_date, to_date) as YYYY-MM-DD strings
@@ -107,7 +107,7 @@ def days_ago(date_str: Optional[str]) -> Optional[int]:
         return None
 
 
-def recency_score(date_str: Optional[str], max_days: int = 30) -> int:
+def recency_score(date_str: Optional[str], max_days: int = 60) -> int:
     """Calculate recency score (0-100).
 
     0 days ago = 100, max_days ago = 0, clamped.

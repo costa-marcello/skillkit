@@ -1,4 +1,4 @@
-"""Near-duplicate detection for last30days skill."""
+"""Near-duplicate detection for research skill."""
 
 import re
 from typing import List, Set, Tuple, Union

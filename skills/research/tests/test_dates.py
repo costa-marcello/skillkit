@@ -13,22 +13,22 @@ from lib import dates
 
 class TestGetDateRange(unittest.TestCase):
     def test_returns_tuple_of_two_strings(self):
-        from_date, to_date = dates.get_date_range(30)
+        from_date, to_date = dates.get_date_range(60)
         self.assertIsInstance(from_date, str)
         self.assertIsInstance(to_date, str)
 
     def test_date_format(self):
-        from_date, to_date = dates.get_date_range(30)
+        from_date, to_date = dates.get_date_range(60)
         # Should be YYYY-MM-DD format
         self.assertRegex(from_date, r'^\d{4}-\d{2}-\d{2}$')
         self.assertRegex(to_date, r'^\d{4}-\d{2}-\d{2}$')
 
     def test_range_is_correct_days(self):
-        from_date, to_date = dates.get_date_range(30)
+        from_date, to_date = dates.get_date_range(60)
         start = datetime.strptime(from_date, "%Y-%m-%d")
         end = datetime.strptime(to_date, "%Y-%m-%d")
         delta = end - start
-        self.assertEqual(delta.days, 30)
+        self.assertEqual(delta.days, 60)
 
 
 class TestParseDate(unittest.TestCase):
@@ -95,13 +95,13 @@ class TestRecencyScore(unittest.TestCase):
         result = dates.recency_score(today)
         self.assertEqual(result, 100)
 
-    def test_30_days_ago_is_0(self):
-        old_date = (datetime.now(timezone.utc).date() - timedelta(days=30)).isoformat()
+    def test_60_days_ago_is_0(self):
+        old_date = (datetime.now(timezone.utc).date() - timedelta(days=60)).isoformat()
         result = dates.recency_score(old_date)
         self.assertEqual(result, 0)
 
-    def test_15_days_ago_is_50(self):
-        mid_date = (datetime.now(timezone.utc).date() - timedelta(days=15)).isoformat()
+    def test_30_days_ago_is_50(self):
+        mid_date = (datetime.now(timezone.utc).date() - timedelta(days=30)).isoformat()
         result = dates.recency_score(mid_date)
         self.assertEqual(result, 50)
 

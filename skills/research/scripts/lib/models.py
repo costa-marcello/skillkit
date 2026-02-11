@@ -1,4 +1,4 @@
-"""Model auto-selection for last30days skill."""
+"""Model auto-selection for research skill."""
 
 import re
 from typing import Dict, List, Optional, Tuple

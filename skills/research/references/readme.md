@@ -1,6 +1,6 @@
 # /research
 
-**The AI world reinvents itself every month. This Claude Code skill keeps you current.** /research researches your topic across Reddit, X, and the web from the last 30 days, finds what the community is actually upvoting and sharing, and writes you a prompt that works today, not six months ago. Whether it's Ralph Wiggum loops, Suno music prompts, or the latest Midjourney techniques, you'll prompt like someone who's been paying attention.
+**The AI world reinvents itself every month. This Claude Code skill keeps you current.** /research researches your topic across Reddit, X, and the web, finds what the community is actually upvoting and sharing, and writes you a prompt that works today, not six months ago. Whether it's Ralph Wiggum loops, Suno music prompts, or the latest Midjourney techniques, you'll prompt like someone who's been paying attention.
 
 **Best for prompt research**: discover what prompting techniques actually work for any tool (ChatGPT, Midjourney, Claude, Figma AI, etc.) by learning from real community discussions and best practices.
 
@@ -10,15 +10,15 @@
 
 ```bash
 # Clone the repo
-git clone https://github.com/mvanhorn/last30days-skill.git ~/.claude/skills/research
+git clone https://github.com/mvanhorn/research-skill.git ~/.claude/skills/research
 
 # Add your API keys
-mkdir -p ~/.config/last30days
-cat > ~/.config/last30days/.env << 'EOF'
+mkdir -p ~/.config/research
+cat > ~/.config/research/.env << 'EOF'
 OPENAI_API_KEY=sk-...
 XAI_API_KEY=xai-...
 EOF
-chmod 600 ~/.config/last30days/.env
+chmod 600 ~/.config/research/.env
 ```
 
 ## Usage
@@ -36,7 +36,7 @@ Examples:
 
 ## What It Does
 
-1. **Researches** - Scans Reddit and X for discussions from the last 30 days
+1. **Researches** - Scans Reddit and X for discussions from the last 2 months
 2. **Synthesizes** - Identifies patterns, best practices, and what actually works
 3. **Delivers** - Either writes copy-paste-ready prompts for your target tool, or gives you a curated expert-level answer
 
@@ -334,67 +334,6 @@ portrait photo, not a cartoon.
 Same golden fur → red hair. Same tongue out. Same harness. Same pink tag. ChatGPT nailed it.
 
 This example shows how /research discovers **viral trends you didn't know existed** - the "dog as human" phenomenon with 600-900+ upvote threads.
-
----
-
-## Example: Remotion Launch Video
-
-**Query:** `/research research best practices for beautiful remotion animation videos in claude code`
-
-**Research Output:**
-> The Remotion + Claude Code combination has emerged as a powerful workflow. Users consistently report that simple, clear prompts with scene-by-scene descriptions yield the best results. Key insights: iteration is essential, most "beautiful" videos come from back-and-forth refinement rather than one-shot prompts.
-
-**Then asked:** "Can you make a prompt for a 50 second launch video for my /research skill?"
-
-**Generated Prompt:**
-
-```
-Create a 50-second launch video for "/last30days" - a Claude Code skill that
-researches any topic across Reddit and X from the last 30 days, then writes
-copy-paste-ready prompts.
-
-SCENE 1 (0-8s): The Problem
-Dark background. Text fades in: "You want to create something great."
-Beat. Then: "But the internet is overwhelming."
-Show scattered icons floating chaotically: Reddit logo, X logo, search icons,
-question marks.
-Slight camera shake to convey chaos.
-
-SCENE 2 (8-16s): The Solution Reveal
-Clean wipe transition. Calm, modern gradient background (deep purple to blue).
-"/last30days" types in with a terminal cursor, monospace font.
-Subtitle fades in below: "Instant expertise. Real prompts."
-
-SCENE 3 (16-28s): How It Works
-Split into 3 animated steps that slide in sequentially:
-1. [Reddit + X icons merge] "Scans Reddit & X from the last 30 days"
-2. [Brain/lightbulb icon] "Synthesizes what actually works"
-3. [Document with sparkle] "Writes prompts you can copy-paste"
-
-Each step has a subtle bounce animation on entry.
-
-SCENE 4 (28-40s): Live Demo Feel
-Simulate a terminal. Show:
-> /research remotion animations
-Then a progress indicator animates.
-Results appear: "Analyzed 28 sources..."
-Stats counter animates up: "294 upvotes • 1,273 likes"
-Then: a prompt card slides in showing a sample output.
-
-SCENE 5 (40-50s): Call to Action
-Zoom out slightly. Everything fades except the logo.
-Text animates in: "Research any topic. Get prompts that work."
-GitHub icon + "github.com/mvanhorn/last30days-skill"
-Tagline: "A Claude Code Skill"
-
-STYLE NOTES:
-- Color palette: Deep purple (#1a1a2e), electric blue (#4361ee), white text
-- Typography: Inter or SF Mono for code, clean sans-serif for headlines
-- Transitions: Smooth eases, nothing jarring
-- Music sync points: Scene transitions should land on beats
-```
-
-This prompt was generated based on research from 10 Reddit threads (294 upvotes) and 18 X posts (1,273 likes) about Remotion animation best practices.
 
 ---
 
@@ -718,6 +657,6 @@ The skill uses:
 
 ---
 
-*30 days of research. 30 seconds of work.*
+*Real research. 30 seconds of work.*
 
 *Prompt research. Trend discovery. Expert answers.*

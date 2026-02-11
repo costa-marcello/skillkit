@@ -1,4 +1,4 @@
-"""Data schemas for last30days skill."""
+"""Data schemas for research skill."""
 
 from dataclasses import dataclass, field, asdict
 from typing import Any, Dict, List, Optional

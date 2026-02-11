@@ -1,4 +1,4 @@
-"""WebSearch module for last30days skill.
+"""WebSearch module for research skill.
 
 NOTE: WebSearch uses Claude's built-in WebSearch tool, which runs INSIDE Claude Code.
 Unlike Reddit/X which use external APIs, WebSearch results are obtained by Claude

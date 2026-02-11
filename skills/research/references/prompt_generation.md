@@ -72,5 +72,5 @@ Based on: {community_n} community sources + {official_n} official sources
 
 Want another prompt? Just tell me what you're creating next.
 
-Unlock Reddit & X data: Add API keys to ~/.config/last30days/.env
+Unlock Reddit & X data: Add API keys to ~/.config/research/.env
 ```

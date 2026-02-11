@@ -1,4 +1,4 @@
-"""Terminal UI utilities for last30days skill."""
+"""Terminal UI utilities for research skill."""
 
 import os
 import sys
@@ -30,10 +30,10 @@ BANNER = f"""{Colors.PURPLE}{Colors.BOLD}
   ██║     ██╔══██║╚════██║   ██║    ╚═══██╗████╔╝██║██║  ██║██╔══██║  ╚██╔╝  ╚════██║
   ███████╗██║  ██║███████║   ██║   ██████╔╝╚██████╔╝██████╔╝██║  ██║   ██║   ███████║
   ╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═════╝  ╚═════╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚══════╝
-{Colors.RESET}{Colors.DIM}  30 days of research. 30 seconds of work.{Colors.RESET}
+{Colors.RESET}{Colors.DIM}  Deep research. 30 seconds of work.{Colors.RESET}
 """
 
-MINI_BANNER = f"""{Colors.PURPLE}{Colors.BOLD}/last30days{Colors.RESET} {Colors.DIM}· researching...{Colors.RESET}"""
+MINI_BANNER = f"""{Colors.PURPLE}{Colors.BOLD}/research{Colors.RESET} {Colors.DIM}· researching...{Colors.RESET}"""
 
 # Fun status messages for each phase
 REDDIT_MESSAGES = [
@@ -82,7 +82,7 @@ WEB_ONLY_MESSAGES = [
 # Promo message for users without API keys
 PROMO_MESSAGE = f"""
 {Colors.YELLOW}{Colors.BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Colors.RESET}
-{Colors.YELLOW}⚡ UNLOCK THE FULL POWER OF /last30days{Colors.RESET}
+{Colors.YELLOW}⚡ UNLOCK THE FULL POWER OF /research{Colors.RESET}
 
 {Colors.DIM}Right now you're using web search only. Add API keys to unlock:{Colors.RESET}
 
@@ -92,13 +92,13 @@ PROMO_MESSAGE = f"""
   {Colors.CYAN}🔵 X (Twitter){Colors.RESET} - Real-time posts, likes, reposts from creators
      └─ Add XAI_API_KEY (uses xAI's live X search)
 
-{Colors.DIM}Setup:{Colors.RESET} Edit {Colors.BOLD}~/.config/last30days/.env{Colors.RESET}
+{Colors.DIM}Setup:{Colors.RESET} Edit {Colors.BOLD}~/.config/research/.env{Colors.RESET}
 {Colors.YELLOW}{Colors.BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{Colors.RESET}
 """
 
 PROMO_MESSAGE_PLAIN = """
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚡ UNLOCK THE FULL POWER OF /last30days
+⚡ UNLOCK THE FULL POWER OF /research
 
 Right now you're using web search only. Add API keys to unlock:
 
@@ -108,23 +108,23 @@ Right now you're using web search only. Add API keys to unlock:
   🔵 X (Twitter) - Real-time posts, likes, reposts from creators
      └─ Add XAI_API_KEY (uses xAI's live X search)
 
-Setup: Edit ~/.config/last30days/.env
+Setup: Edit ~/.config/research/.env
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
 
 # Shorter promo for single missing key
 PROMO_SINGLE_KEY = {
     "reddit": f"""
-{Colors.DIM}💡 Tip: Add {Colors.YELLOW}OPENAI_API_KEY{Colors.RESET}{Colors.DIM} to ~/.config/last30days/.env for Reddit data with real engagement metrics!{Colors.RESET}
+{Colors.DIM}💡 Tip: Add {Colors.YELLOW}OPENAI_API_KEY{Colors.RESET}{Colors.DIM} to ~/.config/research/.env for Reddit data with real engagement metrics!{Colors.RESET}
 """,
     "x": f"""
-{Colors.DIM}💡 Tip: Add {Colors.CYAN}XAI_API_KEY{Colors.RESET}{Colors.DIM} to ~/.config/last30days/.env for X/Twitter data with real likes & reposts!{Colors.RESET}
+{Colors.DIM}💡 Tip: Add {Colors.CYAN}XAI_API_KEY{Colors.RESET}{Colors.DIM} to ~/.config/research/.env for X/Twitter data with real likes & reposts!{Colors.RESET}
 """,
 }
 
 PROMO_SINGLE_KEY_PLAIN = {
-    "reddit": "\n💡 Tip: Add OPENAI_API_KEY to ~/.config/last30days/.env for Reddit data with real engagement metrics!\n",
-    "x": "\n💡 Tip: Add XAI_API_KEY to ~/.config/last30days/.env for X/Twitter data with real likes & reposts!\n",
+    "reddit": "\n💡 Tip: Add OPENAI_API_KEY to ~/.config/research/.env for Reddit data with real engagement metrics!\n",
+    "x": "\n💡 Tip: Add XAI_API_KEY to ~/.config/research/.env for X/Twitter data with real likes & reposts!\n",
 }
 
 # Spinner frames
@@ -200,7 +200,7 @@ class ProgressDisplay:
             sys.stderr.write(f"{Colors.DIM}Topic: {Colors.RESET}{Colors.BOLD}{self.topic}{Colors.RESET}\n\n")
         else:
             # Simple text for non-TTY
-            sys.stderr.write(f"/last30days · researching: {self.topic}\n")
+            sys.stderr.write(f"/research · researching: {self.topic}\n")
         sys.stderr.flush()
 
     def start_reddit(self):

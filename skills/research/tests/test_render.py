@@ -83,7 +83,7 @@ class TestRenderContextSnippet(unittest.TestCase):
         result = render.render_context_snippet(report)
 
         self.assertIn("Claude Code Skills", result)
-        self.assertIn("Last 30 Days", result)
+        self.assertIn("Recent Research", result)
 
 
 class TestRenderFullReport(unittest.TestCase):
@@ -109,7 +109,7 @@ class TestGetContextPath(unittest.TestCase):
     def test_returns_path_string(self):
         result = render.get_context_path()
         self.assertIsInstance(result, str)
-        self.assertIn("last30days.context.md", result)
+        self.assertIn("research.context.md", result)
 
 
 if __name__ == "__main__":

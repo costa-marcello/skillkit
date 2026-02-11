@@ -1,4 +1,4 @@
-"""HTTP utilities for last30days skill (stdlib only)."""
+"""HTTP utilities for research skill (stdlib only)."""
 
 import json
 import os
@@ -12,7 +12,7 @@ from urllib.parse import urlencode
 # 30 seconds covers slow API responses without blocking the pipeline too long.
 # Reddit JSON and OpenAI Responses API typically respond within 5-15 seconds.
 DEFAULT_TIMEOUT = 30
-DEBUG = os.environ.get("LAST30DAYS_DEBUG", "").lower() in ("1", "true", "yes")
+DEBUG = os.environ.get("RESEARCH_DEBUG", "").lower() in ("1", "true", "yes")
 
 
 def log(msg: str):
@@ -26,7 +26,7 @@ MAX_RETRIES = 3
 # Linear backoff: 1s, 2s, 3s. Enough spacing to clear rate limits
 # without stalling the research pipeline.
 RETRY_DELAY = 1.0
-USER_AGENT = "last30days-skill/1.0 (Claude Code Skill)"
+USER_AGENT = "research-skill/1.0 (Claude Code Skill)"
 
 
 class HTTPError(Exception):

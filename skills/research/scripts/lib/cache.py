@@ -1,4 +1,4 @@
-"""Caching utilities for last30days skill."""
+"""Caching utilities for research skill."""
 
 import hashlib
 import json
@@ -8,14 +8,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
-CACHE_DIR = Path.home() / ".cache" / "last30days"
+CACHE_DIR = Path.home() / ".cache" / "research"
 # 24 hours matches the research window granularity. Queries for the
 # same topic within a day reuse cached results instead of re-calling APIs.
 DEFAULT_TTL_HOURS = 24
 # Model lists change infrequently. 7 days avoids repeated model
 # listing API calls while still catching new model releases.
 MODEL_CACHE_TTL_DAYS = 7
-DEBUG = os.environ.get("LAST30DAYS_DEBUG", "").lower() in ("1", "true", "yes")
+DEBUG = os.environ.get("RESEARCH_DEBUG", "").lower() in ("1", "true", "yes")
 
 
 def ensure_cache_dir():

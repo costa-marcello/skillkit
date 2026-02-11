@@ -1,6 +1,6 @@
 ---
 name: research
-description: "Researches any topic from the last 30 days by dispatching 6-10 parallel sub-agents across community discussions and official sources. Use when user wants deep research, topic analysis, community sentiment, or asks 'what's new with X'."
+description: "Researches any topic by dispatching 6-10 parallel sub-agents across community discussions and official sources. Use when user wants deep research, topic analysis, community sentiment, or asks 'what's new with X'."
 argument-hint: "[topic] for [tool]" or "[topic]" or "[topic] deep"
 context: fork
 agent: general-purpose
@@ -8,7 +8,7 @@ agent: general-purpose
 
 <instructions>
 
-# research: Deep Research Any Topic from the Last 30 Days
+# research: Deep Research Any Topic
 
 Research ANY topic across Reddit, X, community forums, official docs, academic papers, and industry publications. Dispatches 6-10 parallel sub-agents to cover every angle — community AND official sources — then synthesizes a two-sided report.
 
@@ -97,7 +97,7 @@ Output: SCRIPT_DATA (Reddit/X results with engagement metrics, or empty if web-o
 Run the research script synchronously — it provides Reddit/X data with real engagement metrics that sub-agents cannot replicate.
 
 ```bash
-python3 ~/.claude/skills/research/scripts/last30days.py "$TOPIC" --emit=compact 2>&1
+RESEARCH_SCRIPT="$([ -f .claude/skills/research/scripts/research.py ] && echo .claude/skills/research/scripts/research.py || echo ~/.claude/skills/research/scripts/research.py)" && python3 "$RESEARCH_SCRIPT" "$TOPIC" --emit=compact 2>&1
 ```
 
 The `$DEPTH` flag maps to: `--quick` -> pass `--quick`; default -> no flag; `--deep` -> pass `--deep`.

@@ -36,7 +36,7 @@ When no MCP search tools are detected:
 
 ```
 You are a community research agent. Your job is to find what REAL PEOPLE are saying
-about {TOPIC} in online discussions and forums from the last 30 days.
+about {TOPIC} in online discussions and forums from the last 2 months.
 
 CONTEXT:
 - Reddit and X/Twitter are covered by a separate specialized script with real engagement
@@ -55,7 +55,7 @@ QUERIES TO RUN (3-5 searches):
 For each query:
 - Exclude reddit.com and x.com from results
 - Use the user's exact terminology. Do not substitute terms based on your knowledge
-- Look for content from the last 30 days specifically
+- Look for content from the last 2 months specifically
 
 RETURN FORMAT (max 500 words):
 
@@ -86,7 +86,7 @@ Notes:
 
 ```
 You are an official/authoritative source research agent. Your job is to find
-OFFICIAL, INSTITUTIONAL, and EXPERT information about {TOPIC} from the last 30 days.
+OFFICIAL, INSTITUTIONAL, and EXPERT information about {TOPIC} from the last 2 months.
 
 CONTEXT:
 - Community discussions (Reddit, X, forums) are covered by separate agents.
@@ -104,7 +104,7 @@ QUERIES TO RUN (3-5 searches):
 For each query:
 - Prioritise: .gov, .edu, official project sites, peer-reviewed sources, institutional reports
 - Use the user's exact terminology. Do not substitute terms based on your knowledge
-- Look for content from the last 30 days specifically
+- Look for content from the last 2 months specifically
 
 RETURN FORMAT (max 500 words):
 
@@ -122,7 +122,7 @@ For each relevant result found:
 - [What is the official/institutional stance or latest information?]
 
 ### Recent Changes
-- [Any announcements, updates, or shifts in the last 30 days]
+- [Any announcements, updates, or shifts in the last 2 months]
 
 ### Gaps
 - [Areas where official information is lacking or outdated]

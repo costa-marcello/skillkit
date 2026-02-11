@@ -39,7 +39,7 @@ Each agent searches a different slice of the authoritative landscape.
 For each agent, build a prompt from the templates in `subagent_prompts.md`:
 
 1. Choose **Community Agent Template** or **Official Agent Template**
-2. Fill in variables: `{TOPIC}`, `{QUERY_TYPE}`, `{FOCUS}`, `{QUERIES}` (3-5 queries adapted to QUERY_TYPE), `{DATE_FROM}` (30 days ago), `{MCP_TOOLS}`
+2. Fill in variables: `{TOPIC}`, `{QUERY_TYPE}`, `{FOCUS}`, `{QUERIES}` (3-5 queries adapted to QUERY_TYPE), `{DATE_FROM}` (60 days ago), `{MCP_TOOLS}`
 3. Each Task call uses `subagent_type: "general-purpose"`
 
 ## Dispatch Pattern Example (default depth, 8 agents)

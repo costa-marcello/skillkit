@@ -5,7 +5,7 @@
 ## Report Template
 
 ```
-## Research Report: {TOPIC} (Last 30 Days)
+## Research Report: {TOPIC}
 
 ### What the Community Says
 
@@ -117,7 +117,7 @@ All agents reported back!
 ├─ Agents dispatched: {total} ({C}C + {O}O)
 └─ Cross-reference: {agree} aligned, {disagree} divergent, {gaps} gaps
 
-Unlock Reddit & X data: Add API keys to ~/.config/last30days/.env
+Unlock Reddit & X data: Add API keys to ~/.config/research/.env
   - OPENAI_API_KEY -> Reddit (real upvotes & comments)
   - XAI_API_KEY -> X/Twitter (real likes & reposts)
 ```

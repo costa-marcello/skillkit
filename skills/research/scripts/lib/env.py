@@ -1,10 +1,10 @@
-"""Environment and API key management for last30days skill."""
+"""Environment and API key management for research skill."""
 
 import os
 from pathlib import Path
 from typing import Optional, Dict, Any
 
-CONFIG_DIR = Path.home() / ".config" / "last30days"
+CONFIG_DIR = Path.home() / ".config" / "research"
 CONFIG_FILE = CONFIG_DIR / ".env"
 
 
@@ -32,7 +32,7 @@ def load_env_file(path: Path) -> Dict[str, str]:
 
 
 def get_config() -> Dict[str, Any]:
-    """Load configuration from ~/.config/last30days/.env and environment."""
+    """Load configuration from ~/.config/research/.env and environment."""
     # Load from config file first
     file_env = load_env_file(CONFIG_FILE)
 
@@ -108,7 +108,7 @@ def validate_sources(requested: str, available: str, include_web: bool = False) 
         elif requested == 'web':
             return 'web', None
         else:
-            return 'web', f"No API keys configured. Using WebSearch fallback. Add keys to ~/.config/last30days/.env for Reddit/X."
+            return 'web', f"No API keys configured. Using WebSearch fallback. Add keys to ~/.config/research/.env for Reddit/X."
 
     if requested == 'auto':
         # Add web to sources if include_web is set
