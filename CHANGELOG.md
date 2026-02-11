@@ -25,6 +25,8 @@ All notable changes to this project will be documented in this file.
 - Fixed 13 Mermaid syntax errors across 10 reference files including flowchart labels, ERD constraints, and deprecated directives
 - Fixed install commands across README and review-skill to use documented `-s` flag format
 - Fixed missing `license` field in mermaid-diagrams SKILL.md frontmatter
+- Fixed invalid YAML in research skill `argument-hint` that broke frontmatter parsing in the skill installer
+- Fixed missing `license: MIT` field in 9 skills (changelog, ci-cd, codex, frontend-design, gemini, orla3-production, production-audit, research, smart-merge)
 
 ## [0.2.0] - 2026-02-09
 
