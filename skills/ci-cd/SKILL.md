@@ -1,6 +1,7 @@
 ---
 name: ci-cd
 description: "Creates production-ready GitHub Actions workflows for CI/CD, Docker builds, security scanning, and monorepo orchestration. Triggers on requests for CI/CD setup, workflow creation, pipeline automation, GitHub Actions help, deployment workflows, matrix builds, reusable workflows, or security scanning configuration."
+license: MIT
 context: fork
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash(git *)
 ---

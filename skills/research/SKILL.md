@@ -1,7 +1,8 @@
 ---
 name: research
 description: "Researches any topic by dispatching 6-10 parallel sub-agents across community discussions and official sources. Use when user wants deep research, topic analysis, community sentiment, or asks 'what's new with X'."
-argument-hint: "[topic] for [tool]" or "[topic]" or "[topic] deep"
+license: MIT
+argument-hint: "[topic]"
 context: fork
 agent: general-purpose
 ---

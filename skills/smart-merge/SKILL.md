@@ -1,6 +1,7 @@
 ---
 name: smart-merge
 description: Merges branches with comprehensive validation while preserving feature branches. Use when user wants to merge PR, sync with main, update feature branch, complete merge, or finalize work. Runs full validation (tests, lint, CI, review comments), merges without deleting branches, and always returns to the working branch.
+license: MIT
 context: fork
 ---
 

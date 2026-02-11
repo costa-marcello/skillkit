@@ -1,6 +1,7 @@
 ---
 name: gemini
 description: "Invokes Gemini CLI for code review, plan analysis, frontend development, or large-context (>200k token) processing. Use when the user asks to run Gemini CLI, references Google Gemini, or needs analysis that benefits from a 1M-token context window."
+license: MIT
 context: fork
 ---
 

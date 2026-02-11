@@ -1,6 +1,7 @@
 ---
 name: changelog
 description: "Generates and updates CHANGELOG.md files from git history using Keep a Changelog format. Use when creating changelogs, adding release notes, documenting version history, or preparing release documentation."
+license: MIT
 context: fork
 agent: general-purpose
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash(git *)

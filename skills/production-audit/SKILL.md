@@ -1,6 +1,7 @@
 ---
 name: production-audit
 description: "Audits a codebase for production readiness across six dimensions: API completeness, frontend-backend sync, security, scalability, infrastructure, and dead code/architecture. Use when asked for a launch assessment, production readiness check, pre-deployment audit, or multi-agent patchwork cleanup."
+license: MIT
 context: fork
 ---
 

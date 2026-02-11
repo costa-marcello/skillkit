@@ -1,6 +1,7 @@
 ---
 name: orla3-production
 description: "Audits a codebase for production readiness across six dimensions: API completeness, frontend-backend sync, security, scalability, infrastructure, and dead code/architecture. Use when the user requests a launch assessment, production readiness check, pre-deployment audit, or multi-agent patchwork cleanup."
+license: MIT
 context: fork
 agent: general-purpose
 allowed-tools: "Read, Grep, Glob, Bash(which *), Bash(npx *), Bash(pnpm *), Bash(npm *), Bash(semgrep *), Bash(git log *), Bash(git diff *), Bash(wc *), Bash(ls *), LSP, ToolSearch, mcp__plugin_semgrep-plugin_semgrep__*"

@@ -1,6 +1,7 @@
 ---
 name: codex
 description: Invokes Codex CLI for code analysis, refactoring, or automated editing. Use when the user asks to run codex exec, codex resume, or references OpenAI Codex.
+license: MIT
 context: fork
 ---
 
