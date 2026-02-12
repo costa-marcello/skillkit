@@ -27,7 +27,7 @@ export const CODE_LIMIT = parseInt(process.env.HOOK_CODE_LIMIT, 10) || 3
 export const DOCS_LIMIT = parseInt(process.env.HOOK_DOCS_LIMIT, 10) || 3
 export const MEM_LIMIT = parseInt(process.env.HOOK_MEM_LIMIT, 10) || 5
 export const MIN_SCORE = parseFloat(process.env.HOOK_MIN_SCORE) || 0.55
-export const DOCS_COLLECTION = process.env.HOOK_DOCS_COLLECTION || "codemad-docs"
+export const DOCS_COLLECTION = process.env.HOOK_DOCS_COLLECTION || "project-docs"
 
 export const MEM_WORKER = process.env.MEM_WORKER_URL || "http://127.0.0.1:37777"
 
@@ -145,16 +145,44 @@ export async function getQdrantModules() {
 }
 
 // ─── Memory search via claude-mem HTTP API ──────────────────────────────────
+const MAX_MEM_QUERY_LEN = 2000
+
 export function searchMemory(query, limit) {
   return new Promise((resolve) => {
+    // Sanitise: truncate long queries and validate limit is a positive integer
+    const safeQuery = typeof query === "string" ? query.slice(0, MAX_MEM_QUERY_LEN) : ""
+    const safeLimit = Math.max(1, Math.min(Number.isFinite(limit) ? Math.floor(limit) : MEM_LIMIT, 50))
+
+    if (!safeQuery) {
+      resolve([])
+      return
+    }
+
     const timer = setTimeout(() => {
-      warn("mem_timeout", { query: query.slice(0, 50) })
+      warn("mem_timeout", { query: safeQuery.slice(0, 50) })
       req.destroy()
       resolve([])
     }, 4000)
 
-    const encoded = encodeURIComponent(query)
-    const url = `${MEM_WORKER}/api/search?query=${encoded}&limit=${limit}`
+    const encoded = encodeURIComponent(safeQuery)
+    const url = `${MEM_WORKER}/api/search?query=${encoded}&limit=${safeLimit}`
+
+    // Validate the constructed URL before sending
+    let parsedUrl
+    try {
+      parsedUrl = new URL(url)
+      if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+        clearTimeout(timer)
+        warn("mem_invalid_protocol", { protocol: parsedUrl.protocol })
+        resolve([])
+        return
+      }
+    } catch {
+      clearTimeout(timer)
+      warn("mem_invalid_url", { url: url.slice(0, 100) })
+      resolve([])
+      return
+    }
 
     const req = request(url, { timeout: 4000 }, (res) => {
       let data = ""
@@ -197,15 +225,38 @@ export function searchMemory(query, limit) {
   })
 }
 
-// ─── Qdrant search function ────────────────────────────────────────────────
-export async function searchQdrant(query, { searchCode, searchDocs, cwd, mcpConfig }) {
-  setQdrantEnv(mcpConfig, { warn })
+// ─── Qdrant client pool (reuse across calls within same process) ─────────────
+let _clientPool = null
+
+function getClientPool(mcpConfig) {
+  const key = `${mcpConfig.QDRANT_URL}:${(mcpConfig.QDRANT_API_KEY || "").slice(0, 8)}`
+  if (_clientPool && _clientPool.key === key) return _clientPool
+  return null
+}
+
+async function getOrCreateClients(mcpConfig) {
+  const existing = getClientPool(mcpConfig)
+  if (existing) return existing
 
   const { QdrantManager, EmbeddingProviderFactory, CodeIndexer, BM25SparseVectorGenerator } = await getQdrantModules()
 
   const qdrant = new QdrantManager(mcpConfig.QDRANT_URL, mcpConfig.QDRANT_API_KEY)
   const embeddings = EmbeddingProviderFactory.createFromEnv()
   const codeIndexer = new CodeIndexer(qdrant, embeddings, { enableHybridSearch: true })
+
+  _clientPool = {
+    key: `${mcpConfig.QDRANT_URL}:${(mcpConfig.QDRANT_API_KEY || "").slice(0, 8)}`,
+    qdrant, embeddings, codeIndexer, BM25SparseVectorGenerator,
+  }
+  return _clientPool
+}
+
+// ─── Qdrant search function ────────────────────────────────────────────────
+export async function searchQdrant(query, { searchCode, searchDocs, cwd, mcpConfig }) {
+  if (!mcpConfig) throw new Error("MCP config not available (.mcp.json missing or invalid)")
+  setQdrantEnv(mcpConfig, { warn })
+
+  const { qdrant, embeddings, codeIndexer, BM25SparseVectorGenerator } = await getOrCreateClients(mcpConfig)
 
   const truncatedQuery = query.length > 1000 ? query.slice(0, 1000) : query
   const searches = []

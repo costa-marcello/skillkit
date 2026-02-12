@@ -4,8 +4,8 @@
   <p><strong>Skills for AI coding agents</strong></p>
 
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-  [![Skills](https://img.shields.io/badge/Skills-21-8B5CF6)](skills/)
-  [![Hooks](https://img.shields.io/badge/Hooks-3-3B82F6)](hooks/)
+  [![Skills](https://img.shields.io/badge/Skills-22-8B5CF6)](skills/)
+  [![Hooks](https://img.shields.io/badge/Hooks-3-3B82F6)](context-intelligence-hooks/)
 </div>
 
 ---
@@ -16,7 +16,7 @@ AI coding agents are powerful out of the box. But ask one to create a Word docum
 
 You end up writing long prompts, correcting mistakes, and re-doing work. Every session starts from zero.
 
-**Skillkit fixes this.** It gives your agent 21 specialist skills, each containing the exact workflows, decision trees, reference materials, and quality checks needed to do one job well. Instead of hoping the agent figures out the right approach, you give it a battle-tested playbook. Works with Claude Code, Cursor, Windsurf, and any agent that supports the skills protocol.
+**Skillkit fixes this.** It gives your agent 22 specialist skills, each containing the exact workflows, decision trees, reference materials, and quality checks needed to do one job well. Instead of hoping the agent figures out the right approach, you give it a battle-tested playbook. Works with Claude Code, Cursor, Windsurf, and any agent that supports the skills protocol.
 
 ## Why these skills are different
 
@@ -50,7 +50,7 @@ That is the full setup. No configuration files, no environment variables, no bui
 
 ---
 
-## All 21 skills
+## All 22 skills
 
 ### Documents and Data
 
@@ -102,7 +102,7 @@ Creates, edits, and analyses spreadsheets with a focus on getting formulas right
 
 ### Development
 
-Six skills that cover the development lifecycle from CI/CD setup through to branch management, UI implementation, and visual documentation.
+Seven skills that cover the development lifecycle from CI/CD setup through to branch management, UI implementation, visual documentation, and systematic debugging.
 
 <table>
 <tr>
@@ -164,6 +164,15 @@ Creates professional software diagrams using Mermaid syntax. Covers class diagra
 </td>
 <td><code>npx skills add costa-marcello/skillkit -s mermaid-diagrams</code></td>
 </tr>
+<tr>
+<td><strong>debug</strong></td>
+<td>
+
+Guides systematic root-cause debugging through four phases: observe (gather evidence without assumptions), hypothesise (form testable theories ranked by likelihood), test (run the cheapest decisive experiment first), and fix (address the root cause, not the symptom). Enforces an iron law: no fixes without root cause investigation first. Works for any technical issue including test failures, runtime errors, performance regressions, integration failures, and deployment problems. Prevents the common anti-pattern of random fixes that waste time and mask underlying issues.
+
+</td>
+<td><code>npx skills add costa-marcello/skillkit -s debug</code></td>
+</tr>
 </table>
 
 ### AI and Research
@@ -216,7 +225,7 @@ Performs exhaustive multi-lens analysis through four universal perspectives: hum
 
 ### Meta (Skills about Skills)
 
-Seven skills that manage the skillkit ecosystem itself: creating, reviewing, discovering, auditing, and documenting.
+Seven skills that manage the skillkit ecosystem itself: creating, reviewing, discovering, auditing, documenting, and automating hooks.
 
 <table>
 <tr>
@@ -261,6 +270,15 @@ Reviews and automatically fixes skills against Anthropic's official best practic
 <td><code>npx skills add costa-marcello/skillkit -s review-skill</code></td>
 </tr>
 <tr>
+<td><strong>cc-hooks</strong></td>
+<td>
+
+Creates and improves event-driven hooks for Claude Code automation. Covers all lifecycle events: PreToolUse guards that block dangerous commands, PostToolUse formatters and linters, Stop hooks for testing and notifications, and SessionStart/SessionEnd for environment setup and teardown. Includes patterns for agent-based verification gates and headless CI/CD integration. Bundles comprehensive reference material covering the hook API, stdin/stdout contracts, error handling, and real-world examples for each event type. Use it when you need to extend Claude Code's behaviour with custom automation.
+
+</td>
+<td><code>npx skills add costa-marcello/skillkit -s cc-hooks</code></td>
+</tr>
+<tr>
 <td><strong>find-skills</strong></td>
 <td>
 
@@ -278,15 +296,6 @@ Audits a codebase for production readiness across six dimensions: API completene
 </td>
 <td><code>npx skills add costa-marcello/skillkit -s production-audit</code></td>
 </tr>
-<tr>
-<td><strong>orla3-production</strong></td>
-<td>
-
-A project-specific variant of the production audit skill. Audits a codebase for production readiness across the same six dimensions (API completeness, frontend-backend sync, security, scalability, infrastructure, and dead code/architecture) but tailored for project-specific conventions and tooling. Spawns parallel audit agents with detailed checklists, integrates with Semgrep MCP for automated vulnerability scanning, and produces structured reports with severity levels and file-level evidence. Use this when you need a production audit calibrated to a particular project's stack and standards.
-
-</td>
-<td><code>npx skills add costa-marcello/skillkit -s orla3-production</code></td>
-</tr>
 </table>
 
 ---
@@ -303,9 +312,9 @@ The three hooks in this repository connect your agent to a Qdrant vector store a
 | **post-commit-index.mjs** | PostToolUse (Bash) | Detects git commits and re-indexes changed files into Qdrant. Handles both code files and documentation. Your vector store stays current after every commit. |
 | **pre-tool-context.mjs** | PreToolUse | Injects additional context before tool execution. |
 
-Hooks run in dual mode: they respond to lifecycle events automatically, and they work as standalone CLI tools (`node hooks/context.mjs "query"`) for manual searches.
+Hooks run in dual mode: they respond to lifecycle events automatically, and they work as standalone CLI tools (`node context-intelligence-hooks/context.mjs "query"`) for manual searches.
 
-**Prerequisites:** A Qdrant Cloud account (free tier works) and a Voyage AI API key for embeddings (also free tier). See [hooks/README.md](hooks/README.md) for full setup instructions.
+**Prerequisites:** A Qdrant Cloud account (free tier works) and a Voyage AI API key for embeddings (also free tier). See [context-intelligence-hooks/README.md](context-intelligence-hooks/README.md) for full setup instructions.
 
 ---
 

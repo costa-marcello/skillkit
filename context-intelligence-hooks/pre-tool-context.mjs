@@ -16,7 +16,7 @@
 // Stdin: { session_id, transcript_path, tool_name, tool_input, cwd }
 // Stdout: { hookSpecificOutput: { hookEventName: "PreToolUse", additionalContext: "..." } }
 
-import { readFileSync, existsSync, writeFileSync, mkdirSync, statSync } from "node:fs"
+import { readFileSync, existsSync, writeFileSync, writeSync, mkdirSync, statSync, openSync, closeSync, constants as fsConstants } from "node:fs"
 import { join } from "node:path"
 import { tmpdir } from "node:os"
 import {
@@ -38,6 +38,7 @@ const GUARD_TTL_MS = parseInt(process.env.HOOK_GUARD_TTL_MS, 10) || 60000
 const CACHE_PREFIX = "ptc-"
 
 const mcpConfig = loadMcpConfig({ warn })
+if (!mcpConfig) process.exit(0)
 
 // ─── Read stdin ─────────────────────────────────────────────────────────────
 let input = ""
@@ -61,18 +62,38 @@ if (!sessionId || typeof sessionId !== "string") process.exit(0)
 
 // ─── First-tool-per-turn guard ──────────────────────────────────────────────
 // Only run once per user turn to avoid adding latency to every tool call.
+// Uses O_CREAT|O_EXCL for atomic creation to prevent TOCTOU race conditions
+// when parallel tool calls fire simultaneously.
 const guardDir = join(tmpdir(), "pre-tool-guard")
 const guardFile = join(guardDir, `${sessionId}.lock`)
 
 try {
+  if (!existsSync(guardDir)) mkdirSync(guardDir, { recursive: true })
+
+  // Check if lock file exists and is still fresh
   if (existsSync(guardFile)) {
     const lockStat = statSync(guardFile)
     const age = Date.now() - lockStat.mtimeMs
     if (age < GUARD_TTL_MS) process.exit(0)
+    // Expired lock: remove and recreate atomically below
+    try { writeFileSync(guardFile, String(Date.now())) } catch { /* race lost, proceed */ }
+  } else {
+    // Atomic create: O_CREAT|O_EXCL fails if another process created it first
+    let fd
+    try {
+      fd = openSync(guardFile, fsConstants.O_CREAT | fsConstants.O_EXCL | fsConstants.O_WRONLY)
+      const buf = Buffer.from(String(Date.now()))
+      writeSync(fd, buf)
+    } catch (e) {
+      if (e.code === "EEXIST") {
+        // Another parallel hook call won the race; skip this one
+        process.exit(0)
+      }
+      // Other errors are non-fatal, proceed with search
+    } finally {
+      if (fd !== undefined) try { closeSync(fd) } catch { /* ignore */ }
+    }
   }
-  // Create or update lock file
-  if (!existsSync(guardDir)) mkdirSync(guardDir, { recursive: true })
-  writeFileSync(guardFile, String(Date.now()))
 } catch {
   // Guard failure is non-fatal, proceed with search
 }

@@ -34,8 +34,16 @@ import { extractReasoning, findTranscriptPath } from "./lib/transcript.mjs"
 
 const { warn, info } = createLogger("context.mjs")
 
-const mcpConfig = loadMcpConfig({ warn })
 const MIN_REASONING_LEN = parseInt(process.env.HOOK_MIN_REASONING_LEN, 10) || 20
+
+// Defer config loading so --health and --dry-run modes work without .mcp.json
+let _mcpConfig = undefined
+function getMcpConfig() {
+  if (_mcpConfig === undefined) {
+    _mcpConfig = loadMcpConfig({ warn })
+  }
+  return _mcpConfig
+}
 
 // ─── Retrieval guidance (injected alongside search results) ──────────────────
 const RETRIEVAL_GUIDANCE = `## Active Retrieval
@@ -57,7 +65,7 @@ Route: code/implementation → search_code, docs/history → hybrid_search on co
 if (process.argv.includes("--health")) {
   const startTime = Date.now()
   Promise.allSettled([
-    searchQdrant("health check", { searchCode: true, searchDocs: false, cwd: DEFAULT_CWD, mcpConfig }),
+    searchQdrant("health check", { searchCode: true, searchDocs: false, cwd: DEFAULT_CWD, mcpConfig: getMcpConfig() }),
     searchMemory("health check", 1),
   ]).then((results) => {
     const checks = [
@@ -115,7 +123,7 @@ if (process.argv.includes("--health")) {
 
           if (searchCode || searchDocs) {
             promises.push(
-              searchQdrant(query, { searchCode, searchDocs, cwd, mcpConfig })
+              searchQdrant(query, { searchCode, searchDocs, cwd, mcpConfig: getMcpConfig() })
                 .then((ctx) => { if (ctx) parts.push(`## Qdrant Context${ctx}`) })
                 .catch((e) => { warn("qdrant_error", { error: e.message }) })
             )
@@ -220,7 +228,7 @@ if (process.argv.includes("--health")) {
 
           if (searchCode || searchKnowledge) {
             promises.push(
-              searchQdrant(prompt, { searchCode: true, searchDocs: true, cwd, mcpConfig })
+              searchQdrant(prompt, { searchCode: true, searchDocs: true, cwd, mcpConfig: getMcpConfig() })
                 .then((ctx) => { if (ctx) parts.push(`## Qdrant Context${ctx}`) })
                 .catch((e) => { warn("qdrant_error", { error: e.message }) })
             )
@@ -243,7 +251,7 @@ if (process.argv.includes("--health")) {
             }
             if (rCode || rKnowledge) {
               promises.push(
-                searchQdrant(reasoningQuery, { searchCode: true, searchDocs: true, cwd, mcpConfig })
+                searchQdrant(reasoningQuery, { searchCode: true, searchDocs: true, cwd, mcpConfig: getMcpConfig() })
                   .then((ctx) => { if (ctx) parts.push(`## Reasoning Context${ctx}`) })
                   .catch((e) => { warn("reasoning_qdrant_error", { error: e.message }) })
               )

@@ -52,7 +52,7 @@ export function loadMcpConfig(logger) {
     return JSON.parse(raw).mcpServers["qdrant-codemad"].env
   } catch (e) {
     logger.warn("config_load_failed", { error: e.message })
-    process.exit(0)
+    return null
   }
 }
 
@@ -71,9 +71,26 @@ export function setQdrantEnv(mcpConfig, logger) {
 
 // ─── Path traversal guard ────────────────────────────────────────────────────
 export function validateCwd(cwd, logger) {
+  if (typeof cwd !== "string" || !cwd) {
+    logger.warn("cwd_invalid", { cwd })
+    return DEFAULT_CWD
+  }
+
+  // Reject obvious traversal patterns before resolving
   if (cwd.includes("..")) {
     logger.warn("cwd_path_traversal", { cwd })
     return DEFAULT_CWD
   }
-  return cwd
+
+  // Resolve to absolute path and verify it does not escape to sensitive areas
+  const resolved = resolve(cwd)
+  const blocked = ["/etc", "/var", "/usr", "/bin", "/sbin", "/boot", "/proc", "/sys", "/dev"]
+  for (const prefix of blocked) {
+    if (resolved === prefix || resolved.startsWith(prefix + "/")) {
+      logger.warn("cwd_blocked_path", { cwd, resolved })
+      return DEFAULT_CWD
+    }
+  }
+
+  return resolved
 }

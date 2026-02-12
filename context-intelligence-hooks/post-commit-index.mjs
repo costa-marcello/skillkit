@@ -25,7 +25,7 @@ const DOC_BATCH_LIMIT = parseInt(process.env.HOOK_DOC_BATCH_LIMIT, 10) || 20
 
 const DOCS_COLLECTION = process.env.HOOK_DOCS_COLLECTION || "project-docs"
 const COMMIT_PATTERN = /git\s+commit/
-const ERROR_PATTERNS = /\b(error:|fatal:|failed)\b/i
+const ERROR_PATTERNS = /(?:^|\s)(?:error|fatal):|(?:\bfailed\b)/i
 const DOC_EXTENSIONS = /\.(md|txt)$/
 const DOC_DIRECTORIES = /^docs\/.*\.(md|txt|json|yaml|yml)$/
 
@@ -58,6 +58,7 @@ const output = parsed.tool_output || ""
 if (ERROR_PATTERNS.test(output)) process.exit(0)
 
 const mcpConfig = loadMcpConfig({ warn })
+if (!mcpConfig) process.exit(0)
 setQdrantEnv(mcpConfig, { warn })
 
 // ─── Doc file detection ─────────────────────────────────────────────────────
