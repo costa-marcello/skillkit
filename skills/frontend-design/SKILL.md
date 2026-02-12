@@ -106,9 +106,13 @@ See `references/style-guide.md` for Color Palette by Industry.
 
 ### Motion
 
-Use animations for effects and micro-interactions. Prioritize CSS-only solutions for HTML. Use Motion library for React when available.
+Use animations for effects and micro-interactions. Prioritise CSS-only solutions for HTML. Use Motion library for React when available.
 
 **Focus on high-impact moments:** One well-orchestrated page load with staggered reveals (`animation-delay`) creates more delight than scattered micro-interactions. Use scroll-triggering and hover states that surprise.
+
+**Animate compositor properties** (`transform`, `opacity`, `filter`). Never animate layout properties (`margin`, `height`, `width`).
+
+See `references/animation-patterns.md` for priority hierarchy, performance rules, trigger patterns, and tech stack selection.
 
 ### Spatial Composition
 
@@ -351,6 +355,7 @@ For quick lookups and detailed guidelines:
 | `references/style-guide.md` | Styles, colors, typography, layouts by product type |
 | `references/ui-rules.md` | 99 UX guidelines (Do/Don't/Why tables) |
 | `references/checklist.md` | Pre-delivery verification checklist |
+| `references/animation-patterns.md` | Animation priorities, performance rules, triggers, tech stack ladder |
 | `references/chart-types.md` | 25+ chart types with selection guidelines |
 | `references/search-domains.md` | Technology stacks with code snippets |
 
