@@ -205,33 +205,89 @@ All notable changes to this project will be documented in this file.
 ## Examples
 
 <example>
-**User request**: `/changelog` (no arguments)
-**Action**: Check if CHANGELOG.md exists → if no, create; if yes, update with new commits
-**Output**: CHANGELOG.md created or updated automatically based on git history
+**User request**: `/changelog` (no arguments, no existing CHANGELOG.md)
+**Action**: No CHANGELOG.md found. Create from full git history.
+**Output**:
+```markdown
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [Unreleased]
+
+### Added
+- User authentication with OAuth2 support
+- Dashboard analytics widget
+
+### Fixed
+- Resolved timeout on large file uploads
+
+[Unreleased]: https://github.com/owner/repo/compare/v0.0.0...HEAD
+```
 </example>
 
 <example>
-**User request**: `/changelog` (all commits pushed)
-**Action**: Detect all commits are pushed, auto-detect version (e.g. feat commits = minor bump), create versioned release with today's date
-**Output**: Updated CHANGELOG.md with `## [2.1.0] - 2026-02-10` (no Unreleased section)
+**User request**: `/changelog` (all commits pushed to remote)
+**Action**: Detect all commits are pushed. Auto-detect version from commit types (feat commits = minor bump). Create versioned release entry with today's date.
+**Output**:
+```markdown
+## [2.1.0] - 2025-11-15
+
+### Added
+- Dark mode theme support
+- Export data to CSV format
+
+### Fixed
+- Fixed crash when processing files over 100MB
+```
+No Unreleased section in output because all changes are released.
 </example>
 
 <example>
 **User request**: "Generate release notes for commits between v1.2.0 and v1.3.0"
-**Action**: Run `git log v1.2.0..v1.3.0`, categorize, translate to user-friendly descriptions
-**Output**: Formatted changelog entry ready to paste or insert
+**Action**: Run `git log v1.2.0..v1.3.0`, categorize, translate to user-friendly descriptions.
+**Output**:
+```markdown
+## [1.3.0] - 2025-10-01
+
+### Added
+- Webhook support for real-time event notifications
+- Bulk import from CSV files
+
+### Changed
+- Improved search performance by 40%
+
+### Fixed
+- Resolved timezone display issues in reports
+```
 </example>
 
 <example>
 **User request**: "Add this week's changes to the changelog"
-**Action**: Run `git log --since="7 days ago"`, categorize, append to Unreleased
-**Output**: Updated CHANGELOG.md with new entries in Unreleased section
+**Action**: Run `git log --since="7 days ago"`, categorize, append to Unreleased section.
+**Output**: Updated CHANGELOG.md with new entries added under `## [Unreleased]`:
+```markdown
+## [Unreleased]
+
+### Added
+- Keyboard shortcuts for common actions
+
+### Fixed
+- Fixed pagination on search results page
+```
 </example>
 
 <example>
 **User request**: "Create release notes for the app store"
-**Action**: Analyze recent commits, filter technical noise, write user-friendly descriptions
-**Output**: Clean, non-technical release notes suitable for end users
+**Action**: Analyse recent commits, filter technical noise, write user-friendly descriptions.
+**Output**:
+```markdown
+What's New:
+- You can now switch to dark mode from Settings
+- Export your data as a spreadsheet with one tap
+- Fixed a crash that happened when uploading large files
+- Search results load faster than before
+```
 </example>
 
 ## References
