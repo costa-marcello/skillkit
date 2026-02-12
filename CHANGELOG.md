@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- Restructured changelog skill to three-mode workflow (update, push, release) with explicit push separation
+- Broadened research skill description triggers for better auto-invocation
+- Updated README with revised changelog and research skill descriptions
+
+### Fixed
+- Fixed research skill unable to dispatch sub-agents by removing incorrect `context: fork` and inlining agent allocation table
+- Fixed review-skill fork detection to distinguish orchestrator skills (no fork) from autonomous skills (add fork)
+
 ## [0.5.0] - 2026-02-12
 
 ### Added
@@ -116,6 +127,7 @@ All notable changes to this project will be documented in this file.
 - Fixed script invocations and variable names after skill rename
 - Fixed review-skill over-specification and deduplicated steps
 
+[Unreleased]: https://github.com/costa-marcello/skillkit/compare/v0.5.0...HEAD
 [0.5.0]: https://github.com/costa-marcello/skillkit/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/costa-marcello/skillkit/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/costa-marcello/skillkit/compare/v0.2.0...v0.3.0
