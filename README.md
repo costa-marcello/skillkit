@@ -70,7 +70,7 @@ These four skills turn your agent into a document processing engine. They handle
 Creates, edits, and analyses Word documents. Five distinct workflows cover the full lifecycle: text extraction via pandoc, raw XML access for metadata and comments, new document creation with docx-js, OOXML editing for existing files, and a professional redlining workflow for tracked changes. The redlining workflow is particularly valuable for legal and business documents, where it implements minimal, precise edits that only mark changed text rather than replacing entire paragraphs. Bundles scripts for packing and unpacking OOXML archives and guides for DOM manipulation.
 
 </td>
-<td><code>/docx</code><br/>then describe what you need</td>
+<td><code>/docx</code> + describe task<br/>"extract text from contract.docx"<br/>"create a report with these sections"<br/>"redline this legal doc with tracked changes"</td>
 <td><code>npx skills add costa-marcello/skillkit -s docx</code></td>
 </tr>
 <tr>
@@ -80,7 +80,7 @@ Creates, edits, and analyses Word documents. Five distinct workflows cover the f
 Extracts text and tables from PDFs, creates new documents, merges, splits, rotates, watermarks, password-protects, and fills forms. Handles scanned documents through OCR with pytesseract. Converts markdown to PDF with professional typography including Chinese font support. Covers both Python libraries (pypdf, pdfplumber, reportlab) and command-line tools (pdftotext, qpdf, pdftk). Includes advanced reference material for pypdfium2 and JavaScript pdf-lib workflows.
 
 </td>
-<td><code>/pdf</code><br/>then describe what you need</td>
+<td><code>/pdf</code> + describe task<br/>"extract tables from report.pdf"<br/>"merge invoice1.pdf and invoice2.pdf"<br/>"convert README.md to a styled PDF"</td>
 <td><code>npx skills add costa-marcello/skillkit -s pdf</code></td>
 </tr>
 <tr>
@@ -90,7 +90,7 @@ Extracts text and tables from PDFs, creates new documents, merges, splits, rotat
 Creates, edits, and analyses PowerPoint presentations. The standout feature is its content-first workflow: a 9-stage process that starts with an intake questionnaire, applies the Pyramid Principle (conclusion first, then reasons, then evidence), and scores output against a rubric requiring 75% or higher before delivery. Bundles reference files for slide templates, colour palettes, design elements, data chart orchestration, a visual guide, and a style guide. Also supports direct OOXML editing for precise slide manipulation.
 
 </td>
-<td><code>/pptx</code><br/>then describe what you need</td>
+<td><code>/pptx</code> + describe task<br/>"create a 10-slide deck on Q3 results"<br/>"add speaker notes to slides 3-5"<br/>"update the chart on slide 8"</td>
 <td><code>npx skills add costa-marcello/skillkit -s pptx</code></td>
 </tr>
 <tr>
@@ -100,7 +100,7 @@ Creates, edits, and analyses PowerPoint presentations. The standout feature is i
 Creates, edits, and analyses spreadsheets with a focus on getting formulas right. Enforces a zero-formula-error standard: every model must be delivered without #REF!, #DIV/0!, #VALUE!, or #NAME? errors. Follows investment banking colour conventions (blue for inputs, black for formulas, green for cross-sheet links). Requires proper Excel formulas instead of hardcoded Python calculations, so spreadsheets stay dynamic. Includes a LibreOffice-powered recalculation script and a formula verification reference for debugging.
 
 </td>
-<td><code>/xlsx</code><br/>then describe what you need</td>
+<td><code>/xlsx</code> + describe task<br/>"create a financial model with projections"<br/>"analyse sales.xlsx and add a summary"<br/>"fix broken formulas in budget.xlsx"</td>
 <td><code>npx skills add costa-marcello/skillkit -s xlsx</code></td>
 </tr>
 </table>
@@ -123,7 +123,7 @@ Seven skills that cover the development lifecycle from CI/CD setup through to br
 Creates production-ready GitHub Actions workflows. Covers test workflows, matrix builds across multiple OS and language versions, Docker image builds with registry pushes, security vulnerability scanning, deployment pipelines with approval gates, and reusable workflow patterns for monorepos. Includes reference YAML templates you can use as starting points and an anti-patterns guide that flags common mistakes. Scoped to GitHub Actions only, with clear guidance on when not to use it (GitLab, CircleCI, Jenkins, or one-off deployments).
 
 </td>
-<td><code>/ci-cd</code><br/>then describe what you need</td>
+<td><code>/ci-cd</code> + describe task<br/>"test workflow with Node 18 and 20 matrix"<br/>"Docker build and push to ECR"<br/>"deployment pipeline with staging gate"</td>
 <td><code>npx skills add costa-marcello/skillkit -s ci-cd</code></td>
 </tr>
 <tr>
@@ -133,7 +133,7 @@ Creates production-ready GitHub Actions workflows. Covers test workflows, matrix
 Generates changelogs and manages the full release lifecycle. Three modes: `/changelog` updates the changelog and commits automatically, `/changelog push` completes the Unreleased section and pushes to remote, `/changelog release` creates a versioned entry, commits, tags, and pushes. Auto-detects the next semantic version from commit types (breaking, feat, fix) or accepts an explicit version (`/changelog release v2.0.0`). Translates developer commit messages into user-friendly descriptions. Runs pre-flight checks (clean working directory, branch sync, no duplicate tags) before git operations. Follows Keep a Changelog format and Conventional Commits conventions.
 
 </td>
-<td><code>/changelog [push|release [version]]</code><br/>e.g. "/changelog release v2.0.0"</td>
+<td><code>/changelog</code> — update + commit<br/><code>/changelog push</code> — also push<br/><code>/changelog release</code> — version, tag, push<br/><code>/changelog release v2.0.0</code> — explicit ver</td>
 <td><code>npx skills add costa-marcello/skillkit -s changelog</code></td>
 </tr>
 <tr>
@@ -143,7 +143,7 @@ Generates changelogs and manages the full release lifecycle. Three modes: `/chan
 Merges branches with comprehensive pre-merge validation. Runs tests, lint, CI checks, and reviews PR comments before merging. Supports two modes: sync (pull main into your feature branch) and PR merge (merge feature into main via GitHub PR). The key behaviour is that it never deletes your feature branch and always returns you to your working branch. A safety-first approach that prevents the "I accidentally deleted my branch" problem.
 
 </td>
-<td><code>/smart-merge</code><br/>auto-detects sync or PR merge mode</td>
+<td><code>/smart-merge</code> from feature branch<br/>Auto-detects mode: sync main into branch, or merge via PR. Runs tests and lint first. Never deletes your branch.</td>
 <td><code>npx skills add costa-marcello/skillkit -s smart-merge</code></td>
 </tr>
 <tr>
@@ -153,7 +153,7 @@ Merges branches with comprehensive pre-merge validation. Runs tests, lint, CI ch
 Installs, configures, and implements shadcn/ui components with full accessibility support. Integrates with the shadcn MCP tools for component discovery and installation as the preferred workflow, falling back to CLI commands when MCP is unavailable. Covers React Hook Form with Zod validation for forms, Tailwind CSS variable theming, and advanced patterns. Bundled references include Next.js integration specifics, extended component patterns, CLI reference, configuration guide, and a learning path.
 
 </td>
-<td><code>/shadcn-ui</code><br/>then describe what you need</td>
+<td><code>/shadcn-ui</code> + describe task<br/>"add a data table with sorting"<br/>"login form with Zod validation"<br/>"set up custom theme with dark mode"</td>
 <td><code>npx skills add costa-marcello/skillkit -s shadcn-ui</code></td>
 </tr>
 <tr>
@@ -163,7 +163,7 @@ Installs, configures, and implements shadcn/ui components with full accessibilit
 Creates distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. This is not a component library. It is a design intelligence system with 99 UX rules, 25+ chart type references, style and colour guides organised by industry, typography pairing recommendations, and 10 tech stack code snippets. Every build starts with a design thinking checklist (purpose, tone, differentiator, constraints) and ends with a polish verification. Explicitly bans Inter, Roboto, purple gradients on white, and predictable layouts. Adapts to whatever framework you use (React, Vue, vanilla HTML/CSS) and respects existing UI libraries in your project.
 
 </td>
-<td><code>/frontend-design</code><br/>then describe what you need</td>
+<td><code>/frontend-design</code> + describe interface<br/>"design a dashboard for a fintech app"<br/>"build a landing page that feels premium"<br/>"improve the visual design of this component"</td>
 <td><code>npx skills add costa-marcello/skillkit -s frontend-design</code></td>
 </tr>
 <tr>
@@ -173,7 +173,7 @@ Creates distinctive, production-grade frontend interfaces that avoid generic "AI
 Creates professional software diagrams using Mermaid syntax. Covers class diagrams, sequence diagrams, flowcharts (basic and advanced), entity-relationship diagrams, C4 architecture diagrams, state machines, git graphs, and Gantt charts. Each diagram type has its own reference file with syntax patterns and examples. Also includes theming and advanced feature references. Useful for documenting architecture, database schemas, API flows, and deployment pipelines as code.
 
 </td>
-<td><code>/mermaid-diagrams</code><br/>then describe what you need</td>
+<td><code>/mermaid-diagrams</code> + describe diagram<br/>"sequence diagram for the auth flow"<br/>"ERD for user and orders tables"<br/>"flowchart of the deployment pipeline"</td>
 <td><code>npx skills add costa-marcello/skillkit -s mermaid-diagrams</code></td>
 </tr>
 <tr>
@@ -183,7 +183,7 @@ Creates professional software diagrams using Mermaid syntax. Covers class diagra
 Guides systematic root-cause debugging through four phases: observe (gather evidence without assumptions), hypothesise (form testable theories ranked by likelihood), test (run the cheapest decisive experiment first), and fix (address the root cause, not the symptom). Enforces an iron law: no fixes without root cause investigation first. Works for any technical issue including test failures, runtime errors, performance regressions, integration failures, and deployment problems. Prevents the common anti-pattern of random fixes that waste time and mask underlying issues.
 
 </td>
-<td><code>/debug</code><br/>then describe the symptom</td>
+<td><code>/debug</code> + describe symptom<br/>"tests pass locally but fail in CI"<br/>"getting a 500 on the /users endpoint"<br/>"memory usage spikes after 10 minutes"</td>
 <td><code>npx skills add costa-marcello/skillkit -s debug</code></td>
 </tr>
 </table>
@@ -206,7 +206,7 @@ Four skills that connect your agent to other AI models and deep research workflo
 Invokes OpenAI's Codex CLI for tasks where Codex excels: tricky debugging (race conditions, edge cases), security analysis and vulnerability discovery, comprehensive code reviews, and large-scale refactoring. Runs as a forked subagent so Codex operates in its own sandbox. Supports configurable reasoning effort (xhigh, high, medium, low), three sandbox modes (read-only, workspace-write, full access), and session resumption for multi-turn tasks. Suppresses thinking tokens by default for clean output.
 
 </td>
-<td><code>/codex</code><br/>then describe what you need</td>
+<td><code>/codex</code> + describe task<br/>"find the race condition in payment handler"<br/>"security review the auth module"<br/>Requires Codex CLI: <code>npm i -g @openai/codex</code></td>
 <td><code>npx skills add costa-marcello/skillkit -s codex</code></td>
 </tr>
 <tr>
@@ -216,7 +216,7 @@ Invokes OpenAI's Codex CLI for tasks where Codex excels: tricky debugging (race 
 Invokes Google's Gemini CLI for tasks that benefit from Gemini's 1M-token context window. Best for frontend development (Gemini 3 Pro produces high-quality UI code), code reviews spanning many files, architectural plan analysis, and processing entire codebases or documentation sets in a single pass. When the frontend-design skill is also installed, its guidelines are automatically passed to Gemini for design-driven results. Supports multiple approval modes for different execution contexts.
 
 </td>
-<td><code>/gemini</code><br/>then describe what you need</td>
+<td><code>/gemini</code> + describe task<br/>"review entire src/ for code quality"<br/>"build a settings page with tabs and forms"<br/>Requires Gemini CLI installed separately.</td>
 <td><code>npx skills add costa-marcello/skillkit -s gemini</code></td>
 </tr>
 <tr>
@@ -226,7 +226,7 @@ Invokes Google's Gemini CLI for tasks that benefit from Gemini's 1M-token contex
 Dispatches 6-10 parallel sub-agents to research any topic from the last 30 days. Covers community sources (Reddit, X, Hacker News, Lobsters, developer forums, blogs) and official sources (documentation, academic papers, industry publications) in a single run. Produces a two-sided report with community findings, official findings, a cross-reference table showing where they agree and disagree, and real engagement statistics. Supports three depth levels (quick, default, deep) and four query types (prompting, recommendations, news, general). After research, it generates tailored prompts in whatever format the research recommends.
 
 </td>
-<td><code>/research topic</code><br/>e.g. "/research RAG pipelines"</td>
+<td><code>/research</code> + topic<br/><code>/research best practices for RAG pipelines</code><br/><code>/research what's new with React 19</code><br/><code>/research Claude Code tips and tricks</code></td>
 <td><code>npx skills add costa-marcello/skillkit -s research</code></td>
 </tr>
 <tr>
@@ -236,7 +236,7 @@ Dispatches 6-10 parallel sub-agents to research any topic from the last 30 days.
 Performs exhaustive multi-lens analysis through four universal perspectives: human, structural, inclusivity, and sustainability. Detects the domain of your question (software engineering, strategy, legal, ethics, research, design, data, learning, writing, problem-solving) and loads domain-specific reference material to augment the universal framework. Suspends brevity constraints so depth takes priority over conciseness. Every conclusion follows explicitly from stated premises. Use it for complex decisions where getting the reasoning chain right matters more than getting a quick answer.
 
 </td>
-<td><code>/ultrathink question</code><br/>e.g. "/ultrathink migrate to GraphQL?"</td>
+<td><code>/ultrathink</code> + question<br/><code>/ultrathink should we migrate to GraphQL?</code><br/><code>/ultrathink evaluate microservices split</code><br/>Or type <code>ULTRATHINK</code> before any question.</td>
 <td><code>npx skills add costa-marcello/skillkit -s ultrathink</code></td>
 </tr>
 </table>
@@ -259,7 +259,7 @@ Seven skills that manage the skillkit ecosystem itself: creating, reviewing, dis
 The complete CLAUDE.md management tool. Five modes: audit (discover and score all rule files), review (detailed quality report against research-backed criteria), improve (targeted updates with diffs), refactor (restructure using progressive disclosure), and generate (create CLAUDE.md files for subdirectories that need context). Built on the insight that rules with reasoning outperform bare rules because models generalise from "why" explanations. Bundles references for quality criteria, anti-patterns, templates, update guidelines, and real examples.
 
 </td>
-<td><code>/claude-md [audit|review|improve|refactor|generate]</code><br/>e.g. "/claude-md audit"</td>
+<td><code>/claude-md</code> + mode<br/><code>/claude-md audit</code> — scan and score rules<br/><code>/claude-md review</code> — quality report<br/><code>/claude-md improve</code> — apply targeted fixes<br/><code>/claude-md refactor</code> — restructure layout<br/><code>/claude-md generate</code> — create for subdirs</td>
 <td><code>npx skills add costa-marcello/skillkit -s claude-md</code></td>
 </tr>
 <tr>
@@ -269,7 +269,7 @@ The complete CLAUDE.md management tool. Five modes: audit (discover and score al
 Guides README creation and improvement with audience-matched templates. Identifies four project types (open source, personal, internal, config) and selects the right template for each. Handles four tasks: creating from scratch, adding sections, updating stale content, and reviewing against actual project state. Bundles the Standard README spec, the Art of README, a style guide for common prose mistakes, and section checklists by project type. Always asks what the audience needs to know before writing.
 
 </td>
-<td><code>/readme-md</code><br/>then describe what you need</td>
+<td><code>/readme-md</code> + describe task<br/>"create a README for this project"<br/>"add a troubleshooting section"<br/>"review the README for accuracy"</td>
 <td><code>npx skills add costa-marcello/skillkit -s readme-md</code></td>
 </tr>
 <tr>
@@ -279,7 +279,7 @@ Guides README creation and improvement with audience-matched templates. Identifi
 Guides creation of new Claude Code skills with best practices. Covers frontmatter configuration, skill anatomy, bundled resources (scripts, references, assets), sanitisation checklists for removing personal data, and planning examples. Produces skills that pass the review-skill on first try. If you want to package your own workflows as reusable skills, start here.
 
 </td>
-<td><code>/create-skill description</code><br/>e.g. "/create-skill API doc generator"</td>
+<td><code>/create-skill</code> + description<br/><code>/create-skill API doc generator</code><br/><code>/create-skill terraform reviewer</code><br/>Guides you through frontmatter + structure.</td>
 <td><code>npx skills add costa-marcello/skillkit -s create-skill</code></td>
 </tr>
 <tr>
@@ -289,7 +289,7 @@ Guides creation of new Claude Code skills with best practices. Covers frontmatte
 Reviews and automatically fixes skills against Anthropic's official best practices. Four modes: review (quality report with scores), auto-fix (read, evaluate, then apply fixes), external review (clone a GitHub URL and report), and auto-PR (fork, fix, submit pull request). Checks SKILL.md size, description format, file organisation, XML tag usage, portability, and script quality. Backed by research-based criteria and source documentation. Includes a marketplace template for publishing.
 
 </td>
-<td><code>/review-skill path [auto-fix]</code><br/>e.g. "/review-skill skills/my-skill"</td>
+<td><code>/review-skill</code> + path<br/><code>/review-skill skills/my-skill</code> — review<br/><code>/review-skill skills/my-skill auto-fix</code><br/><code>/review-skill https://github.com/...</code></td>
 <td><code>npx skills add costa-marcello/skillkit -s review-skill</code></td>
 </tr>
 <tr>
@@ -299,7 +299,7 @@ Reviews and automatically fixes skills against Anthropic's official best practic
 Creates and improves event-driven hooks for Claude Code automation. Covers all lifecycle events: PreToolUse guards that block dangerous commands, PostToolUse formatters and linters, Stop hooks for testing and notifications, and SessionStart/SessionEnd for environment setup and teardown. Includes patterns for agent-based verification gates and headless CI/CD integration. Bundles comprehensive reference material covering the hook API, stdin/stdout contracts, error handling, and real-world examples for each event type. Use it when you need to extend Claude Code's behaviour with custom automation.
 
 </td>
-<td><code>/cc-hooks</code><br/>then describe what you need</td>
+<td><code>/cc-hooks</code> + describe task<br/>"guard that blocks force-push"<br/>"run eslint after file edits"<br/>"run tests before session ends"</td>
 <td><code>npx skills add costa-marcello/skillkit -s cc-hooks</code></td>
 </tr>
 <tr>
@@ -309,7 +309,7 @@ Creates and improves event-driven hooks for Claude Code automation. Covers all l
 Discovers and installs skills from two registries: the open agent skills ecosystem (skills.sh, covering Vercel Labs, ComposioHQ, and community publishers) and CCPM (Claude Code Plugin Manager for Claude-specific skills). Searches both registries, shows results with descriptions, and handles installation. Use it when you want to find a skill for something skillkit does not cover.
 
 </td>
-<td><code>/find-skills keyword</code><br/>e.g. "/find-skills terraform"</td>
+<td><code>/find-skills</code> + keyword<br/><code>/find-skills terraform</code><br/><code>/find-skills database migration</code><br/>Searches skills.sh and CCPM registries.</td>
 <td><code>npx skills add costa-marcello/skillkit -s find-skills</code></td>
 </tr>
 <tr>
@@ -319,7 +319,7 @@ Discovers and installs skills from two registries: the open agent skills ecosyst
 Audits a codebase for production readiness across six dimensions: API completeness, frontend-backend sync, security, scalability, infrastructure, and dead code/architecture. Spawns 4 parallel audit agents, each with detailed checklists loaded from reference files. Produces a structured report with severity levels (blocker, warning, improvement), file paths, line numbers, and evidence. Findings get IDs (B-001, W-001) that work as ticket references. Adapts to any stack: the examples cover Next.js monorepos, Django REST APIs, and backend-only services. Pairs with Semgrep MCP for automated vulnerability scanning.
 
 </td>
-<td><code>/production-audit [path]</code><br/>e.g. "/production-audit src/api"</td>
+<td><code>/production-audit</code> — full codebase<br/><code>/production-audit src/api</code> — scoped<br/>Spawns 4 parallel agents. Report has severity levels and file refs you can use as tickets.</td>
 <td><code>npx skills add costa-marcello/skillkit -s production-audit</code></td>
 </tr>
 </table>
