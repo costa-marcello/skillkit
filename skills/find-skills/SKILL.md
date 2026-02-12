@@ -16,13 +16,13 @@ If `$ARGUMENTS` is empty, ask the user what skill they need.
 
 ## Step 1: Pick the Registry
 
-| User Request | Registry | CLI | Browse |
-|--------------|----------|-----|--------|
-| General coding (React, testing, DevOps) | Open Ecosystem | `npx skills` | https://skills.sh/ |
-| Claude Code features, document processing | CCPM | `ccpm` | https://ccpm.dev |
-| "installed skills", "my skills" | CCPM | `ccpm list` | -- |
+| User Request | Registry | CLI |
+|--------------|----------|-----|
+| General coding (React, testing, DevOps, linting) | Open Ecosystem | `npx skills` |
+| Claude Code features, document processing (PDF, DOCX, XLSX, PPTX) | CCPM | `ccpm` |
+| "installed skills", "my skills", "what do I have" | Both | `ccpm list` + `npx skills check` |
 
-Default to **Open Ecosystem** when the request is general. Use **CCPM** when the request targets Claude Code workflows or document formats (PDF, DOCX, XLSX, PPTX).
+**Tiebreaker:** When the request could match either registry, run both searches and present combined results. Let the user pick.
 
 ## Step 2: Search
 
@@ -36,9 +36,13 @@ npx skills find $ARGUMENTS
 ccpm search $ARGUMENTS
 ```
 
-Run both searches when the registry is unclear. Present results from both.
+If one registry returns no results, search the other before reporting "not found".
 
-## Step 3: Install
+## Step 3: Present Results
+
+Show matching skills with name, description, and install command. When both registries return results, group them by registry with clear labels.
+
+## Step 4: Install
 
 **Open Ecosystem:**
 ```bash
@@ -50,7 +54,7 @@ npx skills add <owner/repo@skill> -g -y
 ccpm install <skill-name>
 ```
 
-## Step 4: Verify Installation
+## Step 5: Verify Installation
 
 **Open Ecosystem:**
 ```bash
@@ -64,75 +68,74 @@ ccpm list
 ```
 Confirm the skill appears. Remind the user to restart Claude Code -- CCPM skills load at startup.
 
+**If verification fails:**
+1. Check the error message from the install command output.
+2. Run the install command again with verbose output.
+3. Check write permissions: `ls -la ~/.claude/skills/`
+4. If the skill still does not appear, consult the Troubleshooting section below.
+
 </instructions>
-
-## Common Skill Categories
-
-| Category | Example Queries |
-|----------|-----------------|
-| Web Development | react, nextjs, typescript, css, tailwind |
-| Testing | testing, jest, playwright, e2e |
-| DevOps | deploy, docker, kubernetes, ci-cd |
-| Documentation | docs, readme, changelog, api-docs |
-| Code Quality | review, lint, refactor, best-practices |
-| Design | ui, ux, design-system, accessibility |
-| Productivity | workflow, automation, git |
-
-## Registry Commands Reference
-
-### Open Ecosystem (`npx skills`)
-
-```bash
-npx skills find [query]           # Search for skills
-npx skills add <package> -g -y    # Install globally
-npx skills check                  # Check for updates
-npx skills update                 # Update all installed
-```
-
-### CCPM (`ccpm`)
-
-```bash
-ccpm search <query>               # Search for skills
-ccpm install <skill-name>         # Install a skill
-ccpm install <skill-name> --project  # Install to current project only
-ccpm info <skill-name>            # Get skill details
-ccpm list                         # List installed skills
-ccpm uninstall <skill-name>       # Remove a skill
-```
 
 ## When No Skills Are Found
 
 1. Tell the user no matching skill exists in either registry.
-2. Help with the task directly using built-in capabilities.
-3. If the user wants a reusable solution, create a custom skill:
-   - Open Ecosystem: run `npx skills init my-skill`
-   - CCPM: invoke the `/create-skill` skill
+2. Attempt the task directly using built-in capabilities.
+3. If the user wants a reusable solution, offer to create a custom skill:
+   - Open Ecosystem: `npx skills init my-skill`
+   - CCPM: invoke `/create-skill`
 
 <example>
 **User asks: "how do I make my React app faster?"**
 
-1. Search: `npx skills find react performance`
-2. Results show `vercel-labs/agent-skills@vercel-react-best-practices`
-3. Install: `npx skills add vercel-labs/agent-skills@vercel-react-best-practices -g -y`
-4. Verify: `npx skills check` -- confirm skill appears in list
+1. Registry: Open Ecosystem (general coding topic).
+2. Search: `npx skills find react performance`
+3. Results show `vercel-labs/agent-skills@vercel-react-best-practices`.
+4. Install: `npx skills add vercel-labs/agent-skills@vercel-react-best-practices -g -y`
+5. Verify: `npx skills check` -- confirm skill appears in list.
+6. Run the installed skill to help with the React performance task.
 </example>
 
 <example>
 **User asks: "is there a skill for PDF processing?"**
 
-1. Search: `ccpm search pdf`
-2. Check details: `ccpm info pdf-processor`
-3. Install: `ccpm install pdf-processor`
-4. Verify: `ccpm list` -- confirm `pdf-processor` appears
-5. Remind user to restart Claude Code
+1. Registry: CCPM (document processing topic).
+2. Search: `ccpm search pdf`
+3. Check details: `ccpm info pdf`
+4. Install: `ccpm install pdf`
+5. Verify: `ccpm list` -- confirm `pdf` appears.
+6. Remind user to restart Claude Code for CCPM skills to load.
 </example>
 
 <example>
 **User asks: "what skills do I have installed?"**
 
-1. Run: `ccpm list`
-2. Run: `npx skills check`
-3. Present combined results from both registries
+1. Run both: `ccpm list` and `npx skills check`
+2. Combine results into a single list grouped by registry.
+3. Report total count and highlight any skills with available updates.
+</example>
+
+<example>
+**User asks: "find me a skill for testing" (ambiguous -- exists in both registries)**
+
+1. Registry unclear -- run both searches.
+2. Search: `npx skills find testing` and `ccpm search testing`
+3. Present combined results:
+   - **Open Ecosystem:** `playwright-testing`, `jest-helpers`, `vitest-runner`
+   - **CCPM:** (no results)
+4. Recommend the best match based on the user's project context.
+5. Install the chosen skill from the matching registry.
+</example>
+
+<example>
+**User asks: "find a skill for Kubernetes autoscaling" (no results)**
+
+1. Registry: Open Ecosystem (DevOps topic).
+2. Search: `npx skills find kubernetes autoscaling` -- no results.
+3. Broaden search: `npx skills find kubernetes` -- still no results.
+4. Search CCPM as fallback: `ccpm search kubernetes` -- no results.
+5. Tell the user: "No matching skill found in either registry."
+6. Offer to help directly with Kubernetes autoscaling using built-in knowledge.
+7. Offer to create a custom skill: `npx skills init kubernetes-autoscaling`
 </example>
 
 ## Troubleshooting
@@ -140,5 +143,14 @@ ccpm uninstall <skill-name>       # Remove a skill
 | Problem | Fix |
 |---------|-----|
 | `ccpm: command not found` | Run `npm install -g @daymade/ccpm` |
+| `npx skills` hangs or fails | Check Node.js version is 18+: `node --version` |
 | Skill not available after CCPM install | Restart Claude Code -- skills load at startup |
-| Permission errors | Check write permissions to `~/.claude/skills/` |
+| Permission errors on install | Check write permissions: `ls -la ~/.claude/skills/` and fix with `chmod -R u+rw ~/.claude/skills/` |
+| Install succeeds but skill not in list | Run `npx skills check` or `ccpm list` again. If still missing, reinstall with `--force` flag |
+| Search returns too many results | Add more specific keywords to narrow the query |
+
+## References
+
+| File | Purpose |
+|------|---------|
+| `references/registry-commands.md` | Full CLI command reference for both registries and common search categories |

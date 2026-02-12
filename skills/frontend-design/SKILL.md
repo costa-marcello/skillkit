@@ -3,6 +3,7 @@ name: frontend-design
 description: "Creates and improves distinctive, production-grade frontend interfaces that avoid generic AI aesthetics. Includes style/color/typography guides by industry, 30+ UX rules, 25+ chart types, and 10 tech stacks. Use when designing components, building pages, choosing palettes, implementing UI patterns, or improving existing interfaces."
 license: MIT
 context: fork
+agent: general-purpose
 ---
 
 # Frontend Design Intelligence
@@ -11,34 +12,13 @@ Create distinctive, production-grade frontend interfaces that avoid generic "AI 
 
 ## When to Apply
 
-Use this skill when the user mentions:
-- UI/UX design, frontend development, visual design
-- Components, layouts, landing pages, dashboards
-- Color palettes, color schemes, theming
-- Typography, fonts, font pairings
-- Styling, CSS, Tailwind, design tokens
-- Design systems, component libraries
-- Accessibility (visual aspects: contrast, focus states, color blindness)
-- Charts, graphs, data visualization
-- Mobile/responsive design, breakpoints
-- Animations, transitions, micro-interactions
-- Shadows, gradients, glassmorphism, visual effects
-- Hero sections, navbars, footers, cards, modals
-- Form design, input styling, validation UX
-- Dark mode, light mode, theme switching
-- Improving, auditing, or refactoring an existing UI against these guidelines
+Use when the user works on UI/UX design, components, layouts, landing pages, dashboards, colour palettes, typography, design tokens, accessibility visuals, charts, responsive design, animations, visual effects, form styling, or theme switching. Also use when auditing or refactoring existing interfaces.
 
-## When NOT to Apply
-
-Skip this skill for:
-- Backend/API development, server-side logic
-- Database design, queries, migrations, ORMs
-- Authentication flows, authorization logic (not UI)
-- DevOps, infrastructure, deployment, CI/CD
-- Pure algorithms, data structures, business logic
-- CLI tools, terminal applications
+Skip for backend logic, database work, auth flows, DevOps, algorithms, or CLI tools.
 
 ---
+
+<instructions>
 
 ## Design Thinking
 
@@ -85,6 +65,10 @@ Then build working front-end code that is:
 - **Visually standout**: bold, memorable, instantly recognisable
 - **Design-led**: one clear aesthetic, consistent patterns, no visual drift
 - **Detail-perfect**: spacing, typography, motion, states, responsiveness polished
+
+## Pre-Delivery Verification
+
+Before delivering, verify every item in the workflow checklist above is checked. Then run through `references/checklist.md` (visual quality, interaction, light/dark mode, layout, accessibility, performance). Fix any failures before presenting the final code.
 
 ---
 
@@ -166,6 +150,8 @@ Create atmosphere and depth rather than defaulting to solid colors. Add contextu
 - Minimalist designs need restraint, precision, careful spacing
 
 **No two designs should look the same.** Vary between light and dark themes, different fonts, different aesthetics. Interpret creatively and make unexpected choices that feel genuinely designed for the context.
+
+</instructions>
 
 ---
 
@@ -344,6 +330,54 @@ Create atmosphere and depth rather than defaulting to solid colors. Add contextu
 
 </example>
 
+<example name="SaaS Analytics Dashboard">
+
+**Request:** "Build a KPI dashboard for a fintech analytics platform"
+
+**Checklist:**
+```text
+- [x] Purpose: Display real-time financial metrics for portfolio managers
+- [x] Tone: Minimal/professional with precise data hierarchy
+- [x] Differentiator: Sparkline-integrated stat cards with subtle pulse on live updates
+- [x] Typography: Inter (body, exception: data-focused dashboard) + Tabular Nums for figures
+- [x] Color: Deep navy (#0f172a), emerald accent (#10b981), neutral slate (#94a3b8)
+- [x] Motion: 200ms fade for data updates, smooth chart transitions
+- [x] Layout: Sidebar + responsive grid with consistent 24px gap
+```
+
+**Key implementation:**
+- Stat cards use CSS `font-variant-numeric: tabular-nums` so numbers do not shift width on update
+- Sparklines rendered inline within cards (no separate chart library needed for micro-trends)
+- Live-update pulse uses a brief `box-shadow` animation on the card border, not layout-shifting scale
+- Dark mode default with a light mode toggle that swaps CSS custom properties
+
+```css
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card[data-live]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px var(--emerald);
+  opacity: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.4; }
+}
+```
+
+</example>
+
 ---
 
 ## Reference Files
@@ -361,4 +395,4 @@ For quick lookups and detailed guidelines:
 
 ---
 
-**Remember:** Claude is capable of extraordinary creative work. Don't hold back — show what can truly be created when thinking outside the box and committing fully to a distinctive vision.
+Every interface must look intentionally designed for its specific context. Commit fully to the chosen aesthetic and deliver code that ships without further polish.

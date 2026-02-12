@@ -61,42 +61,17 @@ This skill provides the definitive reference for creating and improving Claude C
 ### settings.json
 
 ```json
-{
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/post-tool-format.sh"
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-tool-validate.sh"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/stop-run-tests.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
+{ "hooks": {
+  "PostToolUse": [{ "matcher": "Edit|Write", "hooks": [
+    { "type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/post-tool-format.sh" }
+  ]}],
+  "PreToolUse": [{ "matcher": "Bash", "hooks": [
+    { "type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/pre-tool-validate.sh" }
+  ]}],
+  "Stop": [{ "hooks": [
+    { "type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/stop-run-tests.sh" }
+  ]}]
+}}
 ```
 
 ---
@@ -110,13 +85,7 @@ Hooks receive a JSON payload via stdin (treat it as untrusted input) and run wit
 ### Hook Input (stdin)
 
 ```json
-{
-  "hook_event_name": "PreToolUse",
-  "tool_name": "Bash",
-  "tool_input": {
-    "command": "ls -la"
-  }
-}
+{ "hook_event_name": "PreToolUse", "tool_name": "Bash", "tool_input": { "command": "ls -la" } }
 ```
 
 ### Environment Variables (shell)
@@ -149,18 +118,16 @@ PreToolUse hooks can allow/deny/ask and optionally modify the tool input via `up
 ### Hook Output Schema
 
 ```json
-{
-  "hookSpecificOutput": {
-    "hookEventName": "PreToolUse",
-    "permissionDecision": "allow",
-    "permissionDecisionReason": "Reason shown to user (and to Claude on deny)",
-    "updatedInput": { "command": "echo 'modified'" },
-    "additionalContext": "Extra context added before tool runs"
-  }
-}
+{ "hookSpecificOutput": {
+  "hookEventName": "PreToolUse",
+  "permissionDecision": "allow",
+  "permissionDecisionReason": "Reason shown to user (and to Claude on deny)",
+  "updatedInput": { "command": "echo 'modified'" },
+  "additionalContext": "Extra context added before tool runs"
+}}
 ```
 
-Note: older `decision`/`reason` fields are deprecated. Use the `hookSpecificOutput.*` fields.
+Older `decision`/`reason` fields are deprecated. Use the `hookSpecificOutput.*` fields.
 
 <example>
 **Redirect Sensitive File Edits**
@@ -234,26 +201,67 @@ Input: Stop event with task context.
 Output: LLM evaluates whether all tasks are complete.
 
 ```json
-{
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "Evaluate whether Claude should stop. Context JSON: $ARGUMENTS. Return {\"ok\": true} if all tasks are complete, otherwise {\"ok\": false, \"reason\": \"what remains\"}.",
-            "timeout": 30
-          }
-        ]
-      }
-    ]
-  }
-}
+{ "hooks": { "Stop": [{ "hooks": [{ "type": "prompt", "prompt": "Evaluate whether Claude should stop. Context JSON: $ARGUMENTS. Return {\"ok\": true} if all tasks are complete, otherwise {\"ok\": false, \"reason\": \"what remains\"}.", "timeout": 30 }] }] }}
 ```
 
 Response schema:
 - Allow: `{"ok": true}`
 - Block: `{"ok": false, "reason": "Explanation shown to Claude"}`
+</example>
+
+<example>
+**PostToolUse Audit Logger**
+
+Input: PostToolUse event after any file write.
+Output: Append a JSON line to an audit log (non-blocking).
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+INPUT="$(cat)"
+TOOL_NAME="$(echo "$INPUT" | jq -r '.tool_name')"
+FILE_PATH="$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')"
+TIMESTAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+if [[ -n "$FILE_PATH" ]]; then
+  echo "{\"timestamp\":\"$TIMESTAMP\",\"tool\":\"$TOOL_NAME\",\"file\":\"$FILE_PATH\"}" \
+    >> "$CLAUDE_PROJECT_DIR/.claude/edit-audit.jsonl"
+fi
+
+exit 0
+```
+
+Settings matcher: `"matcher": "Edit|Write"` with `"async": true`.
+</example>
+
+<example>
+**SessionStart Environment Setup**
+
+Input: SessionStart event at session launch.
+Output: Write environment variables to `CLAUDE_ENV_FILE` so they persist across Bash calls.
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+cd "$CLAUDE_PROJECT_DIR"
+
+# Persist environment variables for the session
+if [[ -n "${CLAUDE_ENV_FILE:-}" ]]; then
+  echo "export PROJECT_NAME=$(basename "$CLAUDE_PROJECT_DIR")" >> "$CLAUDE_ENV_FILE"
+  echo "export NODE_ENV=development" >> "$CLAUDE_ENV_FILE"
+fi
+
+# Inject context into Claude's conversation
+echo "=== Session Context ==="
+git branch --show-current 2>/dev/null || echo "Not a git repo"
+echo "Node: $(node --version 2>/dev/null || echo 'not installed')"
+
+exit 0
+```
+
+Stdout is injected into Claude's context. `CLAUDE_ENV_FILE` exports persist across all Bash commands in the session.
 </example>
 
 ---
@@ -265,16 +273,10 @@ For complex decisions, use LLM-evaluated hooks (`type: "prompt"`) instead of bas
 Default to command hooks for fast, deterministic checks. Use prompt hooks only when the decision requires natural language reasoning:
 
 ```json
-{
-  "Stop": [
-    {
-      "hooks": [
-        { "type": "command", "command": ".claude/hooks/quick-check.sh" },
-        { "type": "prompt", "prompt": "Verify code quality meets standards" }
-      ]
-    }
-  ]
-}
+{ "Stop": [{ "hooks": [
+  { "type": "command", "command": ".claude/hooks/quick-check.sh" },
+  { "type": "prompt", "prompt": "Verify code quality meets standards" }
+]}] }
 ```
 
 ---
@@ -307,44 +309,19 @@ All hook templates already demonstrate `set -euo pipefail`, quoted variables, an
 For multi-turn verification, use `type: "agent"`. An agent hook spawns a subagent that can use tools (up to 50 turns) to verify work before allowing Claude to proceed. Supported on `Stop` and `SubagentStop` events.
 
 ```json
-{
-  "Stop": [
-    {
-      "hooks": [
-        {
-          "type": "agent",
-          "prompt": "Run the test suite and verify all tests pass. Check that no console.log statements remain in production files.",
-          "timeout": 120
-        }
-      ]
-    }
-  ]
-}
+{ "Stop": [{ "hooks": [{ "type": "agent", "prompt": "Run the test suite and verify all tests pass. Check that no console.log statements remain in production files.", "timeout": 120 }] }] }
 ```
 
-Agent hooks return the same `{"ok": true}` / `{"ok": false, "reason": "..."}` schema as prompt hooks, but can use tools to gather evidence before making a decision.
+Agent hooks return the same `{"ok": true}` / `{"ok": false, "reason": "..."}` schema as prompt hooks, but can use tools to gather evidence before deciding.
 
 ---
 
 ## Async Hooks
 
-Add `"async": true` to run hooks in the background without blocking Claude. Useful for logging, notifications, and slow post-processing that should not delay the conversation.
+Add `"async": true` to run hooks in the background without blocking Claude. Useful for logging, notifications, and slow post-processing.
 
 ```json
-{
-  "PostToolUse": [
-    {
-      "matcher": "Bash",
-      "hooks": [
-        {
-          "type": "command",
-          "command": ".claude/hooks/async-test-runner.sh",
-          "async": true
-        }
-      ]
-    }
-  ]
-}
+{ "PostToolUse": [{ "matcher": "Bash", "hooks": [{ "type": "command", "command": ".claude/hooks/async-test-runner.sh", "async": true }] }] }
 ```
 
 Async hooks do not block Claude's response. Their exit codes and stdout are ignored for decision control. Use them for fire-and-forget tasks like audit logging or CI triggers.
@@ -353,24 +330,41 @@ Async hooks do not block Claude's response. Their exit codes and stdout are igno
 
 ## Hook Composition
 
-### Multiple Hooks on Same Event
+Multiple hooks on the same event run in parallel:
 
 ```json
-{
-  "PostToolUse": [
-    {
-      "matcher": "Edit|Write",
-      "hooks": [
-        { "type": "command", "command": ".claude/hooks/format.sh" },
-        { "type": "command", "command": ".claude/hooks/audit.sh" },
-        { "type": "command", "command": ".claude/hooks/notify.sh" }
-      ]
-    }
-  ]
-}
+{ "PostToolUse": [{ "matcher": "Edit|Write", "hooks": [
+  { "type": "command", "command": ".claude/hooks/format.sh" },
+  { "type": "command", "command": ".claude/hooks/audit.sh" },
+  { "type": "command", "command": ".claude/hooks/notify.sh" }
+]}] }
 ```
 
-All matching hooks run in parallel. If you need strict ordering (format, then lint, then test), create one wrapper script that runs them sequentially.
+If you need strict ordering (format, then lint, then test), create one wrapper script that runs them sequentially.
+
+---
+
+## Verification
+
+After creating or modifying a hook, verify it works before relying on it:
+
+```bash
+# 1. Test with sample input
+export CLAUDE_PROJECT_DIR="$(pwd)"
+echo '{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"ls"}}' \
+  | bash .claude/hooks/your-hook.sh
+
+# 2. Check exit code
+echo $?  # 0 = success, 2 = blocking error
+
+# 3. Validate JSON output
+echo '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow"}}' | jq .
+
+# 4. Run Claude with debug mode to confirm hook fires
+claude --debug
+```
+
+See [references/troubleshooting.md](references/troubleshooting.md) for full diagnostics when hooks fail silently.
 
 </instructions>
 

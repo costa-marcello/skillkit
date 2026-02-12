@@ -7,13 +7,11 @@ context: fork
 agent: general-purpose
 ---
 
-<!-- v1.1.0 | 2026-02-09 -->
+<!-- v1.2.0 | 2026-02-12 -->
 
 # Claude MD
 
-**Complete CLAUDE.md management:** Audit, Review, Improve, and Refactor. Core insight: rules with reasoning outperform bare rules—models generalize from "why" explanations.
-
----
+**Complete CLAUDE.md management:** Audit, Review, Improve, Refactor, and Generate. Core insight: rules with reasoning outperform bare rules. Models generalize from "why" explanations.
 
 ## Quick Reference
 
@@ -97,6 +95,25 @@ For each CLAUDE.md file, evaluate against quality criteria.
 - **C (50-69)**: Basic info, missing key sections
 - **D (30-49)**: Sparse or outdated
 - **F (0-29)**: Missing or severely outdated
+
+<example>
+**Audit mode summary output:**
+
+```markdown
+## CLAUDE.md Audit Summary
+
+- Files found: 4
+- Average score: 72/100 (Grade B)
+- Files needing update: 2
+
+| File | Score | Grade | Key Issue |
+|------|-------|-------|-----------|
+| ./CLAUDE.md | 88/100 | B | Missing gotchas section |
+| .claude/rules/coding.md | 91/100 | A | No issues |
+| packages/api/CLAUDE.md | 54/100 | C | No commands, vague patterns |
+| packages/shared/CLAUDE.md | 56/100 | C | Rules lack reasoning |
+```
+</example>
 
 **Rule Quality Dimensions (for Review mode):**
 
@@ -256,6 +273,27 @@ For bloated files, restructure using progressive disclosure.
 | 0-1 | **Standard** — full refactoring |
 | Negative | **Deep** — significant restructuring |
 
+<example>
+**Refactor triage output:**
+
+```markdown
+## Triage: ./CLAUDE.md (380 lines)
+
+| Signal | Score |
+|--------|-------|
+| Uses `.claude/rules/` | 0 |
+| Clear hierarchy | +1 |
+| Has reasoning | 0 |
+| Actionable rules | +1 |
+| Length | -1 (>300) |
+| Wall-of-text | -2 |
+
+**Total: -1 → Decision: Standard refactoring**
+
+Plan: Extract coding rules to `.claude/rules/coding.md`, add reasoning to bare directives, move testing patterns to `.claude/rules/testing.md`.
+```
+</example>
+
 **Keep in root (high-value, frequently referenced):**
 
 | Category | Example | Why Keep |
@@ -296,53 +334,21 @@ After user approval, apply changes using the Edit tool. Preserve existing conten
 
 **Triggers:** "Generate subdirectory context", "Create CLAUDE.md for packages", "Add directory context files"
 
-#### Phase G1: Directory Discovery
+**Workflow:** Scan directories, score by "needs context" heuristics, generate minimal CLAUDE.md files for high-value directories, get user approval before creating any files.
 
-**If Audit was run first:** Reuse Phase 1 discovery results — no need to rescan.
+| Phase | Action | Detail |
+|-------|--------|--------|
+| G1 | Directory Discovery | Scan structure, skip `node_modules`, `dist`, `.git`, etc. Reuse Audit discovery if already run. |
+| G2 | Directory Scoring | Score each directory (file count, entry points, naming clarity, monorepo signals). Threshold: >=6 full, 4-5 minimal, <4 skip. |
+| G3 | Content Extraction | Extract purpose, key files, patterns, dependencies, gotchas from each candidate. |
+| G4 | Preview Generation | Show proposed files with scores and content. |
+| G5 | User Approval | Present options: approve all, select specific, modify, or cancel. Never auto-create. |
+| G6 | File Creation | Write approved files. Verify: starts with `@../CLAUDE.md`, under 500 tokens, no root duplication. |
 
-**Otherwise:** Scan project structure to identify candidate directories:
+See [references/generation-workflow.md](references/generation-workflow.md) for the full scoring algorithm, extraction heuristics, and framework-specific guidance.
 
-```bash
-find . -type d -not -path '*/\.*' -not -path '*/node_modules/*' -not -path '*/dist/*' -not -path '*/__pycache__/*' -not -path '*/build/*' -not -path '*/coverage/*' | head -100
-```
-
-**Skip directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `__pycache__`, `.next`, `.nuxt`, `vendor`
-
-#### Phase G2: Directory Scoring
-
-For each directory, calculate a "needs context" score:
-
-| Signal | Score | Detection |
-|--------|-------|-----------|
-| File count >15 | +3 | `ls -1 | wc -l` |
-| Has index/entry file | +2 | `index.ts`, `main.py`, `mod.rs` exists |
-| Non-obvious naming | +2 | Abbreviations, domain jargon, single letters |
-| Deep nesting (>3 levels) | +1 | Path depth from root |
-| Has existing config | +1 | `tsconfig.json`, `package.json`, `.env.example` |
-| Is monorepo package | +3 | Under `packages/`, `apps/`, `services/` |
-| Has README | +1 | Existing documentation to extract from |
-| Already has CLAUDE.md | -10 | Skip if exists |
-| Standard framework dir | -5 | `node_modules`, `dist`, `.git`, `__pycache__` |
-| Shallow with few files | -2 | <5 files, no nesting — not complex enough |
-
-**Threshold:**
-- Score >= 6: High priority — generate with full content
-- Score 4-5: Medium priority — generate minimal file
-- Score < 4: Skip — directory is self-explanatory
-
-#### Phase G3: Content Extraction
-
-For each candidate directory, extract:
-
-1. **Purpose**: From README, package.json description, or top-level comments
-2. **Key files**: Entry points, configs, main exports
-3. **Patterns**: Common conventions visible in file structure
-4. **Dependencies**: Internal imports to other project directories
-5. **Gotchas**: Non-obvious from naming alone
-
-#### Phase G4: Preview Generation
-
-Generate preview of proposed CLAUDE.md files. Present to user:
+<example>
+**Generate mode preview output:**
 
 ```markdown
 ## Proposed Subdirectory CLAUDE.md Files
@@ -368,34 +374,8 @@ Express routes with Zod validation. All routes require auth middleware.
 
 ## Gotchas
 - Rate limiting applies per-user, not per-IP
-
----
-
-### 2. packages/shared/CLAUDE.md (Score: 6)
-**Reason:** Monorepo package, 18 files
-...
 ```
-
-#### Phase G5: User Approval
-
-Never create files without user confirmation.
-
-Present options:
-1. Approve all proposed files
-2. Select specific files to create
-3. Request modifications before creation
-4. Cancel generation
-
-#### Phase G6: File Creation
-
-After approval, create files using Write tool. Verify each file:
-- [ ] Starts with `@../CLAUDE.md` to inherit parent context
-- [ ] Under 500 tokens (target 150-300)
-- [ ] Follows generated template from `references/templates.md`
-- [ ] No duplicate info from root CLAUDE.md
-- [ ] Specific to directory, not generic advice
-
-See [references/generation-workflow.md](references/generation-workflow.md) for detailed scoring algorithm and extraction heuristics.
+</example>
 
 </instructions>
 

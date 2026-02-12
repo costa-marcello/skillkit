@@ -3,165 +3,131 @@ name: smart-merge
 description: Merges branches with comprehensive validation while preserving feature branches. Use when user wants to merge PR, sync with main, update feature branch, complete merge, or finalize work. Runs full validation (tests, lint, CI, review comments), merges without deleting branches, and always returns to the working branch.
 license: MIT
 context: fork
+agent: general-purpose
+allowed-tools: Read, Grep, Glob, Bash(git *), Bash(gh *), Bash(pnpm *), Bash(npm *), Bash(npx *), Bash(yarn *), Bash(pytest *), Bash(python *), Bash(mypy *), Bash(ruff *), Bash(pylint *), Bash(go *), Bash(golangci-lint *), Bash(wc *)
 ---
 
 # Smart Merge
 
-Merges branches with comprehensive pre-merge validation while preserving your feature branch and staying on it.
+Merges branches with pre-merge validation while preserving your feature branch.
 
 ## Two Merge Modes
 
-| Mode | Direction | Purpose | Command |
-|------|-----------|---------|---------|
-| **Sync** | main → feature | Keep feature branch current with main | `git merge origin/main` |
-| **PR Merge** | feature → main | Complete your work via PR | `gh pr merge --merge` |
+| Mode | Direction | Purpose | Core Command |
+|------|-----------|---------|--------------|
+| **Sync** | main -> feature | Keep feature branch current | `git merge origin/main` |
+| **PR Merge** | feature -> main | Complete work via PR | `gh pr merge --merge` |
 
-**Key behavior:** Feature branch is NEVER deleted. You always stay on (or return to) your working branch.
+Feature branch is never deleted. You stay on (or return to) your working branch after every operation.
 
-## Quick Reference
+## Package Manager Detection
 
-```bash
-# Sync: bring main into your feature branch
-git fetch origin && git merge origin/main
+Detect the project's package manager before running validation. Default to `pnpm` when multiple lock files exist.
 
-# PR Merge: merge your PR without deleting branch
-gh pr merge --merge  # Note: NO --delete-branch flag
-```
-
----
-
-## Pre-Merge Validation Checklist
-
-**ALWAYS verify before ANY merge:**
-
-| Check | Command | Required |
-|-------|---------|----------|
-| Tests passing | `pnpm test` / `npm test` / `pytest` | Yes |
-| Lint clean | `pnpm lint` / `npm run lint` / `ruff check` | Yes |
-| Type check | `pnpm typecheck` / `tsc --noEmit` / `mypy` | Yes |
-| Build succeeds | `pnpm build` / `npm run build` | Yes |
-| CI green (PR mode) | `gh pr checks $PR` | Yes |
-| Comments replied (PR mode) | See comment check below | Yes |
-
-### Language-Specific Validation
-
-<details>
-<summary>TypeScript/JavaScript</summary>
+| Lock File | Manager | Run Command |
+|-----------|---------|-------------|
+| `pnpm-lock.yaml` | pnpm | `pnpm <script>` |
+| `package-lock.json` | npm | `npm run <script>` |
+| `yarn.lock` | yarn | `yarn <script>` |
+| `requirements.txt` / `pyproject.toml` | pip/poetry | `pytest` / `ruff check` / `mypy` |
+| `go.mod` | go | `go test ./...` / `go build ./...` |
 
 ```bash
-#!/bin/bash
-set -e
-echo "Running quality gate..."
-pnpm typecheck || npx tsc --noEmit
-pnpm lint || npm run lint
-pnpm test || npm test
-pnpm build || npm run build
-echo "All checks passed"
-```
-</details>
-
-<details>
-<summary>Python</summary>
-
-```bash
-#!/bin/bash
-set -e
-echo "Running quality gate..."
-mypy src/ || python -m mypy src/
-ruff check src/ || pylint src/
-pytest
-echo "All checks passed"
-```
-</details>
-
-<details>
-<summary>Go</summary>
-
-```bash
-#!/bin/bash
-set -e
-echo "Running quality gate..."
-go fmt ./... && test -z "$(gofmt -l .)"
-golangci-lint run
-go test ./...
-go build ./...
-echo "All checks passed"
-```
-</details>
-
----
-
-## Mode 1: Sync (main → feature)
-
-Use this to keep your feature branch up-to-date with main. Run regularly to catch conflicts early.
-
-### Workflow
-
-```bash
-# 1. Save current branch name
-FEATURE_BRANCH=$(git branch --show-current)
-
-# 2. Fetch latest
-git fetch origin
-
-# 3. Run validation BEFORE merge
-pnpm test && pnpm lint && pnpm typecheck
-
-# 4. Merge main into feature
-git merge origin/main
-
-# 5. Resolve any conflicts, then:
-git add .
-git commit -m "chore: sync with main"
-
-# 6. Run validation AFTER merge
-pnpm test && pnpm lint && pnpm typecheck
-
-# 7. Verify still on feature branch
-git branch --show-current  # Should show $FEATURE_BRANCH
+# Auto-detect package manager
+if [ -f pnpm-lock.yaml ]; then PM="pnpm"
+elif [ -f yarn.lock ]; then PM="yarn"
+elif [ -f package-lock.json ]; then PM="npm run"
+elif [ -f go.mod ]; then PM="go"
+elif [ -f pyproject.toml ] || [ -f requirements.txt ]; then PM="python"
+else PM="pnpm"; fi
 ```
 
-### Conflict Resolution
+<instructions>
 
-If conflicts occur:
-1. Review conflicts: `git diff --name-only --diff-filter=U`
-2. Resolve each file manually or with merge tool
-3. Stage resolved files: `git add <file>`
+## Pre-Merge Validation
+
+Run these checks before every merge. Stop and report failures instead of proceeding.
+
+| Check | JS/TS Command | Python Command | Go Command | Gate |
+|-------|---------------|----------------|------------|------|
+| Type check | `$PM typecheck` or `npx tsc --noEmit` | `mypy src/` | `go vet ./...` | Block |
+| Lint | `$PM lint` | `ruff check src/` | `golangci-lint run` | Block |
+| Tests | `$PM test` | `pytest` | `go test ./...` | Block |
+| Build | `$PM build` | N/A | `go build ./...` | Block |
+| CI green | `gh pr checks $PR` | Same | Same | Block (PR mode only) |
+| Comments replied | See comment check below | Same | Same | Block (PR mode only) |
+
+If any check fails, stop the merge and report which check failed with the full error output.
+
+## Mode 1: Sync (main -> feature)
+
+Bring main into your feature branch. Run regularly to catch conflicts early.
+
+**Steps:**
+
+1. Save current branch: `FEATURE_BRANCH=$(git branch --show-current)`
+2. Fetch latest: `git fetch origin`
+3. Run pre-merge validation (all checks above except CI and comments)
+4. Merge main into feature: `git merge origin/main`
+5. If conflicts occur, resolve them (see Conflict Resolution below)
+6. Run validation again after merge completes
+7. Verify you are still on `$FEATURE_BRANCH`: `git branch --show-current`
+
+**Conflict Resolution:**
+
+1. List conflicted files: `git diff --name-only --diff-filter=U`
+2. Resolve each file
+3. Stage resolved files: `git add <file>` (stage each file by name, not `git add .`)
 4. Complete merge: `git commit`
-5. Run validation again
+5. Re-run validation
 
-### Alternative: Rebase (Linear History)
+**Rebase alternative (linear history):**
+
+Use rebase only on local/personal branches, never on shared branches.
 
 ```bash
 git fetch origin
 git rebase origin/main
-# If conflicts, resolve per commit, then: git rebase --continue
-git push --force-with-lease  # Required after rebase
+# On conflicts: resolve, then git rebase --continue
+git push --force-with-lease
 ```
 
-**Warning:** Only rebase local/personal branches. Never rebase shared branches.
+## Mode 2: PR Merge (feature -> main)
 
----
+Merge your PR after approval. Confirm with the user before executing the merge.
 
-## Mode 2: PR Merge (feature → main)
+**Steps:**
 
-Use this when your work is complete and PR is approved.
+1. Save current branch: `FEATURE_BRANCH=$(git branch --show-current)`
+2. Get PR number: `PR=$(gh pr view --json number -q '.number')`
+3. Check for unreplied review comments (see below). If any exist, stop and report them.
+4. Run full pre-merge validation (all checks including CI)
+5. Show PR summary to user:
+   ```bash
+   gh pr view $PR --json title,commits,changedFiles --jq '
+     "Title: \(.title)\nCommits: \(.commits | length)\nFiles changed: \(.changedFiles)"
+   '
+   ```
+6. Ask the user to confirm before proceeding
+7. Execute merge (do not use `--delete-branch`):
+   ```bash
+   gh pr merge $PR --merge --body "$(cat <<'EOF'
+   - Key change 1
+   - Key change 2
 
-### Pre-Merge Requirements
+   Tests: passed
+   Reviews: addressed
+   EOF
+   )"
+   ```
+8. Return to feature branch: `git checkout "$FEATURE_BRANCH"`
 
-1. **All CI checks green**
-2. **Code review approved**
-3. **All review comments replied** (verify, don't reply from this skill)
-4. **No merge conflicts**
-5. **Tests pass locally**
-
-### Check Review Comments
+**Check unreplied review comments:**
 
 ```bash
 PR=$(gh pr view --json number -q '.number')
 REPO=$(gh repo view --json nameWithOwner -q '.nameWithOwner')
 
-# Count unreplied comments
 UNREPLIED=$(gh api repos/$REPO/pulls/$PR/comments --jq '
   [.[] | select(.in_reply_to_id) | .in_reply_to_id] as $replied |
   [.[] | select(.in_reply_to_id == null) | select(.id | IN($replied[]) | not)]
@@ -172,51 +138,28 @@ UNREPLIED=$(gh api repos/$REPO/pulls/$PR/comments --jq '
 }
 
 if [ "$UNREPLIED" -gt 0 ]; then
-  echo "STOP: $UNREPLIED unreplied comments. Address them first."
+  echo "Blocked: $UNREPLIED unreplied comments. Address them before merging."
   exit 1
 fi
 ```
 
-### PR Merge Workflow
+## Post-Merge Verification
 
-```bash
-# 1. Save current branch
-FEATURE_BRANCH=$(git branch --show-current)
+Run this checklist after every merge operation:
 
-# 2. Get PR info
-PR=$(gh pr view --json number -q '.number')
-
-# 3. Run full validation
-pnpm test && pnpm lint && pnpm typecheck && pnpm build
-
-# 4. Verify CI
-gh pr checks $PR
-
-# 5. Show PR summary
-gh pr view $PR --json title,commits,changedFiles --jq '
-  "Title: \(.title)\nCommits: \(.commits | length)\nFiles changed: \(.changedFiles)"
-'
-
-# 6. CONFIRM with user before proceeding
-
-# 7. Execute merge (NO --delete-branch flag!)
-gh pr merge $PR --merge --body "$(cat <<'EOF'
-- Key change 1
-- Key change 2
-
-Tests: passed
-Reviews: addressed
-EOF
-)"
-
-# 8. Return to feature branch (gh pr merge switches to main)
-git checkout "$FEATURE_BRANCH"
-echo "Back on $FEATURE_BRANCH"
+```
+Post-Merge Checklist:
+- [ ] On correct branch: git branch --show-current
+- [ ] Clean working tree: git status
+- [ ] Merge visible in history: git log --oneline -5
+- [ ] Validation passes: $PM test && $PM lint && $PM typecheck
 ```
 
-### Merge Message Format
+If any check fails, see Error Recovery below.
 
-Keep it concise (~10 lines max):
+## Merge Message Format
+
+Keep merge messages under 10 lines:
 
 ```
 - Key change 1 (what was added/fixed)
@@ -228,73 +171,32 @@ Reviews: N/N addressed
 Refs: #123, PROJ-456
 ```
 
----
+</instructions>
 
-## Post-Merge Verification
+## Rules
 
-After ANY merge operation:
-
-```bash
-# 1. Verify you're on feature branch
-git branch --show-current
-
-# 2. Check clean state
-git status
-
-# 3. Verify merge in history
-git log --oneline -5
-
-# 4. Run full validation
-pnpm test && pnpm lint && pnpm typecheck
-
-# 5. Start application and smoke test
-pnpm dev  # or: npm run dev
-```
-
----
-
-## Important Rules
-
-### Do
-- Run full validation (test, lint, typecheck) before merging
-- Run validation again after merge completes
-- Confirm with user before PR merge
-- Return to feature branch after operations
-- Keep feature branch intact (no deletion)
-
-### Avoid
-- Using `--delete-branch` flag (preserves your branch)
-- Merging with failing tests or lint
-- Skipping user confirmation on PR merge
-- Replying to PR comments from this skill (use separate review workflow)
-- Force pushing to shared branches
-
-### Stop if
-- Tests failing
-- Lint errors exist
-- CI checks pending or failing
-- Unreplied review comments exist
-- Merge conflicts unresolved
-
----
+| Rule | Action |
+|------|--------|
+| Run validation before and after every merge | Block the merge on any failure |
+| Confirm with user before PR merge | Show PR summary first, then ask |
+| Never use `--delete-branch` flag | Feature branch must survive the merge |
+| Never reply to PR comments from this skill | Report unreplied comments, let user handle them |
+| Never force push to shared branches | Use `--force-with-lease` only on personal branches after rebase |
+| Stop on failing tests, lint errors, pending CI, unreplied comments, or unresolved conflicts | Report the failure and do not proceed |
 
 ## Branch Preservation
 
-This skill explicitly preserves your feature branch:
+| Operation | Branch Status After |
+|-----------|---------------------|
+| Sync (main -> feature) | Feature branch updated, stays checked out |
+| PR Merge (feature -> main) | Feature branch kept, switched back after merge |
 
-| Operation | Branch Status |
-|-----------|---------------|
-| Sync (main → feature) | Feature branch updated, stays checked out |
-| PR Merge | Feature branch kept, switch back after merge |
+To delete a branch after merge (only when the user explicitly requests it):
 
-If you WANT to delete after merge (rare):
 ```bash
-# Only after successful merge AND you're done with the branch
 git branch -d feature/my-branch           # local
 git push origin --delete feature/my-branch # remote
 ```
-
----
 
 ## Error Recovery
 
@@ -304,32 +206,72 @@ git merge --abort  # Cancel incomplete merge
 git status         # Verify clean state
 ```
 
-**Accidentally on wrong branch:**
+**On wrong branch after merge:**
 ```bash
-git checkout feature/your-branch
+git checkout "$FEATURE_BRANCH"
 ```
 
-**Need to undo merge:**
+**Undo a completed merge:**
 ```bash
-git reflog                    # Find commit before merge
-git reset --hard HEAD~1       # Undo last merge commit
-# Or: git reset --hard <sha>  # Reset to specific commit
+git reflog                  # Find the commit before the merge
+git reset --hard <sha>      # Reset to that commit
 ```
 
----
+<example>
+**Sync: Simple merge with no conflicts**
 
-## Comparison with Other Approaches
+User: "Sync my branch with main"
 
-| Approach | Deletes Branch | Stays on Feature | This Skill |
-|----------|----------------|------------------|------------|
-| `gh pr merge --delete-branch` | Yes | No | Not used |
-| `gh pr merge --merge` | No | Switches to main | Used + switch back |
-| `git merge origin/main` | No | Yes | Used for sync |
+1. Detected pnpm from `pnpm-lock.yaml`
+2. Ran `pnpm test && pnpm lint && pnpm typecheck` -- all passed
+3. Ran `git fetch origin && git merge origin/main` -- fast-forward merge
+4. Ran validation again -- all passed
+5. Confirmed on branch `feature/auth-flow`
 
----
+Result: Branch synced, 0 conflicts, all checks green.
+</example>
 
-## Related Workflows
+<example>
+**Sync: Merge with conflicts**
 
-- **Code Review**: Address comments before using PR merge mode
-- **CI/CD**: Ensure all checks pass before merge
-- **Conflict Resolution**: Resolve before completing merge
+User: "Update my feature branch from main"
+
+1. Detected npm from `package-lock.json`
+2. Ran `npm run test && npm run lint` -- passed
+3. Ran `git fetch origin && git merge origin/main` -- 2 conflicts in `src/api.ts` and `src/config.ts`
+4. Listed conflicts: `git diff --name-only --diff-filter=U`
+5. Resolved both files, staged with `git add src/api.ts src/config.ts`
+6. Completed merge: `git commit`
+7. Ran validation again -- passed
+8. Confirmed on branch `feature/new-api`
+
+Result: Branch synced, 2 conflicts resolved, all checks green.
+</example>
+
+<example>
+**PR Merge: Successful merge after review**
+
+User: "Merge my PR"
+
+1. Detected pnpm, ran full validation -- all passed
+2. Checked unreplied comments -- 0 unreplied
+3. Verified CI: `gh pr checks 47` -- all green
+4. Showed summary: "Title: Add auth module | Commits: 3 | Files changed: 7"
+5. User confirmed
+6. Ran `gh pr merge 47 --merge` (no `--delete-branch`)
+7. Returned to `feature/auth-module` with `git checkout`
+
+Result: PR #47 merged, feature branch preserved, back on working branch.
+</example>
+
+<example>
+**PR Merge: Blocked by unreplied comments**
+
+User: "Merge my PR into main"
+
+1. Detected pnpm, ran validation -- all passed
+2. Checked unreplied comments -- found 2 unreplied
+3. Stopped. Reported: "Blocked: 2 unreplied review comments on PR #32. Address them before merging."
+
+Result: Merge blocked. User needs to reply to review comments first.
+</example>

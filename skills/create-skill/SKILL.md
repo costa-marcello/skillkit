@@ -168,13 +168,29 @@ To complete SKILL.md, answer the following questions:
 
 #### Consistency Verification
 
-Before finalizing, check for contradictions:
+Before finalizing, check for contradictions using Grep:
 
-1. Search SKILL.md for each decision or rule. Verify the same rule does not appear with different values elsewhere.
-2. For each term used more than twice, confirm the same word refers to the same concept throughout (e.g., do not mix "user" and "customer" for the same entity).
-3. For each reference file mentioned in SKILL.md, open it and confirm the guidance aligns with what SKILL.md states.
+1. For each default value or rule in SKILL.md, grep the references/ folder for the same topic. Verify values match. Fix any mismatches by updating the stale copy.
+2. For each term used more than twice, grep across all files to confirm the same word refers to the same concept throughout (e.g., do not mix "user" and "customer" for the same entity).
+3. For each reference file mentioned in SKILL.md, open it and confirm the guidance aligns with what SKILL.md states. Delete stale cross-references.
 
-### Step 5: Sanitization Review (Optional)
+### Step 5: Validation Checkpoint
+
+Before proceeding to sanitization, security, or packaging, run the structural validator:
+
+```bash
+python3 scripts/quick_validate.py <path/to/skill-folder>
+```
+
+Check the output for:
+- Frontmatter errors (missing fields, naming violations, missing `context: fork`)
+- Description warnings (third-person voice, trigger conditions)
+- Line count warnings (under 400 for Grade A, under 500 for Grade B)
+- Missing referenced files (paths in SKILL.md that do not exist on disk)
+
+Fix all errors and warnings before continuing. Re-run the validator after each fix until it reports "Skill is valid!" with no warnings.
+
+### Step 6: Sanitization Review (Optional)
 
 **Ask the user before executing this step:** "This skill appears to be extracted from a business project. Would you like me to perform a sanitization review to remove business-specific content before public distribution?"
 
@@ -195,7 +211,7 @@ Skip this step if:
 3. Re-run all scan patterns to confirm no matches remain
 4. Read through the skill to verify coherence and functionality
 
-### Step 6: Security Review
+### Step 7: Security Review
 
 Before packaging or distributing a skill, run the security scanner:
 
@@ -206,7 +222,7 @@ python3 scripts/security_scan.py <path/to/skill-folder> --verbose  # Detailed re
 
 Install gitleaks first if not present (`brew install gitleaks` on macOS). The script prints installation instructions and remediation guidance for any issues found.
 
-### Step 7: Packaging a Skill
+### Step 8: Packaging a Skill
 
 Package the skill into a distributable zip. The script validates before packaging:
 
@@ -225,25 +241,24 @@ The packaging script will:
 
 2. **Package** the skill if validation passes, creating a zip file named after the skill (e.g., `my-skill.zip`) that includes all files and maintains the proper directory structure for distribution.
 
-**Common validation failure:** If SKILL.md references `scripts/my_script.py` but the file doesn't exist, validation will fail with "Missing referenced files: scripts/my_script.py". Ensure all bundled resources exist before packaging.
+**Common validation failure:** If SKILL.md references `scripts/my_script.py` but the file doesn't exist, validation will fail with "Missing referenced files: scripts/my_script.py". Fix any validation errors and run the packaging command again.
 
-If validation fails, the script will report the errors and exit without creating a package. Fix any validation errors and run the packaging command again.
-
-### Step 8: Update Marketplace
+### Step 9: Update Marketplace
 
 After packaging, update the marketplace registry so the skill is discoverable. Read `references/marketplace_update.md` for the JSON template and semver versioning rules.
 
-### Step 9: Iterate
+### Step 10: Iterate
 
-After testing the skill, users may request improvements. Often this happens right after using the skill, with fresh context of how the skill performed.
+After testing the skill, users request improvements based on observed failures.
 
 **Iteration workflow:**
-1. Use the skill on a real task and record where Claude hesitates, asks unnecessary questions, or produces incorrect output.
-2. For each observed failure, trace back to the responsible section in SKILL.md or a reference file.
-3. Apply the fix: add missing context, tighten vague instructions, or add an example covering the failure case.
-4. Re-run the same task to verify the fix resolved the issue.
+1. Run the skill on a real task. Record each point where Claude hesitates, asks an unnecessary question, or produces wrong output.
+2. For each failure, grep SKILL.md and references/ to find the responsible section.
+3. Apply the fix: add missing context, replace vague instructions with specific commands, or add an `<example>` block covering the failure case.
+4. Run `python3 scripts/quick_validate.py <path/to/skill-folder>` to confirm no structural regressions.
+5. Re-run the same task to verify the fix resolved the issue.
 
-**Refinement filter:** Only add what solves observed problems. If best practices already cover it, do not duplicate.
+**Refinement filter:** Only add what solves observed problems. Do not duplicate content that best practices already cover.
 
 </instructions>
 
@@ -274,7 +289,61 @@ license: MIT
 ```
 Body references `references/color_palette.md` and `references/typography.md`. Asks user to provide the logo file for `assets/`.
 
-**Step 5:** Skipped -- created from scratch for public use.
+**Step 5 (Validate):** Run `python3 scripts/quick_validate.py skills/brand-guidelines` -- passes.
 
-**Steps 6-8:** Run security scan, package, update marketplace.
+**Step 6:** Skipped -- created from scratch for public use.
+
+**Steps 7-9:** Run security scan, package, update marketplace.
+</example>
+
+<example>
+**User request:** `/create-skill db-migrate`
+
+**Step 1:** Skipped -- purpose clear from the name.
+
+**Step 2 (Planning):** Database migrations are fragile, sequence-dependent operations (low freedom). Resources needed:
+- `scripts/migrate.py` -- runs migrations with rollback on failure
+- `references/migration_patterns.md` -- naming conventions, idempotency rules
+
+**Step 3 (Init):**
+```bash
+python3 scripts/init_skill.py db-migrate --path skills/
+```
+
+**Step 4 (Edit):** Write SKILL.md with:
+```yaml
+---
+name: db-migrate
+description: "Generates and runs database migration scripts with rollback support. Use when creating schema changes, adding columns, or restructuring tables."
+license: MIT
+context: fork
+agent: general-purpose
+---
+```
+Body wraps the migration workflow in `<instructions>` tags with exact commands. Low freedom: each step specifies the exact script to run and the verification query to confirm success.
+
+**Step 5 (Validate):** Run `python3 scripts/quick_validate.py skills/db-migrate` -- passes with no warnings.
+
+**Steps 6-9:** Skip sanitization (created from scratch), run security scan, package, update marketplace.
+</example>
+
+<example>
+**User request:** "The changelog skill sometimes misses merge commits. Can you improve it?"
+
+**Step 1:** Skipped -- user described the problem.
+
+**Step 2 (Planning):** This is an update, not a new skill. Identify the root cause: the skill's git log parsing likely filters merge commits.
+
+**Step 3:** Skipped -- skill already exists.
+
+**Step 4 (Edit):**
+1. Read the existing SKILL.md and all reference files.
+2. Locate the git log command pattern -- confirm it uses `--no-merges` flag.
+3. Remove `--no-merges` and add a merge commit formatting section.
+4. Update `references/commit_types.md` to include merge commit categorisation.
+5. Run consistency verification: check that no other section contradicts the new merge handling.
+
+**Step 5 (Validate):** Run `python3 scripts/quick_validate.py skills/changelog` -- passes.
+
+**Step 10 (Iterate):** Test on a repository with merge commits. Confirm the changelog now includes them with correct formatting.
 </example>

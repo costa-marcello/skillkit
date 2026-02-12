@@ -11,9 +11,7 @@ argument-hint: "[task] [project-type]"
 
 ## Overview
 
-READMEs answer questions your audience will have. Different audiences need different information - a contributor to an OSS project needs different context than future-you opening a config folder.
-
-**Always ask:** Who will read this, and what do they need to know?
+Identify the audience first. Match sections, depth, and tone to what that audience needs.
 
 <instructions>
 
@@ -36,7 +34,8 @@ README Progress:
 - [ ] Project type: OSS / Personal / Internal / Config
 - [ ] Template selected from templates/
 - [ ] Draft complete
-- [ ] Asked: "Anything else to highlight?"
+- [ ] Verified: draft matches actual project state (package.json, directory structure, commands)
+- [ ] Asked: "Anything else to highlight or include that I might have missed?"
 ```
 
 ## Process
@@ -199,6 +198,114 @@ My config files.
 ```
 
 **Why better:** Future-you at 2am will thank past-you for the "Gotchas" section.
+</example>
+
+<example>
+**Task:** Creating README for internal team service
+
+**Before (missing operational context):**
+```markdown
+# User Service
+Handles users.
+
+## Setup
+Run `docker compose up`.
+```
+
+**After (onboarding-ready):**
+```markdown
+# User Service
+
+Manages authentication, profiles, and role-based access for the platform.
+
+**Team**: #platform-eng | **On-call**: PagerDuty rotation
+
+## Dependencies
+- **Upstream**: PostgreSQL, Redis, Auth0
+- **Downstream**: Billing Service, Notification Service
+
+## Local Setup
+
+### Prerequisites
+- Docker Desktop >= 4.x
+- Access to 1Password `Platform Eng` vault for env vars
+
+### Run
+
+```bash
+cp .env.example .env        # then fill from 1Password
+docker compose up -d
+curl http://localhost:3000/health   # expect {"status":"ok"}
+```
+
+### Tests
+
+```bash
+npm test                     # unit tests
+npm run test:integration     # requires running Docker services
+```
+
+## Troubleshooting
+
+### Auth0 callback fails locally
+**Fix**: Set `AUTH0_BASE_URL=http://localhost:3000` in `.env`. The default points to staging.
+```
+
+**Why better:** New team members can run the service in under 5 minutes. Troubleshooting section prevents the most common support question.
+</example>
+
+<example>
+**Task:** Reviewing an existing README for accuracy
+
+**Before (stale, misleading):**
+```markdown
+# datakit
+A Python library for CSV processing.
+
+## Installation
+pip install datakit
+
+## Usage
+```python
+from datakit import process
+process("input.csv")
+```
+```
+
+**Review findings:**
+1. Project now supports JSON and Parquet (added 6 months ago), not just CSV
+2. `process()` was renamed to `transform()` in v2.0
+3. Requires Python 3.10+, not mentioned anywhere
+4. No mention of the new CLI interface added in v1.8
+
+**After (accurate, current):**
+```markdown
+# datakit
+Transform CSV, JSON, and Parquet files with a single API or CLI command.
+
+## Installation
+Requires Python 3.10+
+
+```bash
+pip install datakit
+```
+
+## Usage
+
+### Python API
+```python
+from datakit import transform
+transform("input.csv", output_format="json")
+```
+
+### CLI
+```bash
+datakit convert input.csv --to json
+datakit convert data.parquet --to csv
+```
+```
+
+**Why better:** Every section matches the actual project state. Stale docs erode trust faster than no docs.
 </example>
 
 ## References

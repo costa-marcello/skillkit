@@ -25,82 +25,59 @@ diagramType
 - First line declares diagram type (e.g., `classDiagram`, `sequenceDiagram`, `flowchart`)
 - Use `%%` for comments
 - Whitespace aids readability; not required
-- Typos break diagrams silently—validate in Mermaid Live
-
-</instructions>
-
-<diagram-types>
+- Typos break diagrams silently -- validate in Mermaid Live
 
 ## Diagram Type Selection Guide
 
-**Choose the right diagram type:**
+| Type | When to use | Reference |
+|------|-------------|-----------|
+| Class Diagram | Domain modelling, OOP design, entity relationships | `references/class-diagrams.md` |
+| Sequence Diagram | API flows, authentication, component interactions | `references/sequence-diagrams.md` |
+| Flowchart | Processes, algorithms, decision trees, user journeys | `references/flowcharts-basic.md`, `references/flowcharts-advanced.md` |
+| ERD | Database schemas, table relationships, data modelling | `references/erd-basic.md`, `references/erd-patterns.md` |
+| C4 Diagram | Software architecture at Context, Container, Component levels | `references/c4-diagrams.md` |
+| State Diagram | State machines, lifecycle states, workflow status | `references/other-diagrams.md` |
+| Git Graph | Branching strategies, commit history | `references/other-diagrams.md` |
+| Gantt Chart | Project timelines, scheduling, sprint planning | `references/other-diagrams.md` |
+| Pie/Quadrant | Data distribution, prioritisation matrices | `references/other-diagrams.md` |
 
-1. **Class Diagrams** - Domain modeling, OOP design, entity relationships
-   - Domain-driven design documentation
-   - Object-oriented class structures
-   - Entity relationships and dependencies
+Default to **flowchart** when the user's intent is unclear. Flowcharts cover the widest range of use cases.
 
-2. **Sequence Diagrams** - Temporal interactions, message flows
-   - API request/response flows
-   - User authentication flows
-   - System component interactions
-   - Method call sequences
+</instructions>
 
-3. **Flowcharts** - Processes, algorithms, decision trees
-   - User journeys and workflows
-   - Business processes
-   - Algorithm logic
-   - Deployment pipelines
+<example name="Class Diagram (Domain Model)">
 
-4. **Entity Relationship Diagrams (ERD)** - Database schemas
-   - Table relationships
-   - Data modeling
-   - Schema design
-
-5. **C4 Diagrams** - Software architecture at multiple levels
-   - System Context (systems and users)
-   - Container (applications, databases, services)
-   - Component (internal structure)
-   - Code (class/interface level)
-
-6. **State Diagrams** - State machines, lifecycle states
-7. **Git Graphs** - Version control branching strategies
-8. **Gantt Charts** - Project timelines, scheduling
-9. **Pie/Bar Charts** - Data visualization
-
-</diagram-types>
-
-<examples>
-
-## Quick Start Examples
-
-### Class Diagram (Domain Model)
+### Class Diagram
 ```mermaid
 classDiagram
     Title -- Genre
     Title *-- Season
     Title *-- Review
     User --> Review : creates
-    
+
     class Title {
         +string name
         +int releaseYear
         +play()
     }
-    
+
     class Genre {
         +string name
         +getTopTitles()
     }
 ```
 
-### Sequence Diagram (API Flow)
+</example>
+
+<example name="Sequence Diagram (API Flow)">
+
+### Sequence Diagram
 ```mermaid
 sequenceDiagram
     participant User
     participant API
     participant Database
-    
+
     User->>API: POST /login
     API->>Database: Query credentials
     Database-->>API: Return user data
@@ -111,7 +88,11 @@ sequenceDiagram
     end
 ```
 
-### Flowchart (User Journey)
+</example>
+
+<example name="Flowchart (User Journey)">
+
+### Flowchart
 ```mermaid
 flowchart TD
     Start([User visits site]) --> Auth{Authenticated?}
@@ -124,20 +105,24 @@ flowchart TD
     Error --> Login
 ```
 
-### ERD (Database Schema)
+</example>
+
+<example name="ERD (Database Schema)">
+
+### ERD
 ```mermaid
 erDiagram
     USER ||--o{ ORDER : places
     ORDER ||--|{ LINE_ITEM : contains
     PRODUCT ||--o{ LINE_ITEM : includes
-    
+
     USER {
         int id PK
         string email UK
         string name
         datetime created_at
     }
-    
+
     ORDER {
         int id PK
         int user_id FK
@@ -146,15 +131,30 @@ erDiagram
     }
 ```
 
-</examples>
+</example>
+
+<example name="State Diagram (Order Lifecycle)">
+
+### State Diagram
+```mermaid
+stateDiagram-v2
+    [*] --> Draft
+    Draft --> Submitted : submit
+    Draft --> Cancelled : cancel
+    Submitted --> Processing : approve
+    Processing --> Shipped : ship
+    Shipped --> Delivered : confirm
+    Delivered --> [*]
+    Cancelled --> [*]
+```
+
+</example>
 
 <references>
 
 ## Detailed References
 
-For in-depth guidance on specific diagram types, see:
-
-- **[references/class-diagrams.md](references/class-diagrams.md)** - Domain modeling, relationships (association, composition, aggregation, inheritance), multiplicity, methods/properties
+- **[references/class-diagrams.md](references/class-diagrams.md)** - Domain modelling, relationships (association, composition, aggregation, inheritance), multiplicity, methods/properties
 - **[references/sequence-diagrams.md](references/sequence-diagrams.md)** - Actors, participants, messages (sync/async), activations, loops, alt/opt/par blocks, notes
 - **[references/flowcharts-basic.md](references/flowcharts-basic.md)** - Node shapes, connections, subgraphs
 - **[references/flowcharts-advanced.md](references/flowcharts-advanced.md)** - Styling, comprehensive examples, patterns
@@ -162,7 +162,7 @@ For in-depth guidance on specific diagram types, see:
 - **[references/erd-patterns.md](references/erd-patterns.md)** - Schema examples, design patterns
 - **[references/c4-diagrams.md](references/c4-diagrams.md)** - System context, container, component diagrams, boundaries
 - **[references/advanced-features.md](references/advanced-features.md)** - Configuration, layout, export options
-- **[references/theming.md](references/theming.md)** - Themes, colors, visual styling
+- **[references/theming.md](references/theming.md)** - Themes, colours, visual styling
 - **[references/other-diagrams.md](references/other-diagrams.md)** - State diagrams, git graphs, gantt charts, pie/quadrant
 
 </references>
@@ -226,6 +226,8 @@ If the user reports a rendering failure:
 
 </validation>
 
+<configuration>
+
 ## Configuration and Theming
 
 Configure diagrams using frontmatter:
@@ -241,30 +243,41 @@ flowchart LR
     A --> B
 ```
 
-**Available themes:** default (recommended), forest, dark, neutral, base (for full colour control)
+**Themes (default to `default`; use `base` for full colour control):**
 
-**Layout options:**
-- `layout: dagre` (default) - Classic balanced layout
-- `layout: elk` - Advanced layout for complex diagrams (requires integration)
+| Theme | When to use |
+|-------|-------------|
+| `default` | General-purpose diagrams (recommended) |
+| `forest` | Green earth tones for environmental or organic topics |
+| `dark` | Dark-mode pages or presentations |
+| `neutral` | Grayscale professional documentation |
+| `base` | Full colour customisation via `themeVariables` |
 
-**Look options:**
-- `look: classic` - Traditional Mermaid style
-- `look: handDrawn` - Sketch-like appearance
+**Layout:** Default to `dagre`. Switch to `elk` when dagre produces crossed lines on 20+ node diagrams.
+
+**Look:** Default to `classic`. Use `handDrawn` for informal docs or whiteboard-style presentations.
 
 ## Exporting and Rendering
 
-**Native support (with caveats):**
-- GitHub README/Issues - Renders in Markdown. Wiki rendering is broken. C4 diagrams often fail.
-- GitLab - Renders reliably. May need cache refresh after adding new diagrams.
-- VS Code - With Markdown Mermaid extension. Known bug with "No diagram type detected" on first open.
-- Obsidian - Desktop works. iOS rendering fails entirely. Pie charts render as empty boxes.
-- Notion, Confluence - Built-in support. Feature coverage varies by Mermaid version.
-- Azure DevOps - Requires `::: mermaid` syntax instead of ` ```mermaid ` backticks.
+**Platform support:**
 
-**Export options:**
-- [Mermaid Live Editor](https://mermaid.live) - Online editor with PNG/SVG export
-- Mermaid CLI - `npm install -g @mermaid-js/mermaid-cli` then `mmdc -i input.mmd -o output.png`
-- Docker - `docker run --rm -v $(pwd):/data minlag/mermaid-cli -i /data/input.mmd -o /data/output.png`
+| Platform | Status | Notes |
+|----------|--------|-------|
+| GitHub README/Issues | Works | Wiki rendering broken. C4 diagrams often fail. |
+| GitLab | Works | May need cache refresh after adding new diagrams. |
+| VS Code | Works | Requires Markdown Mermaid extension. |
+| Obsidian | Partial | Desktop works. iOS fails entirely. Pie charts render as empty boxes. |
+| Azure DevOps | Works | Requires `::: mermaid` syntax, not backtick fences. |
+| PDF export | Fails | Export as PNG/SVG from mermaid.live first. |
+
+**Export commands:**
+- **Online**: [Mermaid Live Editor](https://mermaid.live) with PNG/SVG export
+- **CLI**: `mmdc -i input.mmd -o output.png` (install via `npm install -g @mermaid-js/mermaid-cli`)
+- **Docker**: `docker run --rm -v $(pwd):/data minlag/mermaid-cli -i /data/input.mmd -o /data/output.png`
+
+</configuration>
+
+<pitfalls>
 
 ## Common Pitfalls
 
@@ -276,29 +289,12 @@ flowchart LR
 
 **Platform-specific failures:**
 - **GitHub Wiki** - Mermaid rendering is broken despite documentation claiming support. Use README or Pages instead.
-- **Azure DevOps** - Requires `::: mermaid` syntax, not standard ` ```mermaid ` backticks.
+- **Azure DevOps** - Requires `::: mermaid` syntax, not standard backtick fences.
 - **Obsidian iOS** - Mermaid fails to render entirely on iOS. Desktop works.
 - **C4 diagrams on GitHub** - C4 is experimental in Mermaid. Renders in mermaid.live but often fails on GitHub.
-- **PDF export** - Most tools render Mermaid as plain text. Export as PNG/SVG from mermaid.live first.
 
 **Structural issues:**
 - **Overcomplexity** - Split diagrams with more than 15 nodes into multiple focused views.
 - **Nested subgraphs** - Deep nesting fails on some platforms. Keep to 2 levels maximum.
-- **Missing relationships** - Document all important connections between entities.
 
-## When to Create Diagrams
-
-**Always diagram when:**
-- Starting new projects or features
-- Documenting complex systems
-- Explaining architecture decisions
-- Designing database schemas
-- Planning refactoring efforts
-- Onboarding new team members
-
-**Use diagrams to:**
-- Align stakeholders on technical decisions
-- Document domain models collaboratively
-- Visualize data flows and system interactions
-- Plan before coding
-- Create living documentation that evolves with code
+</pitfalls>

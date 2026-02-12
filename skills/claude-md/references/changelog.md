@@ -4,6 +4,21 @@ All notable changes to the claude-md skill are documented here.
 
 ---
 
+## [1.2.0] - 2026-02-12
+
+### Changed
+- Extracted verbose Generate mode inline content (Phases G1-G6) from SKILL.md to a compact summary table with reference link. Reduced line count from 419 to 399.
+- Added intro mention of "Generate" mode in the opening summary line.
+- Replaced em dash with period in opening description for consistency.
+
+### Added
+- `<example>` block for Audit mode summary output (Phase 3).
+- `<example>` block for Refactor triage output (Phase 6).
+- `<example>` block for Generate mode preview output (new compact section).
+- Total `<example>` blocks increased from 2 to 5, meeting Grade A criterion of 3-5 diverse examples.
+
+---
+
 ## [1.1.0] - 2026-02-09
 
 ### Changed

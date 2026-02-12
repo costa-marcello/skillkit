@@ -3,23 +3,20 @@ name: production-audit
 description: "Audits a codebase for production readiness across six dimensions: API completeness, frontend-backend sync, security, scalability, infrastructure, and dead code/architecture. Use when asked for a launch assessment, production readiness check, pre-deployment audit, or multi-agent patchwork cleanup."
 license: MIT
 context: fork
+agent: general-purpose
+argument-hint: "[scope]"
+allowed-tools: "Read, Grep, Glob, Bash, Write, Edit, LSP, Task, SendMessage, TeamCreate, TaskCreate, TaskUpdate, TaskList, TaskGet, ToolSearch"
 ---
 
 # Production Audit Skill
-
-## When to Use
-
-- **Pre-launch assessment**: Codebase has core features working and needs gap analysis before production
-- **Multi-agent cleanup**: Project built across multiple AI sessions with likely accumulated patchwork
-- **Security review**: Auth, validation, and injection audit before exposing to real users
-- **Scalability check**: Preparing for significant user load and need to find query issues, missing indexes, caching gaps
-- **Dead code sweep**: Finding orphaned files, unused imports, abandoned mocks, duplicate utilities
 
 <instructions>
 
 ## Audit Workflow
 
 This audit produces a **read-only assessment report** with evidence (file paths, line numbers, severity). It does not auto-fix anything.
+
+If `$ARGUMENTS` specifies a scope (e.g., "security only", "skip dead code", "focus on scalability"), narrow the audit to those dimensions only. Otherwise, audit all six dimensions.
 
 ### Step 1: Discover Project Structure
 
@@ -36,9 +33,16 @@ Store this map as a numbered list of directories and key files. Pass it verbatim
 
 **CHECKPOINT**: Verify the project map covers all major directories. If the project lacks a category (e.g., no payment integration), note it as "not applicable" rather than skipping it silently.
 
-### Step 2: Spawn Audit Team
+### Step 2: Determine Scope and Spawn Audit Team
 
-Spawn 4 agents in parallel. Each agent handles one or two audit dimensions and writes findings to a structured section.
+**Scope narrowing**: Users can narrow the audit via `$ARGUMENTS` or natural language:
+- "audit security only" -- spawn only the security agent
+- "audit everything except dead code" -- skip Agent 4
+- "focus on API completeness" -- spawn only Agent 1
+
+When the user specifies a target user count (e.g., "10k users"), pass that to the scalability agent as a sizing constraint.
+
+**Agent assignment**: Spawn up to 4 agents in parallel. Each agent handles one or two audit dimensions and writes findings to a structured section.
 
 | Agent | Dimensions | Reference |
 | --- | --- | --- |
@@ -78,24 +82,16 @@ Severity definitions:
 - **WARNING**: Fix within first sprint post-launch. Performance issues under load, missing monitoring, incomplete error handling, partial implementations.
 - **IMPROVEMENT**: Fix when convenient. Code quality, dead code removal, test coverage gaps, documentation.
 
-### Step 4: Synthesise Report
+### Step 4: Verify and Synthesise Report
 
-After all agents complete, the lead assembles the final report:
+After all agents complete, the lead verifies and assembles the final report:
 
 1. Collect all findings from agents
-2. Deduplicate (different agents may flag the same file)
-3. Sort by severity: blockers first, then warnings, then improvements
-4. Add an executive summary with counts per severity and dimension
-5. Add a recommended fix order (blockers grouped by dependency -- fix auth middleware before individual route fixes)
-
-### Step 5: Customise Scope
-
-Users can narrow the audit scope by specifying dimensions:
-- "audit security only" -- spawn only the security agent
-- "audit everything except dead code" -- skip Agent 4
-- "focus on API completeness" -- spawn only Agent 1
-
-When the user specifies a target user count (e.g., "10k users"), pass that to the scalability agent as a sizing constraint.
+2. **CHECKPOINT**: Verify every finding has all four required fields (severity, dimension, file path with line number, evidence). Reject malformed findings back to the agent for correction.
+3. Deduplicate (different agents may flag the same file)
+4. Sort by severity: blockers first, then warnings, then improvements
+5. Add an executive summary with counts per severity and dimension
+6. Add a recommended fix order (blockers grouped by dependency -- fix auth middleware before individual route fixes)
 
 ### Report Output
 
@@ -106,13 +102,14 @@ Save the report to `PRODUCTION-AUDIT.md` in the project root. Follow the full te
 ```
 - [ ] 1. Map project structure (directories, framework, database, auth, payments, config)
 - [ ] 2. CHECKPOINT: Verify project map is complete. Note any N/A categories.
-- [ ] 3. Read reference files for each audit dimension
-- [ ] 4. Spawn audit agents in parallel with project map + checklists
-- [ ] 5. Collect findings from all agents
-- [ ] 6. Deduplicate findings (different agents may flag the same file)
+- [ ] 3. Determine scope (full audit or narrowed via $ARGUMENTS)
+- [ ] 4. Read reference files for each audit dimension in scope
+- [ ] 5. Spawn audit agents in parallel with project map + checklists
+- [ ] 6. Collect findings from all agents
 - [ ] 7. CHECKPOINT: Verify every finding has severity, dimension, file path, and evidence
-- [ ] 8. Write executive summary with counts and recommended fix order
-- [ ] 9. Save report to `PRODUCTION-AUDIT.md` in project root
+- [ ] 8. Deduplicate findings (different agents may flag the same file)
+- [ ] 9. Write executive summary with counts and recommended fix order
+- [ ] 10. Save report to `PRODUCTION-AUDIT.md` in project root
 ```
 
 </instructions>
@@ -127,7 +124,8 @@ Save the report to `PRODUCTION-AUDIT.md` in the project root. Follow the full te
 2. Reads all four reference files for audit checklists
 3. Spawns 4 agents in parallel, each with the project map and their dimension checklist
 4. Collects 47 findings: 8 blockers, 15 warnings, 24 improvements
-5. Writes `PRODUCTION-AUDIT.md` with executive summary and prioritised fix order
+5. Verifies all findings have severity, dimension, file path, and evidence
+6. Writes `PRODUCTION-AUDIT.md` with executive summary and prioritised fix order
 
 **Report excerpt**:
 ```markdown
@@ -147,12 +145,13 @@ Save the report to `PRODUCTION-AUDIT.md` in the project root. Follow the full te
 </example>
 
 <example>
-**User**: "Just check security and dead code, skip the rest"
+**User**: "/production-audit security only"
 
 **Claude**:
-1. Maps project structure
-2. Spawns only 2 agents: Security + Dead Code & Architecture
-3. Produces a focused report covering only those dimensions
+1. Parses `$ARGUMENTS` = "security only"
+2. Maps project structure
+3. Spawns only the security agent with `references/security-audit.md`
+4. Produces a focused report covering only security findings
 </example>
 
 <example>
@@ -176,11 +175,26 @@ Save the report to `PRODUCTION-AUDIT.md` in the project root. Follow the full te
 5. Produces report with Django-specific findings (e.g., missing `DEFAULT_PERMISSION_CLASSES`, unprotected Celery tasks)
 </example>
 
+<example>
+**User**: "Audit this project" (but the project is a Rust CLI tool with no web server, no database, no frontend)
+
+**Claude**:
+1. Maps project structure: Rust binary crate, `src/main.rs` + `src/lib.rs`, no web framework, no database, no frontend
+2. Marks API Mapping, Frontend-Backend Sync, and Scalability as "not applicable"
+3. Spawns 2 agents: Security (focused on input validation, dependency audit, command injection) + Dead Code & Architecture
+4. Infrastructure agent checks for CI/CD, release binaries, and environment config
+5. Report is shorter but still follows the standard template, with N/A dimensions clearly marked
+</example>
+
 </examples>
+
+<context>
 
 ## Tips
 
 1. **Run early.** Catches architectural issues before they compound. The audit is read-only and works at any stage.
 2. **Commit the report.** `PRODUCTION-AUDIT.md` is designed for team review. Finding IDs (B-001, W-001) work as ticket references.
 3. **Pair with Semgrep.** If the Semgrep MCP server is available, the security agent can run `semgrep_scan` for automated vulnerability detection alongside manual pattern matching.
-4. **Re-audit after fixes.** Verify blockers are resolved and no new issues were introduced.
+4. **Re-audit after fixes.** Run the audit again after resolving blockers to verify they are fixed and no new issues were introduced.
+
+</context>

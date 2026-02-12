@@ -17,13 +17,24 @@ from pathlib import Path
 
 SKILL_TEMPLATE = """---
 name: {skill_name}
-description: Processes X and extracts Y from Z. Use when the user mentions 'keyword1', 'keyword2', or asks to perform specific-action.
+description: "Processes X and extracts Y from Z. Use when the user mentions 'keyword1', 'keyword2', or asks to perform specific-action."
+license: MIT
 context: fork
 ---
 
 # {skill_title}
 
-[TODO: Replace the description above with a third-person verb ("Processes...", "Extracts...", "Creates...") + trigger conditions ("Use when...")]
+<!-- Review-skill checklist:
+  - [ ] Description starts with third-person verb + "Use when..." triggers
+  - [ ] SKILL.md under 400 lines (Grade A) or 500 lines (Grade B)
+  - [ ] Only SKILL.md in skill root; supporting files in references/, scripts/, assets/
+  - [ ] 3-5 diverse <example> blocks
+  - [ ] Core workflow wrapped in <instructions> tags
+  - [ ] Multi-step workflows have verification checkpoints
+  - [ ] No vague verbs ("consider", "ensure") -- use "check", "verify", "run"
+  - [ ] No explanations of concepts Claude already knows
+  - [ ] Delete this checklist before finalising
+-->
 
 <context>
 ## Overview
@@ -32,103 +43,38 @@ context: fork
 </context>
 
 <instructions>
-## How to Use This Skill
 
-[TODO: Core procedural instructions - what Claude should DO when this skill is invoked]
+## Workflow
+
+[TODO: Core procedural instructions. Write in imperative form ("Run X", "Check Y").
+For multi-step workflows, add a verification checkpoint after critical steps.]
+
 </instructions>
-
-## Structuring This Skill
-
-[TODO: Choose the structure that best fits this skill's purpose. Common patterns:
-
-**1. Workflow-Based** (best for sequential processes)
-- Works well when there are clear step-by-step procedures
-- Example: DOCX skill with "Workflow Decision Tree" → "Reading" → "Creating" → "Editing"
-- Structure: ## Overview → ## Workflow Decision Tree → ## Step 1 → ## Step 2...
-
-**2. Task-Based** (best for tool collections)
-- Works well when the skill offers different operations/capabilities
-- Example: PDF skill with "Quick Start" → "Merge PDFs" → "Split PDFs" → "Extract Text"
-- Structure: ## Overview → ## Quick Start → ## Task Category 1 → ## Task Category 2...
-
-**3. Reference/Guidelines** (best for standards or specifications)
-- Works well for brand guidelines, coding standards, or requirements
-- Example: Brand styling with "Brand Guidelines" → "Colors" → "Typography" → "Features"
-- Structure: ## Overview → ## Guidelines → ## Specifications → ## Usage...
-
-**4. Capabilities-Based** (best for integrated systems)
-- Works well when the skill provides multiple interrelated features
-- Example: Product Management with "Core Capabilities" → numbered capability list
-- Structure: ## Overview → ## Core Capabilities → ### 1. Feature → ### 2. Feature...
-
-Patterns can be mixed and matched as needed. Most skills combine patterns (e.g., start with task-based, add workflow for complex operations).
-
-Delete this entire "Structuring This Skill" section when done - it's just guidance.]
-
-## [TODO: Replace with the first main section based on chosen structure]
-
-[TODO: Add content here]
 
 ## Examples
 
-[TODO: Add 3-5 diverse examples wrapped in <example> tags]
+[TODO: Replace these 3 placeholders with diverse, realistic examples.
+Include at least one edge case. Keep input/output pairs concrete.]
 
 <example>
-**User request**: "[TODO: Example user input]"
-**Action**: [TODO: What the skill does]
-**Output**: [TODO: Expected result]
+**User request:** "[TODO: Typical use case]"
+**Action:** [TODO: What the skill does]
+**Output:** [TODO: Expected result]
 </example>
 
 <example>
-**User request**: "[TODO: Different use case]"
-**Action**: [TODO: What the skill does]
-**Output**: [TODO: Expected result]
+**User request:** "[TODO: Different use case]"
+**Action:** [TODO: What the skill does]
+**Output:** [TODO: Expected result]
 </example>
 
 <example>
-**User request**: "[TODO: Edge case or alternative scenario]"
-**Action**: [TODO: What the skill does]
-**Output**: [TODO: Expected result]
+**User request:** "[TODO: Edge case or error scenario]"
+**Action:** [TODO: What the skill does]
+**Output:** [TODO: Expected result]
 </example>
 
-## Resources
-
-This skill includes example resource directories that demonstrate how to organize different types of bundled resources:
-
-### scripts/
-Executable code (Python/Bash/etc.) that can be run directly to perform specific operations.
-
-**Examples from other skills:**
-- PDF skill: `fill_fillable_fields.py`, `extract_form_field_info.py` - utilities for PDF manipulation
-- DOCX skill: `document.py`, `utilities.py` - Python modules for document processing
-
-**Appropriate for:** Python scripts, shell scripts, or any executable code that performs automation, data processing, or specific operations.
-
-**Note:** Scripts may be executed without loading into context, but can still be read by Claude for patching or environment adjustments.
-
-### references/
-Documentation and reference material intended to be loaded into context to inform Claude's process and thinking.
-
-**Examples from other skills:**
-- Product management: `communication.md`, `context_building.md` - detailed workflow guides
-- BigQuery: API reference documentation and query examples
-- Finance: Schema documentation, company policies
-
-**Appropriate for:** In-depth documentation, API references, database schemas, comprehensive guides, or any detailed information that Claude should reference while working.
-
-### assets/
-Files not intended to be loaded into context, but rather used within the output Claude produces.
-
-**Examples from other skills:**
-- Brand styling: PowerPoint template files (.pptx), logo files
-- Frontend builder: HTML/React boilerplate project directories
-- Typography: Font files (.ttf, .woff2)
-
-**Appropriate for:** Templates, boilerplate code, document templates, images, icons, fonts, or any files meant to be copied or used in the final output.
-
----
-
-**Any unneeded directories can be deleted.** Not every skill requires all three types of resources.
+Delete any unneeded resource directories (scripts/, references/, assets/).
 """
 
 EXAMPLE_SCRIPT = '''#!/usr/bin/env python3

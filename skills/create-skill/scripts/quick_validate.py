@@ -255,12 +255,12 @@ def validate_skill(skill_path):
         if not has_trigger:
             warnings.append("⚠️  Description should include trigger conditions (e.g., 'Use when...')")
 
-    # Check SKILL.md line count (review-skill: under 500 lines)
-    body_lines = len(body.strip().splitlines())
-    if body_lines > 500:
-        warnings.append(f"⚠️  SKILL.md body is {body_lines} lines (should be under 500 for review-skill)")
-    elif body_lines > 300:
-        warnings.append(f"ℹ️  SKILL.md body is {body_lines} lines (under 300 recommended for Grade A)")
+    # Check SKILL.md total line count (review-skill rubric: under 400 for Grade A, under 500 for Grade B)
+    total_lines = len(content.splitlines())
+    if total_lines > 500:
+        warnings.append(f"⚠️  SKILL.md is {total_lines} lines (must be under 500 for Grade B)")
+    elif total_lines > 400:
+        warnings.append(f"ℹ️  SKILL.md is {total_lines} lines (under 400 for Grade A, under 500 for Grade B)")
 
     # Check for loose .md files in root (only SKILL.md allowed)
     loose_md = [

@@ -149,7 +149,46 @@ Surface-level reasoning is prohibited. If the analysis feels easy, dig deeper un
 
 ## Examples
 
-See `references/examples.md` for two full worked examples (Problem-Solving and Software Engineering domains). Each domain reference file contains 2-3 additional domain-specific examples.
+Three compact examples below. See `references/examples.md` for full worked examples. Each domain reference file contains 2-3 additional domain-specific examples.
+
+<example>
+**Prompt:** ULTRATHINK: Our deployment pipeline fails every Friday but works Monday-Thursday.
+
+**Domain detected:** Problem-Solving
+**Lenses:** Human, Structural, Inclusivity, Sustainability + Root Cause Diagnosis
+
+**Deep Reasoning Chain:** Three approaches investigated (environment diff, temporal analysis, load analysis). Root cause found via 5 Whys: log aggregation job runs Thursday night, fills /tmp, causing disk exhaustion before Friday builds.
+
+**Edge Cases:** Multiple overlapping root causes, intermittent reproduction, fix breaking compliance retention.
+
+**Deliverable:** Diagnosis report with layered findings (symptom, proximate cause, root cause, systemic factor). Three-phase fix: immediate (move log output), short-term (disk monitoring at 80%), long-term (isolated storage). Validation experiment: manual Friday deploy, monitor 3 consecutive Fridays.
+</example>
+
+<example>
+**Prompt:** ULTRATHINK: Should we enter the European market this year or double down on US growth?
+
+**Domain detected:** Strategy
+**Lenses:** Human, Structural, Inclusivity, Sustainability + Probabilistic Reasoning
+
+**Deep Reasoning Chain:** Three approaches (full EU launch, US-only with EU pilot, deferred partnership). Probability-weighted: P(full launch ROI in 18mo) ~25%, P(pilot validates demand) ~70%. Pre-mortem: "Burned $600K with 3 customers because we underestimated localisation." Runway constraint eliminates full launch.
+
+**Edge Cases:** Pilot churn from incomplete localisation, board interpreting pilot as lack of ambition, regulatory surprise (Digital Markets Act).
+
+**Deliverable:** Recommendation table with assumptions, confidence levels, and falsification signals. Phased action plan with gate review at $100K ARR from pilot cohort. Explicit sacrifice stated: 6 months slower than full launch.
+</example>
+
+<example>
+**Prompt:** ULTRATHINK: This blog post loses the reader at paragraph 4. Help me restructure it.
+
+**Domain detected:** Writing
+**Lenses:** Human, Structural, Inclusivity, Sustainability + Aesthetic Judgment
+
+**Deep Reasoning Chain:** Three approaches (inverted pyramid, problem-solution-evidence, narrative arc). Diagnosis: paragraphs 1-3 are throat-clearing with no stakes. The author's sharpest observation is buried in paragraph 5. Problem-solution-evidence fits the time-poor tech manager audience.
+
+**Edge Cases:** Author resists restructuring (attached to chronological setup), multiple audiences (managers and ICs), SEO vs. readability tension.
+
+**Deliverable:** Restructured outline with editorial annotations. Hook moved to paragraph 1. Each paragraph earns the next. Closing echoes the opening for structural completeness.
+</example>
 
 ## Scope
 
