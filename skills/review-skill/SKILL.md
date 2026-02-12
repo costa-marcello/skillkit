@@ -15,6 +15,14 @@ The target skill to review is: `$ARGUMENTS`
 
 If `$ARGUMENTS` is empty, ask the user which skill to review.
 
+## Pre-Flight Check
+
+Before starting any mode, verify the target skill exists:
+
+1. Check the target path contains a `SKILL.md` file. If not, report "No SKILL.md found at [path]" and stop.
+2. List all files in the skill directory and `references/` (if present) to build a complete file inventory.
+3. Record the initial line count of `SKILL.md` with `wc -l`.
+
 ## Mode Selection
 
 | Mode | Trigger | Action |
@@ -73,6 +81,8 @@ python3 "$CREATE_SKILL"/scripts/security_scan.py <target-skill> --verbose
 - [ ] Deep review covers all 6 criteria from `references/research-backed-criteria.md`
 
 **Step 7: Present report, then proceed to auto-fix.** After showing the full review report, automatically apply all recommended fixes using the Auto-Fix procedure (Mode 2). Do not wait for user confirmation. The review informs the fix -- every finding from Steps 2-4 becomes a fix target.
+
+**Step 8: Post-fix verification.** After auto-fix completes, re-run Steps 2-4 against the modified skill. If any issues remain, fix them. Repeat until 0 major and 0 minor issues remain. Report the final grade with before/after comparison.
 
 <example>
 **Review + Auto-Fix Report Format:**
@@ -136,15 +146,16 @@ Automatically refactor a skill to meet best practices. When triggered by Mode 1 
 
 ```
 Auto-Fix Progress:
-- [ ] Step 1: Read SKILL.md and all loose files
-- [ ] Step 2: Run evaluation, identify issues
-- [ ] Step 3: Fix frontmatter (description, context: fork)
+- [ ] Step 1: Read SKILL.md and all files in root, references/, scripts/, assets/
+- [ ] Step 2: Run structural check (evaluation-checklist.md), content quality check (content-quality-checklist.md), deep review (research-backed-criteria.md). List every issue with file path and line number.
+- [ ] Step 3: Fix frontmatter (description, context: fork, missing fields)
 - [ ] Step 4: Create references/ folder if needed
 - [ ] Step 5: Move content over 500 lines to references/
 - [ ] Step 6: Move loose files to references/ with clear names
 - [ ] Step 7: Update SKILL.md references section
-- [ ] Step 8: Verify final line count under 500
-- [ ] Step 9: Generate summary of changes (files modified, issues fixed, before/after line counts)
+- [ ] Step 8: Verify final line count under 400 (Grade A target) or under 500 (Grade B minimum)
+- [ ] Step 9: Run evaluation again to confirm 0 major and 0 minor issues remain
+- [ ] Step 10: Generate summary of changes (files modified, issues fixed, before/after line counts, final grade)
 ```
 
 **Auto-Fix Actions:**
@@ -165,8 +176,8 @@ Auto-Fix Progress:
 | Vague instructions ("consider", "ensure") | Rewrite with strong verbs ("check", "verify", "run") |
 | Too many options without default | Add recommended default + escape hatch pattern |
 | Missing feedback loop | Add validation checkpoint before destructive actions |
-| Verbose explanations Claude knows | Flag for condensing (manual review) |
-| Time-sensitive content | Flag for removal or add deprecation notice |
+| Verbose explanations Claude knows | Delete paragraphs that explain common concepts (JSON, APIs, HTTP). If the paragraph answers "Does Claude already know this?" with yes, remove it. |
+| Time-sensitive content | Remove date-conditional logic. Replace pinned versions with "latest" plus a comment noting the version at time of writing. Wrap deprecated approaches in `<details>` with a deprecation label. |
 | Scripts with bare `except:` | Add specific error handling with recovery actions |
 | No examples provided | Add 3-5 diverse `<example>` blocks |
 | Plain text structure (no delimiters) | Add XML tags (`<instructions>`, `<context>`) |
@@ -223,15 +234,64 @@ Skill `changelog` analysed. 280 lines, all checks pass. No fixes needed.
 - `ui-reference.md` + `official-ui-reference.md` → `references/cli-reference.md` (merge)
 </example>
 
+<example>
+**Auto-Fix: Grade D skill with multiple major issues**
+
+Before (SKILL.md, 720 lines):
+```yaml
+---
+name: api-tester
+description: "Test your APIs"
+license: MIT
+---
+```
+Issues found:
+- (M1) 720 lines, over 500-line limit
+- (M8) Description imperative ("Test your") + no "Use when..." triggers
+- (M2) Missing `context: fork` despite `<instructions>` tags and script references
+- (M7) 4 directives use "ensure" or "handle appropriately" with no defaults
+- (m1) Lines 50-80 explain what REST APIs are
+- (m8) 2 loose `.md` files in root beside SKILL.md
+
+After (SKILL.md, 310 lines):
+```yaml
+---
+name: api-tester
+description: "Tests REST and GraphQL API endpoints with automated assertions. Use when validating API contracts, running regression tests, or checking response schemas."
+license: MIT
+context: fork
+agent: general-purpose
+---
+```
+- Description rewritten: third-person + three triggers
+- `context: fork` added
+- 410 lines extracted to `references/api-patterns.md` and `references/schema-validation.md`
+- 4 vague directives replaced: "ensure response is valid" became "run `python3 scripts/validate_response.py --schema expected.json`"
+- REST explanation deleted (Claude knows what REST is)
+- Loose files moved: `common-headers.md` -> `references/http-headers.md`, `auth-flows.md` -> `references/authentication.md`
+
+**Changes summary:** 6 major + 2 minor issues fixed, 2 files reorganised, line count reduced from 720 to 310. Grade improved from D to A.
+</example>
+
 </instructions>
 
 <instructions>
 
 ## Mode 3: External Review
 
-Review a skill from an external GitHub repository without modifying it. Clone to `/tmp/review-target`, identify the author's intent, run all three evaluation checks (structural, content quality, deep review), generate a read-only improvement report with strengths and findings, then delete the clone.
+Review a skill from an external GitHub repository without modifying it.
 
-Read `references/mode-external-review.md` for the full step-by-step procedure.
+Read `references/mode-external-review.md` for the full step-by-step procedure. If the reference fails to load, follow this inline summary:
+
+1. Clone: `git clone <github-url> /tmp/review-target`
+2. Read all files: SKILL.md first, then references/, scripts/, assets/.
+3. Identify intent: What problem does the skill solve? Who uses it? What workflow does it automate?
+4. Run all three evaluations (structural, content quality, deep review) using the same checklists as Mode 1 Steps 2-4.
+5. Generate read-only report: strengths first, then findings with file paths and line numbers, ranked by severity.
+6. Verify report: every finding has file path + line number, grade matches rubric, fixes use strong verbs.
+7. Clean up: `rm -rf /tmp/review-target`
+
+Do not modify any files. Report only.
 
 </instructions>
 
@@ -239,9 +299,19 @@ Read `references/mode-external-review.md` for the full step-by-step procedure.
 
 ## Mode 4: Auto-PR
 
-Fork an external skill repository, improve it, and submit a pull request. Run a full deep review, apply auto-fix using the findings, verify all changes are additive (no deletions, no functionality removed), pass the self-review respect check, then create a PR with summary, rationale, and test plan.
+Fork an external skill repository, improve it, and submit a pull request.
 
-Read `references/mode-auto-pr.md` for the full step-by-step procedure. Use `references/pr-template.md` for the PR format.
+Read `references/mode-auto-pr.md` for the full procedure and `references/pr-template.md` for the PR format. If references fail to load, follow this inline summary:
+
+1. Fork: `gh repo fork <github-url> --clone --remote`
+2. Branch: `git checkout -b refactor/skill-best-practices`
+3. Run full deep review (Mode 1 Steps 2-4).
+4. Apply Auto-Fix (Mode 2) using review findings.
+5. Self-review respect check -- verify: no files deleted, no functionality removed, original language preserved, all changes additive.
+6. Create PR with: summary, what is NOT changed, rationale for each change, test plan.
+7. Use `gh pr create` with the template from `references/pr-template.md`.
+
+Core principle: additive only. Do not delete files or remove functionality.
 
 </instructions>
 
