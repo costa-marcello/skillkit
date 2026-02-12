@@ -3,8 +3,6 @@ name: research
 description: "Researches any topic by dispatching 6-10 parallel sub-agents across community discussions and official sources. Use when user wants deep research, topic analysis, community sentiment, or asks 'what's new with X'."
 license: MIT
 argument-hint: "[topic]"
-context: fork
-agent: general-purpose
 ---
 
 <instructions>
