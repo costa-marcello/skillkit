@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - Fixed missing `license` field in mermaid-diagrams SKILL.md frontmatter
 - Fixed invalid YAML in research skill `argument-hint` that broke frontmatter parsing in the skill installer
 - Fixed missing `license: MIT` field in 9 skills (changelog, ci-cd, codex, frontend-design, gemini, orla3-production, production-audit, research, smart-merge)
+- Fixed research skill unable to dispatch parallel subagents by removing `context: fork` that blocked nested Task tool access
 
 ## [0.2.0] - 2026-02-09
 
