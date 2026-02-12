@@ -1,6 +1,6 @@
 ---
 name: cc-hooks
-description: "Creates event-driven hooks for Claude Code automation. Use when building PreToolUse guards, PostToolUse formatters, Stop hooks for testing, SessionStart environment setup, agent-based verification gates, or integrating Claude Code with CI/CD pipelines."
+description: "Creates and improves event-driven hooks for Claude Code automation. Use when building, debugging, or refactoring PreToolUse guards, PostToolUse formatters, Stop hooks for testing, SessionStart environment setup, agent-based verification gates, or integrating Claude Code with CI/CD pipelines."
 license: MIT
 context: fork
 agent: general-purpose
@@ -9,12 +9,13 @@ agent: general-purpose
 # Claude Code Hooks -- Reference
 
 <context>
-This skill provides the definitive reference for creating Claude Code hooks -- event-driven scripts that respond to lifecycle events.
+This skill provides the definitive reference for creating and improving Claude Code hooks -- event-driven scripts that respond to lifecycle events.
 
 **When to use:**
 
-- Building event-driven automation for Claude Code
-- Creating PreToolUse guards to block dangerous commands
+- Building or improving event-driven automation for Claude Code
+- Creating or refactoring PreToolUse guards to block dangerous commands
+- Debugging hooks that fail silently or produce unexpected results
 - Implementing PostToolUse formatters, linters, or auditors
 - Adding Stop hooks for testing or notifications
 - Setting up SessionStart/SessionEnd for environment management
@@ -377,5 +378,8 @@ All matching hooks run in parallel. If you need strict ordering (format, then li
 
 ## References
 
-- [references/hook-templates.md](references/hook-templates.md) -- Ready-to-use bash templates for pre-tool validation, post-tool formatting, security audit, stop hooks, session start, context re-injection, async test runner, session state persistence, MCP audit logging, and infinite loop guard
-- [references/debugging-and-pitfalls.md](references/debugging-and-pitfalls.md) -- Manual hook testing, debug logging, verbose output, and common pitfalls (infinite loops, broken JSON, slow hooks, supply chain risk)
+- [references/hook-templates.md](references/hook-templates.md) -- 16 ready-to-use templates: pre-tool validation, post-tool formatting, security audit, stop hooks, session start/end, context re-injection, async test runner, session state persistence, MCP audit logging, infinite loop guard, desktop notifications, bash logging, protected files, sprint context, session archiving
+- [references/input-output-schemas.md](references/input-output-schemas.md) -- Per-event JSON schemas (stdin input and stdout output) for all 14 hook events, plus tool-specific `tool_input` fields for Bash, Write, Edit, Read, Grep, Glob, and MCP tools
+- [references/command-vs-prompt.md](references/command-vs-prompt.md) -- Decision tree for choosing between command, prompt, and agent hook types. Performance comparison, prompt authoring guidance, and combining strategies
+- [references/tool-names.md](references/tool-names.md) -- Complete tool name reference (19+ built-in tools, MCP naming convention), advanced matcher patterns (anchored, negative lookahead, case-insensitive), and common matcher mistakes
+- [references/troubleshooting.md](references/troubleshooting.md) -- Step-by-step diagnostics for hooks not triggering, command failures, prompt issues, infinite loops, output visibility, timeouts, environment variables, and common pitfalls

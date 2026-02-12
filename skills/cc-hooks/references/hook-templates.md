@@ -404,3 +404,178 @@ exit 0
 
 **Behaviour:** Checks `stop_hook_active` first. If already in a Stop hook cycle, exits cleanly to break the loop. Otherwise runs tests and blocks on failure.
 </example>
+
+---
+
+## Desktop Notification (macOS)
+
+Sends a macOS notification when Claude needs input.
+
+<example>
+**Notification Hook** (settings.json)
+
+```json
+{
+  "Notification": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "osascript -e 'display notification \"Claude needs your input\" with title \"Claude Code\" sound name \"Glass\"'"
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Behaviour:** Fires when Claude pauses for user input. Shows a native macOS notification with sound.
+
+For Linux, replace with: `notify-send 'Claude Code' 'Awaiting your input' --urgency=normal`
+</example>
+
+---
+
+## Bash Command Logger
+
+Logs every bash command to a file for audit.
+
+<example>
+**PreToolUse Logger** (`bash-logger.sh`)
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+INPUT="$(cat)"
+TOOL_NAME="$(echo "$INPUT" | jq -r '.tool_name')"
+CMD="$(echo "$INPUT" | jq -r '.tool_input.command // empty')"
+TIMESTAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+if [[ "$TOOL_NAME" == "Bash" && -n "$CMD" ]]; then
+  echo "{\"timestamp\":\"$TIMESTAMP\",\"command\":$(echo "$CMD" | jq -Rs .)}" \
+    >> "$CLAUDE_PROJECT_DIR/.claude/bash-audit.jsonl"
+fi
+
+exit 0
+```
+
+**Behaviour:** Appends a JSON line for every Bash command. Does not block execution.
+</example>
+
+---
+
+## Protected Files Guard
+
+Blocks writes to files that should not be modified by Claude.
+
+<example>
+**Protected Files Hook** (`check-protected.sh`)
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+INPUT="$(cat)"
+FILE_PATH="$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')"
+
+PROTECTED=(
+  "package-lock.json"
+  ".env.production"
+  "credentials.json"
+  ".claude/settings.json"
+)
+
+for PATTERN in "${PROTECTED[@]}"; do
+  if [[ "$FILE_PATH" == *"$PATTERN" ]]; then
+    jq -cn --arg reason "Cannot modify $PATTERN -- protected file" '{
+      hookSpecificOutput: {
+        hookEventName: "PreToolUse",
+        permissionDecision: "deny",
+        permissionDecisionReason: $reason
+      }
+    }'
+    exit 0
+  fi
+done
+
+exit 0
+```
+
+Settings matcher: `"matcher": "Write|Edit"`
+
+**Behaviour:** Denies writes to protected files. Add or remove patterns from the `PROTECTED` array.
+</example>
+
+---
+
+## Sprint Context Loader
+
+Injects project context at session start from a file.
+
+<example>
+**SessionStart Context Hook** (`load-context.sh`)
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+CONTEXT_FILE="$CLAUDE_PROJECT_DIR/.claude/sprint-context.txt"
+
+if [[ -f "$CONTEXT_FILE" ]]; then
+  cat "$CONTEXT_FILE"
+else
+  echo "No sprint context found at $CONTEXT_FILE"
+fi
+
+exit 0
+```
+
+**Behaviour:** Reads `.claude/sprint-context.txt` and injects its contents into Claude's context at session start. Create the file with your current sprint goals, active branches, or team conventions.
+</example>
+
+---
+
+## Session Transcript Archiver
+
+Archives the session transcript when the session ends.
+
+<example>
+**SessionEnd Archive Hook** (`archive-session.sh`)
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+INPUT="$(cat)"
+TRANSCRIPT="$(echo "$INPUT" | jq -r '.transcript_path // empty')"
+SESSION_ID="$(echo "$INPUT" | jq -r '.session_id // "unknown"')"
+
+if [[ -n "$TRANSCRIPT" && -f "$TRANSCRIPT" ]]; then
+  ARCHIVE_DIR="$CLAUDE_PROJECT_DIR/.claude/archives"
+  mkdir -p "$ARCHIVE_DIR"
+  TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+  cp "$TRANSCRIPT" "$ARCHIVE_DIR/${TIMESTAMP}-${SESSION_ID}.jsonl"
+fi
+
+exit 0
+```
+
+Settings:
+```json
+{
+  "SessionEnd": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/archive-session.sh"
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Behaviour:** Copies the session transcript to `.claude/archives/` with a timestamp prefix. Useful for compliance, debugging, or building training data.
+</example>
