@@ -152,12 +152,15 @@ Create atmosphere and depth rather than defaulting to solid colors. Add contextu
 | Purple gradients on white backgrounds | Cliché, seen everywhere |
 | Predictable layouts and component patterns | Template-like, not designed |
 | Cookie-cutter design lacking context | No character, forgettable |
+| Converging on common choices across generations | Every output looks the same — the opposite of design |
 
 **If it looks like a template, it is wrong.** Templates are starting points to escape from, not destinations.
 
 **Match implementation complexity to aesthetic vision:**
 - Maximalist designs need elaborate code with extensive animations
 - Minimalist designs need restraint, precision, careful spacing
+
+**No two designs should look the same.** Vary between light and dark themes, different fonts, different aesthetics. Interpret creatively and make unexpected choices that feel genuinely designed for the context.
 
 ---
 
