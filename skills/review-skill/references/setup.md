@@ -18,7 +18,7 @@ You should see `quick_validate.py` and `security_scan.py`.
 
 ## Manual Fallback
 
-If installation fails, use manual evaluation via `references/evaluation_checklist.md`.
+If installation fails, use manual evaluation via `references/evaluation-checklist.md`.
 
 ## Validation Commands
 

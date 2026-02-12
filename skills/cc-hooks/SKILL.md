@@ -262,7 +262,7 @@ Response schema:
 
 For complex decisions, use LLM-evaluated hooks (`type: "prompt"`) instead of bash scripts. They are most useful for `Stop` and `SubagentStop` decisions.
 
-Use command hooks for fast, deterministic checks. Use prompt hooks for nuanced decisions:
+Default to command hooks for fast, deterministic checks. Use prompt hooks only when the decision requires natural language reasoning:
 
 ```json
 {
@@ -296,9 +296,9 @@ Matchers filter which tool triggers the hook:
 All hook templates already demonstrate `set -euo pipefail`, quoted variables, and absolute paths. Beyond those defaults, check for:
 
 - No `eval` with untrusted input (stdin JSON is attacker-controlled)
-- Keep hooks fast (<1 second) to avoid blocking Claude
-- Log actions for audit trails
-- Test hooks manually before deploying (see [references/debugging-and-pitfalls.md](references/debugging-and-pitfalls.md))
+- Target <1 second execution per hook. Profile with `time bash .claude/hooks/your-hook.sh < test-input.json` if a hook exceeds this
+- Append structured JSON lines to an audit log file (see the Bash Command Logger and MCP Audit Logger templates in [references/hook-templates.md](references/hook-templates.md))
+- Test hooks manually before deploying (see [references/troubleshooting.md](references/troubleshooting.md))
 
 ---
 
@@ -378,7 +378,7 @@ All matching hooks run in parallel. If you need strict ordering (format, then li
 
 ## References
 
-- [references/hook-templates.md](references/hook-templates.md) -- 16 ready-to-use templates: pre-tool validation, post-tool formatting, security audit, stop hooks, session start/end, context re-injection, async test runner, session state persistence, MCP audit logging, infinite loop guard, desktop notifications, bash logging, protected files, sprint context, session archiving
+- [references/hook-templates.md](references/hook-templates.md) -- 15 ready-to-use templates: pre-tool validation, post-tool formatting, security audit, stop hooks, session start/end, context re-injection, async test runner, session state persistence, MCP audit logging, infinite loop guard, desktop notifications, bash logging, protected files, sprint context, session archiving
 - [references/input-output-schemas.md](references/input-output-schemas.md) -- Per-event JSON schemas (stdin input and stdout output) for all 14 hook events, plus tool-specific `tool_input` fields for Bash, Write, Edit, Read, Grep, Glob, and MCP tools
 - [references/command-vs-prompt.md](references/command-vs-prompt.md) -- Decision tree for choosing between command, prompt, and agent hook types. Performance comparison, prompt authoring guidance, and combining strategies
 - [references/tool-names.md](references/tool-names.md) -- Complete tool name reference (19+ built-in tools, MCP naming convention), advanced matcher patterns (anchored, negative lookahead, case-insensitive), and common matcher mistakes

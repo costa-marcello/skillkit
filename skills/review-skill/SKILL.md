@@ -47,7 +47,7 @@ python3 "$CREATE_SKILL"/scripts/quick_validate.py <target-skill>
 python3 "$CREATE_SKILL"/scripts/security_scan.py <target-skill> --verbose
 ```
 
-**Step 2: Structural evaluation** -- Read `references/evaluation_checklist.md` and check every item against the target skill. Record pass/fail for each item with the file path and line number of the finding.
+**Step 2: Structural evaluation** -- Read `references/evaluation-checklist.md` and check every item against the target skill. Record pass/fail for each item with the file path and line number of the finding.
 
 **Step 3: Content quality evaluation** -- Read `references/content-quality-checklist.md` and evaluate all 8 dimensions (degrees of freedom, conciseness, actionability, options overload, script quality, feedback loops, consistency, time-sensitive content). Record findings per dimension.
 
@@ -63,7 +63,7 @@ python3 "$CREATE_SKILL"/scripts/security_scan.py <target-skill> --verbose
 - Executive summary table (aspect, grade, notes)
 - Section-by-section findings with file paths and line numbers
 - Deep review results table (criterion, verdict, evidence)
-- Combined grade using the unified rubric from `references/evaluation_checklist.md`
+- Combined grade using the unified rubric from `references/evaluation-checklist.md`
 - Recommended fixes ranked by severity (major first, then minor)
 
 **Step 6: Verify report** before presenting:
@@ -209,6 +209,14 @@ agent: general-purpose
 </example>
 
 <example>
+**Auto-Fix: No issues found (Grade A skill)**
+
+Skill `changelog` analysed. 280 lines, all checks pass. No fixes needed.
+
+**Changes summary:** 0 issues found, 0 files changed. Skill meets Grade A criteria.
+</example>
+
+<example>
 **File Naming When Moving**
 - `learn.md` → `references/learning-guide.md`
 - `reference.md` → `references/[descriptive-name].md`
@@ -221,7 +229,9 @@ agent: general-purpose
 
 ## Mode 3: External Review
 
-Read `references/mode-external-review.md` for the full procedure. Clone the target to `/tmp/review-target`, run the same three evaluation checks as Mode 1 Steps 2-4, generate a read-only improvement report, then clean up.
+Review a skill from an external GitHub repository without modifying it. Clone to `/tmp/review-target`, identify the author's intent, run all three evaluation checks (structural, content quality, deep review), generate a read-only improvement report with strengths and findings, then delete the clone.
+
+Read `references/mode-external-review.md` for the full step-by-step procedure.
 
 </instructions>
 
@@ -229,7 +239,9 @@ Read `references/mode-external-review.md` for the full procedure. Clone the targ
 
 ## Mode 4: Auto-PR
 
-Read `references/mode-auto-pr.md` for the full procedure. Fork the repository, run a full deep review, apply auto-fix, pass the self-review respect check, then submit a PR using `references/pr_template.md`.
+Fork an external skill repository, improve it, and submit a pull request. Run a full deep review, apply auto-fix using the findings, verify all changes are additive (no deletions, no functionality removed), pass the self-review respect check, then create a PR with summary, rationale, and test plan.
+
+Read `references/mode-auto-pr.md` for the full step-by-step procedure. Use `references/pr-template.md` for the PR format.
 
 </instructions>
 
@@ -237,14 +249,14 @@ Read `references/mode-auto-pr.md` for the full procedure. Fork the repository, r
 
 | File | Purpose | Used By |
 |------|---------|---------|
-| `references/evaluation_checklist.md` | Structural validation + unified grading rubric | Review, Auto-Fix |
+| `references/evaluation-checklist.md` | Structural validation + unified grading rubric | Review, Auto-Fix |
 | `references/content-quality-checklist.md` | Content effectiveness (8 dimensions) | Review, Auto-Fix |
 | `references/research-backed-criteria.md` | Deep review with academic citations | All modes (always runs) |
 | `references/script-quality.md` | Script error handling, constants | Review, Auto-Fix |
 | `references/feedback-loops.md` | Multi-step workflow validation | Review, Auto-Fix |
 | `references/mode-external-review.md` | Full External Review procedure | External Review |
 | `references/mode-auto-pr.md` | Full Auto-PR procedure with respect checks | Auto-PR |
-| `references/pr_template.md` | PR description template | Auto-PR |
+| `references/pr-template.md` | PR description template | Auto-PR |
 | `references/marketplace_template.json` | marketplace.json template | Auto-PR |
 | `references/sources.md` | Bibliography | Review (deep) |
 | `references/setup.md` | create-skill installation | Setup |

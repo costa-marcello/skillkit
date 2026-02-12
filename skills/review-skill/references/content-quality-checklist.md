@@ -1,6 +1,6 @@
 # Content Quality Checklist
 
-Evaluates skill **effectiveness**, not just structure. Use alongside `evaluation_checklist.md` for complete reviews.
+Evaluates skill **effectiveness**, not just structure. Use alongside `evaluation-checklist.md` for complete reviews.
 
 Based on [Anthropic Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices).
 
@@ -322,7 +322,7 @@ This endpoint is no longer supported.
 
 ## Grading
 
-Use the **Unified Grading Rubric** in `evaluation_checklist.md`. Content quality findings feed into the same grade as structural findings.
+Use the **Unified Grading Rubric** in `evaluation-checklist.md`. Content quality findings feed into the same grade as structural findings.
 
 ---
 

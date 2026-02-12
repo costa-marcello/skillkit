@@ -15,7 +15,7 @@ git clone <github-url> /tmp/review-target
 - What workflow does it automate?
 
 **Step 4: Run full evaluation** -- Run the same three checks as Mode 1 Steps 2-4:
-1. Structural checks via `references/evaluation_checklist.md`
+1. Structural checks via `references/evaluation-checklist.md`
 2. Content quality via `references/content-quality-checklist.md`
 3. Deep review via `references/research-backed-criteria.md` (all 6 criteria: XML tags, example quality, defect taxonomy, anti-patterns, formatting, HELM metrics)
 

@@ -50,7 +50,7 @@ Instead:
 3. **Rationale** - Why each change helps
 4. **Test Plan** - How to verify
 
-Template: `references/pr_template.md`
+Template: `references/pr-template.md`
 
 ## Self-Review Before Submitting
 
