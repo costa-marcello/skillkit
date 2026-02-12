@@ -28,7 +28,6 @@
 | Rule | Do | Don't | Why |
 |------|----|----- |-----|
 | **Image optimization** | Use WebP, srcset, lazy loading | Uncompressed PNG, eager load all | Slow page load, wasted bandwidth |
-| **Reduced motion** | Check `prefers-reduced-motion` | Force animations on everyone | Triggers vestibular disorders |
 | **Content jumping** | Reserve space for async content | Let layout shift on load | Poor CLS score, jarring UX |
 
 ## Priority 4: Layout & Responsive (HIGH)

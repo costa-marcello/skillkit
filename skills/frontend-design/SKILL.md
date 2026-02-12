@@ -109,8 +109,6 @@ Use animations for effects and micro-interactions. Prioritize CSS-only solutions
 
 **Focus on high-impact moments:** One well-orchestrated page load with staggered reveals (`animation-delay`) creates more delight than scattered micro-interactions. Use scroll-triggering and hover states that surprise.
 
-**Always provide `prefers-reduced-motion` alternatives** for complex animations.
-
 ### Spatial Composition
 
 Unexpected layouts. Asymmetry. Overlap. Diagonal flow. Grid-breaking elements. Generous negative space OR controlled density.
@@ -137,7 +135,6 @@ Create atmosphere and depth rather than defaulting to solid colors. Add contextu
 
 | Rule | Do | Don't |
 |------|----|----- |
-| Reduced motion | Respect `prefers-reduced-motion` | Force animations on everyone |
 | Color contrast | 4.5:1 minimum for text | Light gray on white |
 | Focus states | Visible `:focus-visible` on all interactive | Remove outline with `outline-none` |
 | Semantic HTML | Use `<article>`, `<section>`, `<nav>`, `<main>` | `<div>` soup everywhere |
@@ -322,10 +319,8 @@ Create atmosphere and depth rather than defaulting to solid colors. Add contextu
 - Transitions match breathing rhythm (4s inhale, 4s exhale)
 
 ```css
-@media (prefers-reduced-motion: no-preference) {
-  .testimonial-card {
-    animation: breathe 8s ease-in-out infinite;
-  }
+.testimonial-card {
+  animation: breathe 8s ease-in-out infinite;
 }
 
 @keyframes breathe {
