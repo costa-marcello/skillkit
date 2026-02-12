@@ -34,16 +34,12 @@ Display omits Reddit/X stats lines. Report still delivers full two-sided analysi
 </example>
 
 <example>
-Edge case — Agent failure:
+Edge case — Graceful degradation:
 C4 returns empty or errors. Log "C4: dev communities — no results".
-Continue with C1-C3 data. Note gap in stats footer: "1 agent failed".
-</example>
-
-<example>
-Edge case — Sources disagree:
-Community (C2): "Tool A recommended (12 upvotes on HN)"
-Official (O1): "Tool B is the documented approach"
-Cross-reference: Mark as "Divergent" with both views attributed.
+Continue with remaining agents. Note gap in stats footer: "1 agent failed".
+Meanwhile, C2 says "Tool A recommended (12 upvotes on HN)" but O1 says
+"Tool B is the documented approach". Cross-reference marks this as
+"Divergent" with both views attributed.
 </example>
 
 ## Parse User Intent
@@ -80,11 +76,30 @@ API keys are optional. The skill always dispatches sub-agents regardless. Determ
 
 ## MCP Tool Detection
 
-Use `ToolSearch` with query `"brave search"` to check for Brave MCP tools. Record as `AVAILABLE_MCP_TOOLS`.
+Discover available search MCP tools before dispatching agents. Run `ToolSearch` for EACH query below and record every tool found as `AVAILABLE_MCP_TOOLS`:
+
+| Query | Known tool names |
+|-------|-----------------|
+| `"searxng"` | `searxng_web_search`, `web_url_read` |
+| `"brave search"` | `brave_web_search`, `brave_news_search`, `brave_local_search`, `brave_image_search`, `brave_video_search` |
+| `"exa"` | `exa_search`, `exa_find_similar`, `exa_get_contents` |
+| `"tavily"` | `tavily_search`, `tavily_extract` |
+| `"firecrawl"` | `firecrawl_search`, `firecrawl_scrape`, `firecrawl_crawl`, `firecrawl_map` |
+| `"perplexity"` | `perplexity_ask` |
+| `"jina"` | `jina_search`, `jina_read_url` |
+| `"kagi"` | `kagi_search`, `kagi_summarize` |
+| `"serper"` | `serper_google_search`, `serper_news_search` |
+| `"google search"` | `google_web_search` |
+
+Run all ToolSearch calls in a single parallel message. Any tool that appears in the results is loaded and available.
 
 Construct the `MCP_TOOLS` instruction block embedded into every sub-agent prompt:
-- **Brave available**: Use `brave_web_search` and `brave_news_search` as PRIMARY tools; fall back to `WebSearch` only on errors
-- **No MCP tools**: Use `WebSearch` for all queries
+
+- **MCP tools found**: List discovered tools by name. Instruct agents to use them as PRIMARY search tools, falling back to harness tools only on errors or empty results.
+- **No MCP tools found**: Instruct agents to use harness-provided tools in this order:
+  1. `WebSearch` / `WebFetch` (Claude Code built-in)
+  2. `antigravity_search` / Antigravity search tools (if available)
+  3. `codex_search` / Codex search tools (if available)
 
 <context>
 State: MCP_TOOLS instruction block is defined. Script runs synchronously.
@@ -114,7 +129,7 @@ Dependencies: MCP_TOOLS block embedded in every sub-agent prompt.
 
 ## Phase 2: Sub-Agent Dispatch
 
-**HARD RULE:** You MUST dispatch the exact number of agents below. Do NOT reduce the count. Do NOT dispatch generic agents. Each agent MUST target its specific focus area.
+Dispatch the exact agent count below. Each agent targets its specific focus area -- do not reduce the count or use generic agents.
 
 ### Step 1: Read Prompt Templates
 
@@ -231,9 +246,7 @@ Most Mentioned:
 3. [Specific name] - mentioned {n}x (sources)
 
 Notable mentions: [other specific things with 1-2 mentions]
-</example>
 
-<example>
 If PROMPTING/NEWS/GENERAL:
 
 What the community is saying:

@@ -12,22 +12,26 @@ SEARCH STRATEGY (ordered by priority):
 1. First, check if MCP search tools are available:
    {MCP_TOOLS}
 2. For each query, use the highest-priority available tool
-3. Never skip step 1 — always attempt MCP tools before WebSearch
+3. Never skip step 1 — always attempt MCP tools before harness fallbacks
 
-Why: MCP tools return AI-summarized results that reduce context bloat
-and often provide higher-quality structured output.
+Why: MCP tools return structured results that reduce context bloat
+and often provide higher-quality output than built-in search.
 ```
 
-When `{MCP_TOOLS}` is populated with available tools:
+When `{MCP_TOOLS}` is populated with available tools, list them by name:
 ```
-- brave_web_search / brave_news_search → USE THESE FIRST (available)
-- Only fall back to WebSearch if Brave MCP returns errors or no results
+MCP search tools available — USE THESE FIRST:
+- [list each discovered tool by full name, e.g. searxng_web_search, brave_web_search]
+- Only fall back to harness tools if MCP tools return errors or no results
 ```
 
 When no MCP search tools are detected:
 ```
-- No MCP search tools detected in this session
-- Use WebSearch for all queries
+No MCP search tools detected. Use harness tools in this order:
+1. WebSearch / WebFetch (Claude Code built-in)
+2. antigravity_search / Antigravity tools (if available)
+3. codex_search / Codex tools (if available)
+Use whichever responds first with results.
 ```
 
 ---
