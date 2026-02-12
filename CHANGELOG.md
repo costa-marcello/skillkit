@@ -2,14 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.5.0] - 2026-02-12
 
 ### Added
 - Added Debug skill with four-phase root-cause methodology, tracing references, and test pressure scenarios
 - Added comprehensive reference docs for cc-hooks skill (input-output schemas, command-vs-prompt guide, tool-names list, troubleshooting, five hook templates)
 
 ### Changed
-- Renamed `hooks/` to `context-intelligence-hooks/` for clarity (**breaking**: update paths in `.claude/settings.json`)
+- **BREAKING**: Renamed `hooks/` to `context-intelligence-hooks/` (update paths in `.claude/settings.json`)
 - Improved 11 skills to Grade A compliance (cc-hooks, claude-md, create-skill, find-skills, frontend-design, mermaid-diagrams, production-audit, readme-md, smart-merge, ultrathink)
 - Hardened review-skill with pre-flight validation, post-fix re-evaluation loop, and actionable fix instructions
 - Improved changelog skill examples with concrete output snippets showing exact format
@@ -116,7 +116,7 @@ All notable changes to this project will be documented in this file.
 - Fixed script invocations and variable names after skill rename
 - Fixed review-skill over-specification and deduplicated steps
 
-[Unreleased]: https://github.com/costa-marcello/skillkit/compare/v0.4.0...HEAD
+[0.5.0]: https://github.com/costa-marcello/skillkit/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/costa-marcello/skillkit/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/costa-marcello/skillkit/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/costa-marcello/skillkit/compare/v0.1.0...v0.2.0
