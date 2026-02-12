@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-02-12
+
+### Added
+- Added animation patterns reference with spring, fade, and stagger recipes to frontend-design skill
+- Added UI improvement triggers to frontend-design skill for detecting enhancement opportunities
+- Added design variation and convergence anti-pattern to frontend-design skill
+- Added `argument-hint` and `$ARGUMENTS` support to readme-md and review-skill for direct slash command input
+- Added argument usage examples to README showing how skills accept inline parameters
+
+### Changed
+- Relaxed `prefers-reduced-motion` from strict enforcement to a recommended guideline in frontend-design skill
+- Standardised Inter font usage across frontend-design references for consistency
+- Removed redundant `.gitignore` from frontend-design skill directory
+
 ## [0.3.0] - 2026-02-10
 
 ### Added
@@ -10,8 +24,6 @@ All notable changes to this project will be documented in this file.
 - Added push-state detection to changelog skill to choose between Unreleased and versioned release automatically
 - Added validation loop and platform-specific rendering guidance to mermaid-diagrams skill
 - Added `agent` field to mermaid-diagrams skill for subagent context support
-- Added `argument-hint` and `$ARGUMENTS` support to readme-md and review-skill for direct slash command input
-- Added argument usage examples to README showing how skills accept inline parameters
 - Added install docs reference to research skill for clearer onboarding
 
 ### Changed
@@ -80,6 +92,7 @@ All notable changes to this project will be documented in this file.
 - Fixed script invocations and variable names after skill rename
 - Fixed review-skill over-specification and deduplicated steps
 
+[0.4.0]: https://github.com/costa-marcello/skillkit/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/costa-marcello/skillkit/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/costa-marcello/skillkit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/costa-marcello/skillkit/releases/tag/v0.1.0
