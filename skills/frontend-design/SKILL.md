@@ -92,7 +92,7 @@ Then build working front-end code that is:
 
 ### Typography
 
-Choose fonts that are beautiful, unique, and interesting. **Avoid generic fonts like Arial and Inter**; opt for distinctive choices that elevate aesthetics. Pair a distinctive display font with a refined body font.
+Choose fonts that are beautiful, unique, and interesting. **Avoid defaulting to generic fonts like Arial and Inter** — they signal template-level work. Opt for distinctive choices that elevate aesthetics. Pair a distinctive display font with a refined body font. Exception: Inter is acceptable for data-focused dashboards where neutral typography aids readability (see `references/style-guide.md`).
 
 **Default if uncertain:** Serif display (Playfair Display, Fraunces) + humanist sans body (Source Sans 3, Work Sans).
 
