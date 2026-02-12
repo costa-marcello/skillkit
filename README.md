@@ -5,7 +5,7 @@
 
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
   [![Skills](https://img.shields.io/badge/Skills-22-8B5CF6)](skills/)
-  [![Hooks](https://img.shields.io/badge/Hooks-3-3B82F6)](context-intelligence-hooks/)
+  [![Context Intelligence Hooks](https://img.shields.io/badge/Context_Intelligence_Hooks-3-3B82F6)](context-intelligence-hooks/)
 </div>
 
 ---
@@ -300,7 +300,7 @@ Audits a codebase for production readiness across six dimensions: API completene
 
 ---
 
-## Hooks: persistent memory across sessions
+## Context Intelligence Hooks: persistent memory across sessions
 
 Skills give your agent expertise. Hooks give it memory.
 
