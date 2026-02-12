@@ -1,6 +1,6 @@
 ---
 name: research
-description: "Researches any topic by dispatching 6-10 parallel sub-agents across community discussions and official sources. Use when user wants deep research, topic analysis, community sentiment, or asks 'what's new with X'."
+description: "Researches any topic by dispatching 6-10 parallel sub-agents across community discussions and official sources. Use when user wants to research something, asks 'what's new with X', needs recommendations, wants community opinions, or mentions analysing trends, news, or sentiment about any topic."
 license: MIT
 argument-hint: "[topic]"
 ---
@@ -114,20 +114,43 @@ Dependencies: MCP_TOOLS block embedded in every sub-agent prompt.
 
 ## Phase 2: Sub-Agent Dispatch
 
-Launch all agents in a single message with multiple Task tool calls for maximum parallelism.
+**HARD RULE:** You MUST dispatch the exact number of agents below. Do NOT reduce the count. Do NOT dispatch generic agents. Each agent MUST target its specific focus area.
 
-Refer to `references/subagent_prompts.md` for prompt templates and `references/source_categories.md` for source taxonomy.
+### Step 1: Read Prompt Templates
 
-### Agent Allocation
+Use the Read tool to read `references/subagent_prompts.md` BEFORE constructing any prompts. That file contains the Community Agent Template and Official Agent Template you must fill for each agent.
 
-Dispatch community agents (C1-C5) and official agents (O1-O5) in parallel. Agent count scales with depth:
-- `--quick`: 6 (3C + 3O) | default: 8 (4C + 4O) | `--deep`: 10 (5C + 5O)
+### Step 2: Agent Roles
 
-Build each prompt from templates in `references/subagent_prompts.md`, filling: `{TOPIC}`, `{QUERY_TYPE}`, `{FOCUS}`, `{QUERIES}`, `{DATE_FROM}`, `{MCP_TOOLS}`. Use `subagent_type: "general-purpose"`.
+Agent count by depth: `--quick` = 6 (3C + 3O) | default = 8 (4C + 4O) | `--deep` = 10 (5C + 5O)
 
-See `references/agent_allocation.md` for full agent roles, focus areas, and dispatch pattern.
+**Community agents** (exclude reddit.com and x.com from all searches):
 
-Dispatch all agents in a single message. Do not dispatch sequentially.
+| Agent | Focus | When Active |
+|-------|-------|-------------|
+| C1 | HN + tech forums (Lobsters, Stack Overflow) | Always |
+| C2 | Broader community (forums, Discourse, Product Hunt) | Always |
+| C3 | Niche communities + comparisons (review sites, specialised forums) | Always |
+| C4 | Developer/creator communities (Dev.to, GitHub Discussions, blogs) | default + deep |
+| C5 | International perspectives + user reviews (G2, Capterra, global forums) | deep only |
+
+**Official agents:**
+
+| Agent | Focus | When Active |
+|-------|-------|-------------|
+| O1 | Official docs + changelogs + release notes | Always |
+| O2 | Industry publications + analysis (Ars Technica, Wired, InfoQ) | Always |
+| O3 | Academic papers + research (arXiv, Google Scholar) | Always |
+| O4 | Government/institutional + standards bodies | default + deep |
+| O5 | Expert blogs + thought leadership | deep only |
+
+### Step 3: Dispatch
+
+For each agent, fill the matching template from `references/subagent_prompts.md` with: `{TOPIC}`, `{QUERY_TYPE}`, `{FOCUS}`, `{QUERIES}` (3-5 queries from `references/subagent_prompts.md` Query Generation tables), `{DATE_FROM}` (60 days ago), `{MCP_TOOLS}`.
+
+Every Task call uses `subagent_type: "general-purpose"` and a description matching the agent role (e.g. `"C1: HN + tech forums"`, `"O2: industry pubs"`).
+
+**Dispatch ALL agents in a SINGLE message with parallel Task calls. Do not dispatch sequentially.**
 
 ## Phase 3: Collect Results
 
@@ -286,9 +309,5 @@ See `references/prompt_generation.md` for the full prompt writing protocol, qual
 ## Context Memory
 
 After research completes, retain topic expertise for follow-up questions. See `references/context_memory.md` for full context retention protocol.
-
-## Installation and Usage
-
-For installation steps, API key setup, usage examples, and CLI options, see `references/readme.md`.
 
 </instructions>

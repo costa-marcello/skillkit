@@ -1,16 +1,16 @@
 ---
 name: changelog
-description: "Generates and updates CHANGELOG.md files from git history using Keep a Changelog format. Use when creating changelogs, adding release notes, documenting version history, or preparing release documentation."
+description: "Generates changelogs and manages releases. Use when updating changelogs, pushing changelog changes, preparing releases, or tagging versions."
 license: MIT
 context: fork
 agent: general-purpose
-allowed-tools: Read, Write, Edit, Grep, Glob, Bash(git *)
-argument-hint: "[date-range]"
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash(git *), Bash(gh *)
+argument-hint: "[instructions] or [push] or [release [version]]"
 ---
 
 # Changelog
 
-Generates human-readable changelogs from git commit history following Keep a Changelog format and Conventional Commits conventions.
+Generates human-readable changelogs from git commit history and manages the full release lifecycle. Commits automatically, pushes on request, tags and releases when told. Follows Keep a Changelog format and Conventional Commits conventions.
 
 ## Capabilities
 
@@ -18,43 +18,60 @@ Generates human-readable changelogs from git commit history following Keep a Cha
 2. **Update existing changelog** by adding new entries to the Unreleased section
 3. **Create new changelog** with proper structure and initial content
 4. **Translate commits** from developer language to user-friendly descriptions
+5. **Commit** changelog updates automatically
+6. **Push** changelog commits to remote on request
+7. **Tag and release** with annotated tags on request
 
-## Auto-Detection Workflow
+## Workflow Modes
 
-When invoked, detect the git state and act accordingly:
+When invoked, detect the mode from `$ARGUMENTS` and act accordingly:
 
 ```
-/changelog (no args)
+/changelog [instructions]
     |
-    +-- Check: Does CHANGELOG.md exist?
-    |       |
-    |       +-- NO  --> Create New Changelog (full git history)
-    |       |
-    |       +-- YES --> Check: Are there commits since last tag?
-    |               |
-    |               +-- NO  --> Report "Changelog is up to date"
-    |               |
-    |               +-- YES --> Are all commits pushed to remote?
-    |                       |
-    |                       +-- NO  --> Update/create Unreleased section
-    |                       +-- YES --> Auto-detect version, create release entry
-    |                                   (no Unreleased section in output)
+    +-- Mode: UPDATE (default)
+    |   Update or create CHANGELOG.md, commit. No push.
     |
-/changelog [date range]  --> Generate entries for specific period
+/changelog push
+    |
+    +-- Mode: PUSH
+    |   Complete unreleased entries if new commits exist,
+    |   commit if needed, push to remote.
+    |
+/changelog release [version]
+    |
+    +-- Mode: RELEASE
+        Create versioned release entry, commit, tag, push.
 ```
 
-**Detection logic:** Compare `git log <last-tag>..HEAD` with `git log <last-tag>..origin/<branch>`. If HEAD matches the remote, all commits are pushed and the changelog creates a versioned release. If HEAD is ahead of origin, unpushed commits go into Unreleased.
+**Detection logic:**
+- `$ARGUMENTS` contains "release" (case-insensitive) → **release mode**
+- `$ARGUMENTS` contains "push" (case-insensitive) → **push mode**
+- Everything else → **update mode**
 
-**Default behaviour requires zero input.** Run `/changelog` and the correct action runs automatically.
+**Update mode** handles: no arguments, date ranges, free-text instructions (e.g., "add this week's changes"). Always commits, never pushes.
+
+**Push mode** handles: `/changelog push`. Completes the Unreleased section with any new commits not yet documented, commits if changes were made, then pushes.
+
+**Release mode** handles: `/changelog release` (auto-detect version) or `/changelog release v2.0.0` (explicit version).
 
 <instructions>
+
+## Pre-Flight Checks
+
+Run these checks before any git operations:
+
+1. **Clean working directory:** `git status --porcelain` must return empty (CHANGELOG.md changes we are about to write are exempt). If dirty, abort and tell the user to commit or stash first.
+2. **Fetch latest remote state (push and release modes):** `git fetch origin`
+3. **Branch not behind remote (push and release modes):** Compare local and remote with `git rev-list --count HEAD..origin/$(git branch --show-current)`. If behind, abort and tell the user to pull first.
+4. **No duplicate tag (release mode only):** Check `git tag -l vX.Y.Z`. If the tag exists, abort and report the conflict.
 
 ## Creating a New Changelog
 
 1. Verify no CHANGELOG.md exists at project root
 2. Detect git remote URL for footer links: `git remote get-url origin`
 3. Get all tags: `git tag --sort=-v:refname`
-4. Analyze git history to gather commits
+4. Analyse git history to gather commits
 5. Categorize commits using Conventional Commits mapping (see references/changelog_format.md)
 6. Generate CHANGELOG.md with:
    - Header explaining the format
@@ -79,25 +96,50 @@ When invoked, detect the git state and act accordingly:
 
 ## Generating a Release Entry
 
-Triggered automatically when `/changelog` detects all commits since the last tag are pushed to remote:
+Triggered when `$ARGUMENTS` contains the word "release" (case-insensitive):
 
-1. Auto-detect the next version (see Version Auto-Detection below)
+1. Determine the version:
+   - If the user provided a version (e.g., `/changelog release v1.2.0`), use it directly
+   - Otherwise, auto-detect using Version Auto-Detection below
 2. Gather commits since the last tag
 3. Group by change type (Added, Changed, Fixed, etc.)
 4. Filter noise (merge commits, CI/CD changes, refactors unless significant)
 5. Translate technical commits to user-friendly descriptions
-6. Create a versioned section with the auto-detected version and today's date
+6. Create a versioned section with the version and today's date
 7. Remove any existing Unreleased section and its footer link
 8. Update footer comparison links
+
+## Post-Changelog Actions
+
+After writing CHANGELOG.md, run the appropriate git workflow.
+
+### Update Mode (default)
+
+1. `git add CHANGELOG.md`
+2. `git commit -m "Update changelog"` (use a descriptive message based on changes made)
+3. **Stop.** Do not push. Report what was committed.
+
+### Push Mode
+
+1. Check for new commits not yet in the Unreleased section. If found, add them first (follow the Updating an Existing Changelog steps above).
+2. `git add CHANGELOG.md` (if changes were made)
+3. `git commit -m "Update changelog"` (if changes were made)
+4. `git push`
+5. **Verify:** `git log --oneline -1` and confirm the push succeeded
+
+### Release Mode
+
+1. `git add CHANGELOG.md`
+2. `git commit -m "Release vX.Y.Z"`
+3. `git tag -a vX.Y.Z -m "Release vX.Y.Z - <one-line summary of changes>"`
+4. `git push --follow-tags`
+5. **Verify:** `git ls-remote --tags origin | grep vX.Y.Z` and report the version, tag, and commit hash
 
 ## Git Analysis Commands
 
 ```bash
 # All commits since last tag
 git log --oneline $(git describe --tags --abbrev=0 2>/dev/null || echo "")..HEAD
-
-# Check if HEAD is pushed (0 = all pushed, >0 = unpushed commits)
-git rev-list --count origin/$(git branch --show-current)..HEAD
 
 # Commits between tags
 git log --oneline v1.0.0..v1.1.0
@@ -132,7 +174,7 @@ Translate technical commits to user-friendly language:
 
 ## Version Auto-Detection
 
-Automatically detects the next version from commits since the last tag. Runs as part of every changelog action.
+Automatically detects the next version from commits since the last tag. Used in release mode when the user does not provide an explicit version.
 
 **Step 1: Get the current version**
 
@@ -156,14 +198,14 @@ If all commits were filtered (docs, test, ci, chore only), output "No release ne
 
 **Step 3: Output**
 
-When commits are unpushed (Unreleased path), append a version suggestion:
+Report the detected version:
 
 ```
 Next version: X.Y.Z (bump -- reason)
 Commits since vCURRENT: N total (N included, N filtered)
 ```
 
-When all commits are pushed (release path), use the auto-detected version directly to create the versioned release entry. Do not ask the user for a version number.
+Use the auto-detected version to create the versioned release entry and the annotated tag. Do not ask the user for a version number.
 
 See `references/changelog_format.md` for the full version detection rules and edge cases.
 
@@ -206,92 +248,62 @@ All notable changes to this project will be documented in this file.
 
 <example>
 **User request**: `/changelog` (no arguments, no existing CHANGELOG.md)
-**Action**: No CHANGELOG.md found. Create from full git history.
-**Output**:
-```markdown
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-## [Unreleased]
-
-### Added
-- User authentication with OAuth2 support
-- Dashboard analytics widget
-
-### Fixed
-- Resolved timeout on large file uploads
-
-[Unreleased]: https://github.com/owner/repo/compare/v0.0.0...HEAD
-```
+**Mode**: Update
+**Action**: No CHANGELOG.md found. Create from full git history. Commit.
+**Steps**:
+1. Generate CHANGELOG.md from all commits
+2. `git add CHANGELOG.md`
+3. `git commit -m "Add changelog from git history"`
+**Output**: Created CHANGELOG.md and committed. Run `/changelog push` when ready to push.
 </example>
 
 <example>
-**User request**: `/changelog` (all commits pushed to remote)
-**Action**: Detect all commits are pushed. Auto-detect version from commit types (feat commits = minor bump). Create versioned release entry with today's date.
-**Output**:
-```markdown
-## [2.1.0] - 2025-11-15
-
-### Added
-- Dark mode theme support
-- Export data to CSV format
-
-### Fixed
-- Fixed crash when processing files over 100MB
-```
-No Unreleased section in output because all changes are released.
+**User request**: `/changelog` (existing CHANGELOG.md, new commits since last tag)
+**Mode**: Update
+**Action**: Add new entries to Unreleased section. Commit.
+**Steps**:
+1. Update CHANGELOG.md with new Unreleased entries
+2. `git add CHANGELOG.md`
+3. `git commit -m "Update changelog with recent changes"`
+**Output**: Updated Unreleased section and committed.
 </example>
 
 <example>
-**User request**: "Generate release notes for commits between v1.2.0 and v1.3.0"
-**Action**: Run `git log v1.2.0..v1.3.0`, categorize, translate to user-friendly descriptions.
-**Output**:
-```markdown
-## [1.3.0] - 2025-10-01
+**User request**: `/changelog push`
+**Mode**: Push
+**Action**: Check for new commits not yet in Unreleased. Complete the section if needed. Commit and push.
+**Steps**:
+1. Find 3 commits not yet documented, add to Unreleased section
+2. `git add CHANGELOG.md`
+3. `git commit -m "Update changelog with recent changes"`
+4. `git push`
+**Output**: Added 3 entries to Unreleased, committed, and pushed to remote.
+</example>
 
-### Added
-- Webhook support for real-time event notifications
-- Bulk import from CSV files
-
-### Changed
-- Improved search performance by 40%
-
-### Fixed
-- Resolved timezone display issues in reports
-```
+<example>
+**User request**: `/changelog release` or `/changelog release v2.0.0`
+**Mode**: Release
+**Action**: Detect version automatically from commit types, or use the explicit version provided. Create versioned release entry. Commit, tag, push.
+**Steps (auto-detected version)**:
+1. Auto-detect version: v2.1.0 (minor bump, new features detected)
+2. Write release entry to CHANGELOG.md
+3. `git add CHANGELOG.md`
+4. `git commit -m "Release v2.1.0"`
+5. `git tag -a v2.1.0 -m "Release v2.1.0 - Dark mode and CSV export"`
+6. `git push --follow-tags`
+**Steps (explicit version)**: Same workflow, but skip auto-detection and use the provided version directly (e.g., `v2.0.0`).
+**Output**: Released vX.Y.Z, tagged, and pushed to remote.
 </example>
 
 <example>
 **User request**: "Add this week's changes to the changelog"
-**Action**: Run `git log --since="7 days ago"`, categorize, append to Unreleased section.
-**Output**: Updated CHANGELOG.md with new entries added under `## [Unreleased]`:
-```markdown
-## [Unreleased]
-
-### Added
-- Keyboard shortcuts for common actions
-
-### Fixed
-- Fixed pagination on search results page
-```
-</example>
-
-<example>
-**User request**: "Create release notes for the app store"
-**Action**: Analyse recent commits, filter technical noise, write user-friendly descriptions.
-**Output**:
-```markdown
-What's New:
-- You can now switch to dark mode from Settings
-- Export your data as a spreadsheet with one tap
-- Fixed a crash that happened when uploading large files
-- Search results load faster than before
-```
+**Mode**: Update
+**Action**: Run `git log --since="7 days ago"`, categorize, append to Unreleased section. Commit.
+**Output**: Updated CHANGELOG.md with new entries under `## [Unreleased]` and committed.
 </example>
 
 ## References
 
 | File | Content |
 |------|---------|
-| `references/changelog_format.md` | Full Keep a Changelog spec, Conventional Commits mapping, writing style guide, anti-patterns, complete example |
+| `references/changelog_format.md` | Full Keep a Changelog spec, Conventional Commits mapping, writing style guide, anti-patterns, release workflow reference, complete example |

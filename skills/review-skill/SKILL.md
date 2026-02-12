@@ -148,7 +148,7 @@ Automatically refactor a skill to meet best practices. When triggered by Mode 1 
 Auto-Fix Progress:
 - [ ] Step 1: Read SKILL.md and all files in root, references/, scripts/, assets/
 - [ ] Step 2: Run structural check (evaluation-checklist.md), content quality check (content-quality-checklist.md), deep review (research-backed-criteria.md). List every issue with file path and line number.
-- [ ] Step 3: Fix frontmatter (description, context: fork, missing fields)
+- [ ] Step 3: Fix frontmatter (description, context: fork correctness, missing fields)
 - [ ] Step 4: Create references/ folder if needed
 - [ ] Step 5: Move content over 500 lines to references/
 - [ ] Step 6: Move loose files to references/ with clear names
@@ -164,7 +164,7 @@ Auto-Fix Progress:
 |-------|--------------|
 | Description not third-person | Rewrite: "Processes...", "Extracts..." |
 | Missing trigger conditions | Add "Use when..." clause |
-| Missing `context: fork` (task-based skill) | Check for task-based signals (`<instructions>` tags, script references, `agent` field, 3+ numbered steps). Add to frontmatter only when signals are present. |
+| `context: fork` incorrectly applied | **Autonomous skills** (self-contained work, no sub-agent dispatch): add `context: fork` + `agent`. **Orchestrator skills** (dispatch sub-agents via Task tool): REMOVE `context: fork` and `agent` — a forked subagent cannot spawn further subagents. Orchestrator signals: "dispatch agents", "parallel sub-agents", Task tool calls, agent allocation tables, TaskOutput collection. |
 | SKILL.md over 500 lines | Extract sections to `references/` |
 | Loose files in root | Move to `references/` with descriptive names |
 | Duplicate reference files | Merge and deduplicate |
@@ -195,7 +195,7 @@ license: MIT
 ---
 ```
 - No trigger conditions in description
-- No `context: fork` despite script usage
+- No `context: fork` -- autonomous skill (runs scripts, no sub-agent dispatch)
 - 580 lines with inline SQL reference (lines 310-520)
 - Vague step: "Ensure the export format is correct"
 - 3 loose files in root: `formats.md`, `sql-ref.md`, `tips.md`
@@ -214,24 +214,9 @@ agent: general-purpose
 - `context: fork` added (scripts and `<instructions>` tags present)
 - SQL reference extracted to `references/sql-syntax.md` (210 lines saved)
 - Vague step rewritten: "Run `python3 scripts/validate_schema.py` against the output file"
-- Loose files moved: `formats.md` → `references/export-formats.md`, `sql-ref.md` merged into `references/sql-syntax.md`, `tips.md` → `references/troubleshooting.md`
+- Loose files moved and renamed: `formats.md` -> `references/export-formats.md`, `sql-ref.md` merged into `references/sql-syntax.md`, `tips.md` -> `references/troubleshooting.md`
 
 **Changes summary:** 6 issues fixed, 3 files reorganised, line count reduced from 580 to 340.
-</example>
-
-<example>
-**Auto-Fix: No issues found (Grade A skill)**
-
-Skill `changelog` analysed. 280 lines, all checks pass. No fixes needed.
-
-**Changes summary:** 0 issues found, 0 files changed. Skill meets Grade A criteria.
-</example>
-
-<example>
-**File Naming When Moving**
-- `learn.md` → `references/learning-guide.md`
-- `reference.md` → `references/[descriptive-name].md`
-- `ui-reference.md` + `official-ui-reference.md` → `references/cli-reference.md` (merge)
 </example>
 
 <example>
@@ -248,7 +233,7 @@ license: MIT
 Issues found:
 - (M1) 720 lines, over 500-line limit
 - (M8) Description imperative ("Test your") + no "Use when..." triggers
-- (M2) Missing `context: fork` despite `<instructions>` tags and script references
+- (M2) Missing `context: fork` -- autonomous skill (no sub-agent dispatch) with script references
 - (M7) 4 directives use "ensure" or "handle appropriately" with no defaults
 - (m1) Lines 50-80 explain what REST APIs are
 - (m8) 2 loose `.md` files in root beside SKILL.md
@@ -271,6 +256,16 @@ agent: general-purpose
 - Loose files moved: `common-headers.md` -> `references/http-headers.md`, `auth-flows.md` -> `references/authentication.md`
 
 **Changes summary:** 6 major + 2 minor issues fixed, 2 files reorganised, line count reduced from 720 to 310. Grade improved from D to A.
+</example>
+
+<example>
+**Auto-Fix: No issues found (Grade A skill)**
+
+Skill `changelog` analysed. 280 lines, all checks pass. No fixes needed.
+
+**Changes summary:** 0 issues found, 0 files changed. Skill meets Grade A criteria.
+
+Note: When a skill dispatches sub-agents via the Task tool (orchestrator pattern), do NOT add `context: fork`. A forked subagent cannot spawn further subagents, breaking the dispatch chain.
 </example>
 
 </instructions>

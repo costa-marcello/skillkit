@@ -283,3 +283,74 @@ The `/changelog` skill handles generation natively. Use external tools only when
 | **standard-version** | Bump version + generate changelog | `.versionrc.js` |
 | **conventional-changelog** | Generate from conventional commits | CLI options |
 
+## Release Workflow Reference
+
+Reference for git operations used by the `/changelog` skill during commit, tag, and push workflows.
+
+### Git Commands
+
+```bash
+# Stage changelog
+git add CHANGELOG.md
+
+# Commit (update mode)
+git commit -m "Update changelog"
+
+# Commit (release mode)
+git commit -m "Release vX.Y.Z"
+
+# Create annotated tag (release mode only)
+git tag -a vX.Y.Z -m "Release vX.Y.Z - summary of changes"
+
+# Push commit only (update mode)
+git push
+
+# Push commit and tags together (release mode)
+git push --follow-tags
+```
+
+### Tag Naming Convention
+
+- Always use the `v` prefix: `v1.0.0`, `v2.3.1`
+- Tags follow Semantic Versioning: `vMAJOR.MINOR.PATCH`
+- Match the tag version to the changelog heading version exactly
+
+### Annotated vs Lightweight Tags
+
+Always create **annotated tags** (`git tag -a`) for releases:
+
+| Type | Command | Use Case |
+|------|---------|----------|
+| Annotated | `git tag -a v1.0.0 -m "message"` | Releases (stores author, date, message) |
+| Lightweight | `git tag v1.0.0` | Never use for releases |
+
+Annotated tags store the tagger name, email, date, and message. They are proper git objects and are the standard for release tags. `git push --follow-tags` only pushes annotated tags, not lightweight ones.
+
+### The `--follow-tags` Flag
+
+`git push --follow-tags` pushes commits and any annotated tags that point to commits being pushed. This ensures the tag and commit arrive at the remote together in a single operation.
+
+Benefits:
+- Atomic: tag and commit pushed together
+- Safe: only pushes annotated tags (not lightweight)
+- Only pushes tags reachable from the commits being pushed
+
+### Pre-Flight Checks
+
+```bash
+# Check for uncommitted changes
+git status --porcelain
+
+# Fetch latest remote state
+git fetch origin
+
+# Check if local branch is behind remote
+git rev-list --count HEAD..origin/$(git branch --show-current)
+
+# Check if tag already exists
+git tag -l "vX.Y.Z"
+
+# Verify tag reached remote after push
+git ls-remote --tags origin | grep "vX.Y.Z"
+```
+

@@ -18,10 +18,11 @@ Complete checklist based on [official Anthropic best practices](https://platform
   - **Third-person voice** (required -- most common failure)
   - Includes trigger conditions ("Use when...")
 
-- [ ] `context: fork` present for task-based skills
-  - Required when skill performs autonomous tasks or needs subagent access
-  - Ensures fresh context and prevents pollution between invocations
-  - **Task-based signals:** `agent` or `allowed-tools` in frontmatter, `<instructions>` tags, script references, 3+ numbered steps, mode selection tables
+- [ ] `context: fork` correctly applied (present or absent)
+  - **Add `context: fork`** for autonomous skills that do self-contained work (file I/O, script execution, analysis) without dispatching sub-agents via Task
+  - **DO NOT add `context: fork`** for orchestrator skills that dispatch sub-agents via the Task tool. A forked subagent cannot spawn further subagents, so fork breaks the dispatch chain.
+  - **Orchestrator signals (no fork):** skill mentions "dispatch agents", "parallel sub-agents", contains Task tool calls, agent allocation tables, or TaskOutput collection
+  - **Autonomous signals (add fork):** skill does its own work end-to-end, uses `allowed-tools` to restrict tool access, or needs subagent isolation
 
 ### Description Quality
 
@@ -138,7 +139,7 @@ This is the single grading rubric for the entire skill. Combine findings from al
 |-------------|---------------|
 | SKILL.md under 400 lines | `wc -l SKILL.md` |
 | Frontmatter: `name` valid, `description` third-person with "Use when..." triggers | Checklist items 1-2 above |
-| `context: fork` present when task-based signals exist | Checklist item 3 above |
+| `context: fork` correctly applied (present for autonomous, absent for orchestrator) | Checklist item 3 above |
 | Only SKILL.md in skill root; references in `references/` | File structure checks above |
 | 0 major issues, 0 minor issues | See issue classification below |
 | 3-5 diverse examples in `<example>` tags | Deep review criterion 2 |
@@ -191,7 +192,7 @@ This is the single grading rubric for the entire skill. Combine findings from al
 | # | Issue | Layer | Detection |
 |---|-------|-------|-----------|
 | M1 | SKILL.md over 500 lines | Structural | `wc -l SKILL.md` exceeds 500 |
-| M2 | Missing `context: fork` on task-based skill | Structural | Task-based signals present (see checklist item 3) but no `context: fork` |
+| M2 | `context: fork` incorrectly applied | Structural | Autonomous skill missing `context: fork`, OR orchestrator skill (dispatches sub-agents via Task) has `context: fork` when it should not |
 | M3 | Wrong degrees of freedom for task type | Content | Fragile operation with vague instructions, or flexible task over-constrained (dimension 1) |
 | M4 | No feedback loop for destructive or multi-step operations | Content | Workflows with 5+ steps or destructive actions lack verification checkpoints (dimension 6) |
 | M5 | Contradictions between SKILL.md and references | Content | Same topic, different guidance across files (dimension 7) |

@@ -123,7 +123,7 @@ Creates production-ready GitHub Actions workflows. Covers test workflows, matrix
 <td><strong>changelog</strong></td>
 <td>
 
-Generates and updates CHANGELOG.md files from git history following Keep a Changelog format and Conventional Commits conventions. Auto-detects whether to create a new changelog, update an existing one, or add entries for a specific version. Translates developer commit messages into user-friendly descriptions. Suggests the next semantic version based on commit types (breaking, feat, fix) with copy-paste release commands. Works with date ranges, tag ranges, or "since last release" periods.
+Generates changelogs and manages the full release lifecycle. Three modes: `/changelog` updates the changelog and commits automatically, `/changelog push` completes the Unreleased section and pushes to remote, `/changelog release` creates a versioned entry, commits, tags, and pushes. Auto-detects the next semantic version from commit types (breaking, feat, fix) or accepts an explicit version (`/changelog release v2.0.0`). Translates developer commit messages into user-friendly descriptions. Runs pre-flight checks (clean working directory, branch sync, no duplicate tags) before git operations. Follows Keep a Changelog format and Conventional Commits conventions.
 
 </td>
 <td><code>npx skills add costa-marcello/skillkit -s changelog</code></td>
@@ -348,7 +348,8 @@ Some skills accept arguments directly after the slash command. For example:
 
 ```bash
 /research quantum computing        # Researches quantum computing
-/changelog 2025-01-01..2025-02-01  # Changelog for a date range
+/changelog push                    # Complete unreleased, commit, push
+/changelog release                 # Versioned release, commit, tag, push
 /review-skill skills/my-skill      # Review a specific skill
 ```
 
