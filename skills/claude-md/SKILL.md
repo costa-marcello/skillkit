@@ -1,17 +1,17 @@
 ---
 name: claude-md
-description: Manages CLAUDE.md files. Audits, reviews, improves, refactors, and generates subdirectory context. Discovers all CLAUDE.md files, evaluates quality against research-backed criteria, generates improvement reports, applies targeted updates, restructures using progressive disclosure, and creates contextual CLAUDE.md files for directories that benefit from instant context. Use when the user says "audit CLAUDE.md", "review my rules", "improve instructions", "organize Claude config", "generate subdirectory context", or "CLAUDE.md maintenance".
+description: Manages CLAUDE.md files. Audits, reviews, improves, refactors, updates, and generates subdirectory context. Discovers all CLAUDE.md files, evaluates quality against research-backed criteria, generates improvement reports, applies targeted updates, syncs CLAUDE.md with current codebase state, restructures using progressive disclosure, and creates contextual CLAUDE.md files for directories that benefit from instant context. Use when the user says "audit CLAUDE.md", "review my rules", "improve instructions", "organize Claude config", "update CLAUDE.md", "sync my rules", "init project", "generate subdirectory context", or "CLAUDE.md maintenance".
 allowed-tools: Read, Glob, Grep, Bash, Edit
 license: MIT
 context: fork
 agent: general-purpose
 ---
 
-<!-- v1.2.0 | 2026-02-12 -->
+<!-- v1.3.0 | 2026-02-13 -->
 
 # Claude MD
 
-**Complete CLAUDE.md management:** Audit, Review, Improve, Refactor, and Generate. Core insight: rules with reasoning outperform bare rules. Models generalize from "why" explanations.
+**Complete CLAUDE.md management:** Audit, Review, Improve, Refactor, Update, and Generate. Core insight: rules with reasoning outperform bare rules. Models generalize from "why" explanations.
 
 ## Quick Reference
 
@@ -21,6 +21,7 @@ agent: general-purpose
 | **Review** | "Review my CLAUDE.md", "Check instruction quality" | Detailed quality report + improvement suggestions |
 | **Improve** | "Improve my rules", "Fix my CLAUDE.md" | Targeted updates with diffs |
 | **Refactor** | "Organize Claude config", "Split CLAUDE.md" | Restructured files with progressive disclosure |
+| **Update** | "Update CLAUDE.md", "Sync my rules", "Init project" | CLAUDE.md synced with current codebase state |
 | **Generate** | "Generate subdirectory context", "Create package CLAUDE.md files" | New CLAUDE.md files for directories that need context |
 
 ### Mode Sequencing
@@ -31,6 +32,8 @@ Modes can be combined in workflows:
 |----------|-------------|
 | **Audit → Generate** | Audit finds gaps in subdirectory coverage → Generate creates missing files |
 | **Audit → Review → Improve** | Full assessment → quality check → targeted fixes |
+| **Update → Review** | Sync with codebase → check quality of synced content |
+| **Update → Improve** | Sync with codebase → fix reasoning and specificity gaps |
 | **Generate → Review** | Create new files → verify quality meets standards |
 | **Improve → Refactor** | Fix issues → restructure if still bloated |
 
@@ -330,6 +333,58 @@ project-root/
 
 After user approval, apply changes using the Edit tool. Preserve existing content structure.
 
+### Mode: Update (Sync CLAUDE.md with Codebase)
+
+**Triggers:** "Update CLAUDE.md", "Sync my rules", "Init project", "Refresh project context"
+
+Scans the codebase and updates CLAUDE.md to reflect the current project state. Creates a CLAUDE.md from scratch if none exists. Unlike Improve (which fixes quality issues), Update detects drift between the documented state and the actual codebase.
+
+| Phase | Action | Detail |
+|-------|--------|--------|
+| U1 | Codebase Scan | Detect package manager, scripts/commands, directory structure, frameworks, config files, environment vars. |
+| U2 | Existing CLAUDE.md Read | Read current CLAUDE.md (if any). If none exists, treat all discovered info as new. |
+| U3 | Drift Detection | Compare documented state against discovered state. Flag stale commands, missing sections, outdated structure, removed files. |
+| U4 | Change Preview | Show additions, updates, and removals as a diff. Never auto-apply. |
+| U5 | User Approval | Present changes for approval. Support approve all, select specific, or cancel. |
+| U6 | Apply Updates | Write approved changes. Preserve existing reasoning, rules, and user-authored content. |
+
+**Key principle:** Update adds and corrects factual content (commands, structure, files). It never removes or rewrites user-authored rules, reasoning, or principles unless they reference things that no longer exist.
+
+See [references/update-workflow.md](references/update-workflow.md) for the full scanning algorithm, detection heuristics, and framework-specific patterns.
+
+<example>
+**Update mode preview output:**
+
+```markdown
+## CLAUDE.md Update Preview
+
+**Codebase scan results:** Node.js project, pnpm, Next.js 15, TypeScript
+
+### Additions (new sections)
++ ## Commands
++ | `pnpm dev` | Start dev server |
++ | `pnpm build` | Production build |
++ | `pnpm test` | Run vitest |
++ | `pnpm lint` | ESLint check |
+
++ ## Architecture
++ src/app/        # Next.js app router pages
++ src/lib/        # Shared utilities
++ src/components/ # React components
+
+### Updates (changed content)
+~ ## Key Files
+~ - `src/lib/db.ts` → renamed to `src/lib/database.ts`
+~ - Removed reference to deleted `src/utils/legacy.ts`
+
+### No changes
+= ## Hard Rules (unchanged, user-authored)
+= ## Core Principles (unchanged, user-authored)
+
+Apply these changes? [All / Select / Cancel]
+```
+</example>
+
 ### Mode: Generate (Create Subdirectory Context)
 
 **Triggers:** "Generate subdirectory context", "Create CLAUDE.md for packages", "Add directory context files"
@@ -385,15 +440,13 @@ Express routes with Zod validation. All routes require auth middleware.
 
 | File | Purpose |
 |------|---------|
-| `references/research-principles.md` | Anthropic and academic research findings on reasoning vs rules |
 | `references/rule-quality-standards.md` | Hybrid format, transformation examples, positive reframing, preservation rules |
 | `references/quality-criteria.md` | 100-point scoring rubric and rule quality dimensions |
 | `references/templates.md` | CLAUDE.md templates for root, subfolder, monorepo, and rule files |
 | `references/examples.md` | Before/after refactoring transformations |
 | `references/anti-patterns.md` | Common mistakes to avoid when writing CLAUDE.md files |
-| `references/user-tips.md` | Shortcuts and features to share with users |
-| `references/execution-checklists.md` | Mode-specific progress checklists (Audit, Review, Improve, Refactor, Generate) |
+| `references/execution-checklists.md` | Mode-specific progress checklists (Audit, Review, Improve, Refactor, Update, Generate) |
+| `references/update-workflow.md` | Detailed Update mode scanning algorithm, detection heuristics, and framework patterns |
 | `references/generation-workflow.md` | Detailed Generate mode scoring algorithm and extraction heuristics |
 | `references/subfolder-examples.md` | Real-world subfolder CLAUDE.md examples |
 | `references/update-guidelines.md` | What to add vs what to skip when updating CLAUDE.md files |
-| `references/changelog.md` | Version history and update protocol |

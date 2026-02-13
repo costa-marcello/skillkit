@@ -80,6 +80,34 @@ Quality improvements applied:
 
 ---
 
+## Update Mode
+
+```
+- [ ] Phase U1: Codebase scan complete
+  - [ ] Package manager detected: ___
+  - [ ] Commands extracted: ___
+  - [ ] Directory structure mapped
+  - [ ] Frameworks detected: ___
+  - [ ] Config/env files found: ___
+- [ ] Phase U2: Existing CLAUDE.md read (or none found)
+- [ ] Phase U3: Drift detection complete
+  - [ ] Stale commands: ___
+  - [ ] Missing commands: ___
+  - [ ] Structure changes: ___
+  - [ ] Tech stack changes: ___
+- [ ] Phase U4: Change preview presented
+- [ ] Phase U5: User approved changes
+- [ ] Phase U6: Updates applied
+
+Preservation check:
+- [ ] Hard Rules untouched
+- [ ] Core Principles untouched
+- [ ] User-authored reasoning preserved
+- [ ] Gotchas preserved (unless referencing deleted files)
+```
+
+---
+
 ## Generate Mode
 
 ```
