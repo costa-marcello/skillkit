@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] - 2026-02-13
+
+### Added
+- Added Update mode to claude-md skill that scans the codebase and syncs CLAUDE.md with current project state
+
+### Removed
+- Removed 9 non-execution reference files across skills (changelogs, version history, research background, development test cases, internal tracking)
+
 ## [0.7.0] - 2026-02-13
 
 ### Added
@@ -148,6 +156,7 @@ All notable changes to this project will be documented in this file.
 - Fixed script invocations and variable names after skill rename
 - Fixed review-skill over-specification and deduplicated steps
 
+[0.8.0]: https://github.com/costa-marcello/skillkit/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/costa-marcello/skillkit/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/costa-marcello/skillkit/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/costa-marcello/skillkit/compare/v0.5.0...v0.6.0
