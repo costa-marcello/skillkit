@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+- Improved production-audit skill to Grade A with consistent checkpoint fields and corrected agent counts
+- Improved review-skill to Grade A with edge-case decision examples and corrected fork signal detection
+- Expanded research skill MCP tool detection from Brave-only to 10 search providers (SearXNG, Exa, Tavily, Firecrawl, and others)
+- Added "How to use" column with concrete examples to all skill tables in README
+
+### Fixed
+- Fixed production-audit orchestrator fork conflict where `context: fork` silently blocked sub-agent dispatch via Task/TeamCreate
+- Added definitive mechanical check to review-skill: `context: fork` combined with team/task tools now triggers M2 violation
+
 ## [0.6.0] - 2026-02-12
 
 ### Changed
