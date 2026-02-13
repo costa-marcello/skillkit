@@ -21,8 +21,9 @@ Complete checklist based on [official Anthropic best practices](https://platform
 - [ ] `context: fork` correctly applied (present or absent)
   - **Add `context: fork`** for autonomous skills that do self-contained work (file I/O, script execution, analysis) without dispatching sub-agents via Task
   - **DO NOT add `context: fork`** for orchestrator skills that dispatch sub-agents via the Task tool. A forked subagent cannot spawn further subagents, so fork breaks the dispatch chain.
-  - **Orchestrator signals (no fork):** skill mentions "dispatch agents", "parallel sub-agents", contains Task tool calls, agent allocation tables, or TaskOutput collection
-  - **Autonomous signals (add fork):** skill does its own work end-to-end, uses `allowed-tools` to restrict tool access, or needs subagent isolation
+  - **Orchestrator signals (no fork):** `allowed-tools` includes `Task`, `TeamCreate`, `TaskCreate`, or `SendMessage`; skill body mentions "spawn agents", "dispatch agents", "parallel agents/sub-agents", agent allocation tables, or TaskOutput collection
+  - **Definitive conflict:** `context: fork` is set AND `allowed-tools` contains any of `Task`, `TeamCreate`, `TaskCreate`, `SendMessage`. This always means fork must be removed.
+  - **Autonomous signals (add fork):** skill does its own work end-to-end without spawning child agents, uses `allowed-tools` to restrict tool access, or needs subagent isolation
 
 ### Description Quality
 
@@ -192,7 +193,7 @@ This is the single grading rubric for the entire skill. Combine findings from al
 | # | Issue | Layer | Detection |
 |---|-------|-------|-----------|
 | M1 | SKILL.md over 500 lines | Structural | `wc -l SKILL.md` exceeds 500 |
-| M2 | `context: fork` incorrectly applied | Structural | Autonomous skill missing `context: fork`, OR orchestrator skill (dispatches sub-agents via Task) has `context: fork` when it should not |
+| M2 | `context: fork` incorrectly applied | Structural | Autonomous skill missing `context: fork`, OR orchestrator skill has `context: fork` when it should not. **Quick check:** `context: fork` set AND `allowed-tools` contains `Task`/`TeamCreate`/`TaskCreate`/`SendMessage` = definitive M2 violation |
 | M3 | Wrong degrees of freedom for task type | Content | Fragile operation with vague instructions, or flexible task over-constrained (dimension 1) |
 | M4 | No feedback loop for destructive or multi-step operations | Content | Workflows with 5+ steps or destructive actions lack verification checkpoints (dimension 6) |
 | M5 | Contradictions between SKILL.md and references | Content | Same topic, different guidance across files (dimension 7) |

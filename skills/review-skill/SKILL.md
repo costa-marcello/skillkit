@@ -164,7 +164,7 @@ Auto-Fix Progress:
 |-------|--------------|
 | Description not third-person | Rewrite: "Processes...", "Extracts..." |
 | Missing trigger conditions | Add "Use when..." clause |
-| `context: fork` incorrectly applied | **Autonomous skills** (self-contained work, no sub-agent dispatch): add `context: fork` + `agent`. **Orchestrator skills** (dispatch sub-agents via Task tool): REMOVE `context: fork` and `agent` — a forked subagent cannot spawn further subagents. Orchestrator signals: "dispatch agents", "parallel sub-agents", Task tool calls, agent allocation tables, TaskOutput collection. |
+| `context: fork` incorrectly applied | **Autonomous skills** (self-contained work, no sub-agent dispatch): add `context: fork` + `agent`. **Orchestrator skills** (dispatch sub-agents via Task tool): REMOVE `context: fork` and `agent` — a forked subagent cannot spawn further subagents. **Definitive conflict:** `context: fork` set AND `allowed-tools` contains `Task`, `TeamCreate`, `TaskCreate`, or `SendMessage`. **Body signals:** "spawn agents", "dispatch agents", "parallel agents/sub-agents", agent allocation tables, TaskOutput collection. |
 | SKILL.md over 500 lines | Extract sections to `references/` |
 | Loose files in root | Move to `references/` with descriptive names |
 | Duplicate reference files | Merge and deduplicate |
