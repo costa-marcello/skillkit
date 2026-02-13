@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.6.1] - 2026-02-13
 
 ### Changed
 - Restructured changelog skill into self-contained mode flows, eliminating cross-reference jumps that caused mode skipping
@@ -140,7 +140,7 @@ All notable changes to this project will be documented in this file.
 - Fixed script invocations and variable names after skill rename
 - Fixed review-skill over-specification and deduplicated steps
 
-[Unreleased]: https://github.com/costa-marcello/skillkit/compare/v0.6.0...HEAD
+[0.6.1]: https://github.com/costa-marcello/skillkit/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/costa-marcello/skillkit/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/costa-marcello/skillkit/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/costa-marcello/skillkit/compare/v0.3.0...v0.4.0
