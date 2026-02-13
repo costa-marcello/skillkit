@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] - 2026-02-13
+
+### Added
+- Added review-code skill for PR-level code review with SOLID, security, and quality checks graded P0-P3
+
+### Changed
+- Rewrote changelog skill as single-flow release tool, removing three-mode branching that caused mode-skipping failures
+
 ## [0.6.1] - 2026-02-13
 
 ### Changed
@@ -140,6 +148,7 @@ All notable changes to this project will be documented in this file.
 - Fixed script invocations and variable names after skill rename
 - Fixed review-skill over-specification and deduplicated steps
 
+[0.7.0]: https://github.com/costa-marcello/skillkit/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/costa-marcello/skillkit/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/costa-marcello/skillkit/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/costa-marcello/skillkit/compare/v0.4.0...v0.5.0
