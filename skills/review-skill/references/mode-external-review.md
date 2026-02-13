@@ -47,5 +47,5 @@ The `data-pipeline` skill handles CSV-to-database ingestion with retry logic and
 **Findings:**
 1. (Major) SKILL.md at 620 lines -- exceeds 500-line limit. Move lines 400-580 to `references/schema-validation.md`.
 2. (Minor) Description uses imperative voice ("Browse data..."). Change to "Browses data sources and ingests..."
-3. (Minor) No `context: fork` despite having `<instructions>` tags and script references.
+3. (Minor) No `context: fork` despite running scripts autonomously without sub-agent dispatch.
 </example>

@@ -85,7 +85,7 @@ Severity definitions:
 After all agents complete, the lead verifies and assembles the final report:
 
 1. Collect all findings from agents
-2. **CHECKPOINT**: Verify every finding has all four required fields (severity, dimension, file path with line number, evidence). Reject malformed findings back to the agent for correction.
+2. **CHECKPOINT**: Verify every finding has all five required fields (severity in heading, dimension, file path with line number, evidence, impact). Reject malformed findings back to the agent for correction.
 3. Deduplicate (different agents may flag the same file)
 4. Sort by severity: blockers first, then warnings, then improvements
 5. Add an executive summary with counts per severity and dimension
@@ -104,7 +104,7 @@ Save the report to `PRODUCTION-AUDIT.md` in the project root. Follow the full te
 - [ ] 4. Read reference files for each audit dimension in scope
 - [ ] 5. Spawn audit agents in parallel with project map + checklists
 - [ ] 6. Collect findings from all agents
-- [ ] 7. CHECKPOINT: Verify every finding has severity, dimension, file path, and evidence
+- [ ] 7. CHECKPOINT: Verify every finding has severity, dimension, file path, evidence, and impact
 - [ ] 8. Deduplicate findings (different agents may flag the same file)
 - [ ] 9. Write executive summary with counts and recommended fix order
 - [ ] 10. Save report to `PRODUCTION-AUDIT.md` in project root
@@ -122,7 +122,7 @@ Save the report to `PRODUCTION-AUDIT.md` in the project root. Follow the full te
 2. Reads all four reference files for audit checklists
 3. Spawns 4 agents in parallel, each with the project map and their dimension checklist
 4. Collects 47 findings: 8 blockers, 15 warnings, 24 improvements
-5. Verifies all findings have severity, dimension, file path, and evidence
+5. Verifies all findings have severity, dimension, file path, evidence, and impact
 6. Writes `PRODUCTION-AUDIT.md` with executive summary and prioritised fix order
 
 **Report excerpt**:
@@ -179,9 +179,8 @@ Save the report to `PRODUCTION-AUDIT.md` in the project root. Follow the full te
 **Claude**:
 1. Maps project structure: Rust binary crate, `src/main.rs` + `src/lib.rs`, no web framework, no database, no frontend
 2. Marks API Mapping, Frontend-Backend Sync, and Scalability as "not applicable"
-3. Spawns 2 agents: Security (focused on input validation, dependency audit, command injection) + Dead Code & Architecture
-4. Infrastructure agent checks for CI/CD, release binaries, and environment config
-5. Report is shorter but still follows the standard template, with N/A dimensions clearly marked
+3. Spawns 3 agents: Security (input validation, dependency audit, command injection), Infrastructure (CI/CD, release binaries, environment config), Dead Code & Architecture
+4. Report is shorter but still follows the standard template, with N/A dimensions clearly marked
 </example>
 
 </examples>
@@ -192,7 +191,6 @@ Save the report to `PRODUCTION-AUDIT.md` in the project root. Follow the full te
 
 1. **Run early.** Catches architectural issues before they compound. The audit is read-only and works at any stage.
 2. **Commit the report.** `PRODUCTION-AUDIT.md` is designed for team review. Finding IDs (B-001, W-001) work as ticket references.
-3. **Pair with Semgrep.** If the Semgrep MCP server is available, the security agent can run `semgrep_scan` for automated vulnerability detection alongside manual pattern matching.
-4. **Re-audit after fixes.** Run the audit again after resolving blockers to verify they are fixed and no new issues were introduced.
+3. **Re-audit after fixes.** Run the audit again after resolving blockers to verify they are fixed and no new issues were introduced.
 
 </context>

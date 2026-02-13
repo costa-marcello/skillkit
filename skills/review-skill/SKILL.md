@@ -136,6 +136,20 @@ Proceeding to fix all findings above...
 **Changes summary:** 2 issues fixed, 1 file reorganised, line count reduced from 487 to 395.
 </example>
 
+<example>
+**Edge-Case Decision: context: fork on an orchestrator skill**
+
+Skill `deploy-fleet` has `context: fork` set and `allowed-tools: "Read, Grep, Bash(*), Task"`.
+
+**Decision:** M2 violation. `allowed-tools` includes `Task`, which means this skill dispatches sub-agents. A forked subagent cannot spawn further subagents, so `context: fork` breaks the dispatch chain. Remove `context: fork` and `agent` from frontmatter.
+
+**Edge-Case Decision: line count at boundary**
+
+Skill `api-docs` has SKILL.md at exactly 500 lines.
+
+**Decision:** m7 (minor), not M1 (major). The 500-line limit (M1) triggers at 501+. At 500, the skill is in the warning zone (400-500). Recommend extracting content to reach under 400 for Grade A.
+</example>
+
 </instructions>
 
 <instructions>
