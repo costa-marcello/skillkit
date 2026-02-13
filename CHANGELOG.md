@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Changed
+- Restructured changelog skill into self-contained mode flows, eliminating cross-reference jumps that caused mode skipping
 - Improved production-audit skill to Grade A with consistent checkpoint fields and corrected agent counts
 - Improved review-skill to Grade A with edge-case decision examples and corrected fork signal detection
 - Expanded research skill MCP tool detection from Brave-only to 10 search providers (SearXNG, Exa, Tavily, Firecrawl, and others)
