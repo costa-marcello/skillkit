@@ -10,152 +10,113 @@ argument-hint: "[instructions] or [push] or [release [version]]"
 
 # Changelog
 
-Generates human-readable changelogs from git commit history and manages the full release lifecycle. Commits automatically, pushes on request, tags and releases when told. Follows Keep a Changelog format and Conventional Commits conventions.
-
-## Capabilities
-
-1. **Generate changelog** from git commits (date range, tag range, or since last release)
-2. **Update existing changelog** by adding new entries to the Unreleased section
-3. **Create new changelog** with proper structure and initial content
-4. **Translate commits** from developer language to user-friendly descriptions
-5. **Commit** changelog updates automatically
-6. **Push** changelog commits to remote on request
-7. **Tag and release** with annotated tags on request
-
-## Workflow Modes
-
-When invoked, detect the mode from `$ARGUMENTS` and act accordingly:
-
-```
-/changelog [instructions]
-    |
-    +-- Mode: UPDATE (default)
-    |   Update or create CHANGELOG.md, commit. No push.
-    |
-/changelog push
-    |
-    +-- Mode: PUSH
-    |   Complete unreleased entries if new commits exist,
-    |   commit if needed, push to remote.
-    |
-/changelog release [version]
-    |
-    +-- Mode: RELEASE
-        Create versioned release entry, commit, tag, push.
-```
-
-**Detection logic:**
-- `$ARGUMENTS` contains "release" (case-insensitive) → **release mode**
-- `$ARGUMENTS` contains "push" (case-insensitive) → **push mode**
-- Everything else → **update mode**
-
-**Update mode** handles: no arguments, date ranges, free-text instructions (e.g., "add this week's changes"). Always commits, never pushes.
-
-**Push mode** handles: `/changelog push`. Completes the Unreleased section with any new commits not yet documented, commits if changes were made, then pushes.
-
-**Release mode** handles: `/changelog release` (auto-detect version) or `/changelog release v2.0.0` (explicit version).
+Generates human-readable changelogs from git commit history and manages the full release lifecycle. Follows Keep a Changelog format and Conventional Commits conventions.
 
 <instructions>
 
-## Pre-Flight Checks
+## Step 1: Determine Mode
 
-Run these checks before any git operations:
+Read `$ARGUMENTS` and select exactly one mode. State your mode before doing anything else.
 
-1. **Clean working directory:** `git status --porcelain` must return empty (CHANGELOG.md changes we are about to write are exempt). If dirty, abort and tell the user to commit or stash first.
-2. **Fetch latest remote state (push and release modes):** `git fetch origin`
-3. **Branch not behind remote (push and release modes):** Compare local and remote with `git rev-list --count HEAD..origin/$(git branch --show-current)`. If behind, abort and tell the user to pull first.
-4. **No duplicate tag (release mode only):** Check `git tag -l vX.Y.Z`. If the tag exists, abort and report the conflict.
+| Check (in this order) | Mode |
+|-----------------------|------|
+| `$ARGUMENTS` contains "release" (case-insensitive) | **RELEASE** — commit, tag, push |
+| `$ARGUMENTS` contains "push" (case-insensitive) | **PUSH** — commit if needed, push |
+| Everything else (no arguments, date ranges, free-text) | **UPDATE** — commit only, no push |
+
+Once you have stated your mode, follow ONLY the matching section below. Do not mix steps from other modes.
+
+---
+
+## UPDATE Mode
+
+Updates or creates CHANGELOG.md and commits. Never pushes.
+
+1. **Pre-flight:** `git status --porcelain` must return empty (CHANGELOG.md exempt). If dirty, abort.
+2. **Check for CHANGELOG.md** at project root.
+   - If missing: create from full git history (see Creating a New Changelog below).
+   - If present: update with new entries (see Updating an Existing Changelog below).
+3. `git add CHANGELOG.md`
+4. `git commit -m "<descriptive message>"`
+5. Report what was committed. Suggest `/changelog push` to push, or `/changelog release` to tag a version.
+
+---
+
+## PUSH Mode
+
+Completes unreleased entries if new commits exist, commits if needed, pushes to remote.
+
+1. **Pre-flight:**
+   - `git status --porcelain` must return empty. If dirty, abort.
+   - `git fetch origin`
+   - Branch not behind remote: `git rev-list --count HEAD..origin/$(git branch --show-current)`. If behind, abort.
+2. Read CHANGELOG.md. Identify last documented version from `## [x.y.z]` headers.
+3. Get corresponding tag: `git tag --sort=-v:refname | head -1`
+4. Gather commits since that point: `git log --oneline <last-tag>..HEAD`
+5. If new undocumented commits exist, categorize them (see Commit Categorization below) and add to the Unreleased section.
+6. If CHANGELOG.md changed:
+   - `git add CHANGELOG.md`
+   - `git commit -m "Update changelog with recent changes"`
+7. `git push`
+8. **Verify:** `git log --oneline -1` and confirm the push succeeded.
+
+---
+
+## RELEASE Mode
+
+Creates a versioned release entry, commits, tags with an annotated tag, and pushes.
+
+1. **Pre-flight:**
+   - `git status --porcelain` must return empty. If dirty, abort.
+   - `git fetch origin`
+   - Branch not behind remote: `git rev-list --count HEAD..origin/$(git branch --show-current)`. If behind, abort.
+2. **Determine version:**
+   - If the user provided a version (e.g., `/changelog release v1.2.0`), use it directly.
+   - Otherwise, auto-detect using Version Auto-Detection below.
+3. **Check no duplicate tag:** `git tag -l vX.Y.Z`. If the tag exists, abort.
+4. Gather commits since the last tag: `git log --oneline <last-tag>..HEAD`
+5. Categorize commits (see Commit Categorization below).
+6. Filter noise (merge commits, CI/CD changes, refactors unless significant).
+7. Translate technical commits to user-friendly descriptions.
+8. Create a versioned section `## [X.Y.Z] - YYYY-MM-DD` with today's date.
+9. Remove any existing Unreleased section and its footer link.
+10. Update footer comparison links.
+11. `git add CHANGELOG.md`
+12. `git commit -m "Release vX.Y.Z"`
+13. `git tag -a vX.Y.Z -m "Release vX.Y.Z - <one-line summary of changes>"`
+14. `git push --follow-tags`
+15. **Verify:** `git ls-remote --tags origin | grep vX.Y.Z` and report the version, tag, and commit hash.
+
+---
 
 ## Creating a New Changelog
 
-1. Verify no CHANGELOG.md exists at project root
-2. Detect git remote URL for footer links: `git remote get-url origin`
-3. Get all tags: `git tag --sort=-v:refname`
-4. Analyse git history to gather commits
-5. Categorize commits using Conventional Commits mapping (see references/changelog_format.md)
-6. Generate CHANGELOG.md with:
-   - Header explaining the format
-   - Unreleased section with categorized changes
-   - Version sections for each existing tag (if any)
-   - Footer links to GitHub comparisons
-7. **Verify:** Count entries match expected categorized commits
-8. Write CHANGELOG.md to project root
+Used by UPDATE mode when no CHANGELOG.md exists.
+
+1. Detect git remote URL for footer links: `git remote get-url origin`
+2. Get all tags: `git tag --sort=-v:refname`
+3. Analyse git history and categorize commits (see Commit Categorization below)
+4. Generate CHANGELOG.md with header, Unreleased section, version sections for existing tags, and footer links
+5. **Verify:** Entry count matches expected categorized commits
+6. Write CHANGELOG.md to project root
 
 ## Updating an Existing Changelog
 
+Used by UPDATE and PUSH modes when CHANGELOG.md exists.
+
 1. Read existing CHANGELOG.md
-2. Identify last documented version from existing content (look for `## [x.y.z]` headers)
+2. Identify last documented version from `## [x.y.z]` headers
 3. Get corresponding tag: `git tag --sort=-v:refname | head -1`
 4. Gather commits since that point: `git log --oneline <last-tag>..HEAD`
 5. If no new commits: report "Changelog is up to date" and exit
-6. Categorize new commits using Conventional Commits mapping
+6. Categorize new commits (see Commit Categorization below)
 7. Add entries to Unreleased section (create section if missing)
 8. Preserve all existing content exactly
 9. **Verify:** New entry count matches new commit count (minus filtered)
-10. Write updated CHANGELOG.md
-
-## Generating a Release Entry
-
-Triggered when `$ARGUMENTS` contains the word "release" (case-insensitive):
-
-1. Determine the version:
-   - If the user provided a version (e.g., `/changelog release v1.2.0`), use it directly
-   - Otherwise, auto-detect using Version Auto-Detection below
-2. Gather commits since the last tag
-3. Group by change type (Added, Changed, Fixed, etc.)
-4. Filter noise (merge commits, CI/CD changes, refactors unless significant)
-5. Translate technical commits to user-friendly descriptions
-6. Create a versioned section with the version and today's date
-7. Remove any existing Unreleased section and its footer link
-8. Update footer comparison links
-
-## Post-Changelog Actions
-
-After writing CHANGELOG.md, run the appropriate git workflow.
-
-### Update Mode (default)
-
-1. `git add CHANGELOG.md`
-2. `git commit -m "Update changelog"` (use a descriptive message based on changes made)
-3. **Stop.** Do not push. Report what was committed.
-
-### Push Mode
-
-1. Check for new commits not yet in the Unreleased section. If found, add them first (follow the Updating an Existing Changelog steps above).
-2. `git add CHANGELOG.md` (if changes were made)
-3. `git commit -m "Update changelog"` (if changes were made)
-4. `git push`
-5. **Verify:** `git log --oneline -1` and confirm the push succeeded
-
-### Release Mode
-
-1. `git add CHANGELOG.md`
-2. `git commit -m "Release vX.Y.Z"`
-3. `git tag -a vX.Y.Z -m "Release vX.Y.Z - <one-line summary of changes>"`
-4. `git push --follow-tags`
-5. **Verify:** `git ls-remote --tags origin | grep vX.Y.Z` and report the version, tag, and commit hash
-
-## Git Analysis Commands
-
-```bash
-# All commits since last tag
-git log --oneline $(git describe --tags --abbrev=0 2>/dev/null || echo "")..HEAD
-
-# Commits between tags
-git log --oneline v1.0.0..v1.1.0
-
-# Commits in date range (adjust dates to match the requested period)
-git log --oneline --since="2025-01-01" --until="2025-01-31"
-
-# Get current tags
-git tag --sort=-v:refname | head -10
-```
 
 ## Commit Categorization
 
-Map Conventional Commits prefixes to Keep a Changelog sections. See `references/changelog_format.md` for the full type-to-section mapping, writing style guidelines, and anti-patterns.
-
-**Quick reference:**
+Map Conventional Commits prefixes to Keep a Changelog sections. See `references/changelog_format.md` for the full mapping, writing style, and anti-patterns.
 
 | Commit Prefix | Changelog Section |
 |---------------|-------------------|
@@ -174,9 +135,9 @@ Translate technical commits to user-friendly language:
 
 ## Version Auto-Detection
 
-Automatically detects the next version from commits since the last tag. Used in release mode when the user does not provide an explicit version.
+Used by RELEASE mode when the user does not provide an explicit version.
 
-**Step 1: Get the current version**
+**Step 1: Get current version**
 
 ```bash
 git tag --sort=-v:refname | head -1
@@ -184,38 +145,50 @@ git tag --sort=-v:refname | head -1
 
 If no tags exist, treat the current version as `0.0.0`.
 
-**Step 2: Scan commits since last tag for the highest bump signal**
+**Step 2: Scan commits for the highest bump signal**
 
-Check all commits since the last tag using `git log --pretty=format:"%s%n%b" <last-tag>..HEAD`. Apply the highest-priority rule that matches:
+Check all commits since the last tag: `git log --pretty=format:"%s%n%b" <last-tag>..HEAD`. Apply the highest-priority rule that matches:
 
 | Priority | Signal | Bump |
 |----------|--------|------|
-| 1 | Breaking change -- BREAKING CHANGE in body/footer, or type! suffix (feat!, fix!) | Major |
-| 2 | New feature -- feat or feat(scope) prefix | Minor |
-| 3 | Bug fix or improvement -- fix, perf, or other included types | Patch |
+| 1 | Breaking change — BREAKING CHANGE in body/footer, or type! suffix (feat!, fix!) | Major |
+| 2 | New feature — feat or feat(scope) prefix | Minor |
+| 3 | Bug fix or improvement — fix, perf, or other included types | Patch |
 
 If all commits were filtered (docs, test, ci, chore only), output "No release needed" instead of a version.
 
-**Step 3: Output**
-
-Report the detected version:
+**Step 3: Report**
 
 ```
-Next version: X.Y.Z (bump -- reason)
+Next version: X.Y.Z (bump — reason)
 Commits since vCURRENT: N total (N included, N filtered)
 ```
 
-Use the auto-detected version to create the versioned release entry and the annotated tag. Do not ask the user for a version number.
+Use the auto-detected version for the release entry and annotated tag. Do not ask the user.
 
-See `references/changelog_format.md` for the full version detection rules and edge cases.
+See `references/changelog_format.md` for edge cases.
+
+## Git Analysis Commands
+
+```bash
+# All commits since last tag
+git log --oneline $(git describe --tags --abbrev=0 2>/dev/null || echo "")..HEAD
+
+# Commits between tags
+git log --oneline v1.0.0..v1.1.0
+
+# Commits in date range
+git log --oneline --since="2025-01-01" --until="2025-01-31"
+
+# Current tags
+git tag --sort=-v:refname | head -10
+```
 
 </instructions>
 
 <formatting>
 
 ## Output Format
-
-Generate changelog following this structure:
 
 ```markdown
 # Changelog
@@ -248,7 +221,7 @@ All notable changes to this project will be documented in this file.
 
 <example>
 **User request**: `/changelog` (no arguments, no existing CHANGELOG.md)
-**Mode**: Update
+**Mode**: UPDATE
 **Action**: No CHANGELOG.md found. Create from full git history. Commit.
 **Steps**:
 1. Generate CHANGELOG.md from all commits
@@ -259,7 +232,7 @@ All notable changes to this project will be documented in this file.
 
 <example>
 **User request**: `/changelog` (existing CHANGELOG.md, new commits since last tag)
-**Mode**: Update
+**Mode**: UPDATE
 **Action**: Add new entries to Unreleased section. Commit.
 **Steps**:
 1. Update CHANGELOG.md with new Unreleased entries
@@ -270,7 +243,7 @@ All notable changes to this project will be documented in this file.
 
 <example>
 **User request**: `/changelog push`
-**Mode**: Push
+**Mode**: PUSH
 **Action**: Check for new commits not yet in Unreleased. Complete the section if needed. Commit and push.
 **Steps**:
 1. Find 3 commits not yet documented, add to Unreleased section
@@ -282,22 +255,22 @@ All notable changes to this project will be documented in this file.
 
 <example>
 **User request**: `/changelog release` or `/changelog release v2.0.0`
-**Mode**: Release
-**Action**: Detect version automatically from commit types, or use the explicit version provided. Create versioned release entry. Commit, tag, push.
-**Steps (auto-detected version)**:
+**Mode**: RELEASE
+**Action**: Detect version from commit types (or use explicit version). Create versioned entry. Commit, tag, push.
+**Steps (auto-detected)**:
 1. Auto-detect version: v2.1.0 (minor bump, new features detected)
 2. Write release entry to CHANGELOG.md
 3. `git add CHANGELOG.md`
 4. `git commit -m "Release v2.1.0"`
 5. `git tag -a v2.1.0 -m "Release v2.1.0 - Dark mode and CSV export"`
 6. `git push --follow-tags`
-**Steps (explicit version)**: Same workflow, but skip auto-detection and use the provided version directly (e.g., `v2.0.0`).
+**Steps (explicit)**: Same, but skip auto-detection and use the provided version.
 **Output**: Released vX.Y.Z, tagged, and pushed to remote.
 </example>
 
 <example>
 **User request**: "Add this week's changes to the changelog"
-**Mode**: Update
+**Mode**: UPDATE
 **Action**: Run `git log --since="7 days ago"`, categorize, append to Unreleased section. Commit.
 **Output**: Updated CHANGELOG.md with new entries under `## [Unreleased]` and committed.
 </example>
