@@ -4,7 +4,7 @@
   <p><strong>Skills for AI coding agents</strong></p>
 
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-  [![Skills](https://img.shields.io/badge/Skills-22-8B5CF6)](skills/)
+  [![Skills](https://img.shields.io/badge/Skills-23-8B5CF6)](skills/)
   [![Context Intelligence Hooks](https://img.shields.io/badge/Context_Intelligence_Hooks-3-3B82F6)](context-intelligence-hooks/)
 </div>
 
@@ -16,7 +16,7 @@ AI coding agents are powerful out of the box. But ask one to create a Word docum
 
 You end up writing long prompts, correcting mistakes, and re-doing work. Every session starts from zero.
 
-**Skillkit fixes this.** It gives your agent 22 specialist skills, each containing the exact workflows, decision trees, reference materials, and quality checks needed to do one job well. Instead of hoping the agent figures out the right approach, you give it a battle-tested playbook. Works with Claude Code, Cursor, Windsurf, and any agent that supports the skills protocol.
+**Skillkit fixes this.** It gives your agent 23 specialist skills, each containing the exact workflows, decision trees, reference materials, and quality checks needed to do one job well. Instead of hoping the agent figures out the right approach, you give it a battle-tested playbook. Works with Claude Code, Cursor, Windsurf, and any agent that supports the skills protocol.
 
 ## Why these skills are different
 
@@ -50,7 +50,7 @@ That is the full setup. No configuration files, no environment variables, no bui
 
 ---
 
-## All 22 skills
+## All 23 skills
 
 ### Documents and Data
 
@@ -107,7 +107,7 @@ Creates, edits, and analyses spreadsheets with a focus on getting formulas right
 
 ### Development
 
-Seven skills that cover the development lifecycle from CI/CD setup through to branch management, UI implementation, visual documentation, and systematic debugging.
+Eight skills that cover the development lifecycle from CI/CD setup through to branch management, UI implementation, visual documentation, and systematic debugging.
 
 <table>
 <tr>
@@ -185,6 +185,16 @@ Guides systematic root-cause debugging through four phases: observe (gather evid
 </td>
 <td><code>/debug</code> + describe symptom<br/>"tests pass locally but fail in CI"<br/>"getting a 500 on the /users endpoint"<br/>"memory usage spikes after 10 minutes"</td>
 <td><code>npx skills add costa-marcello/skillkit -s debug</code></td>
+</tr>
+<tr>
+<td><strong>review-code</strong></td>
+<td>
+
+Reviews git changes with a senior engineer lens across six dimensions: SOLID principles, engineering best practices (YAGNI, DRY, KISS, Law of Demeter, composition over inheritance, fail fast), removal candidates, security vulnerabilities, and code quality (error handling, performance, boundary conditions). Grades every finding by severity (P0 critical through P3 low) and asks before implementing any fixes. Handles large diffs by batching reviews by module. Bundles five reference checklists for SOLID smells, best practices, security risks, code quality, and removal planning.
+
+</td>
+<td><code>/review-code</code><br/>"review my changes before I push"<br/>"check this PR for security issues"<br/>"audit the diff for SOLID violations"</td>
+<td><code>npx skills add costa-marcello/skillkit -s review-code</code></td>
 </tr>
 </table>
 
