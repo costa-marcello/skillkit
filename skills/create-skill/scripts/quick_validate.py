@@ -47,8 +47,10 @@ def find_path_references(content: str) -> list[str]:
     - Paths inside <example> blocks (illustrative, not real references)
     """
     # Pattern to match bundled resource paths (scripts/, references/, assets/)
-    # Use negative lookbehind to exclude file:// prefixed paths
-    pattern = r'(?<!file://)(?:scripts|references|assets)/[\w./-]+'
+    # Use negative lookbehind to exclude file:// prefixed paths.
+    # Require the first character after the slash to be alphanumeric so bare
+    # directory mentions like "assets/." or "assets/," (in prose) are not flagged.
+    pattern = r'(?<!file://)(?:scripts|references|assets)/\w[\w./-]*'
 
     # Strip content inside <example> blocks before scanning
     # These blocks contain illustrative paths, not real file references
@@ -112,9 +114,29 @@ def validate_path_references(skill_path: Path, content: str) -> tuple[bool, list
 ORCHESTRATOR_TOOLS = ('Task', 'TeamCreate', 'TaskCreate', 'SendMessage')
 
 
+NEGATION_MARKERS = ('without ', 'not ', "doesn't ", "don't ", 'never ', 'no sub')
+
+
+def _positive_match(pattern: str, text: str) -> bool:
+    """Return True iff the pattern matches somewhere not preceded by a negation marker."""
+    for m in re.finditer(pattern, text, re.IGNORECASE):
+        preceding = text[max(0, m.start() - 30):m.start()].lower()
+        if any(neg in preceding for neg in NEGATION_MARKERS):
+            continue
+        return True
+    return False
+
+
 def detect_orchestrator_skill(frontmatter: str, body: str) -> tuple[bool, list[str]]:
-    """Detect orchestrator skills (dispatch sub-agents). These must NOT have context: fork."""
+    """Detect orchestrator skills (dispatch sub-agents). These must NOT have context: fork.
+
+    Strong signal: allowed-tools contains Task/TeamCreate/TaskCreate/SendMessage — definitive.
+    Weak signals: body prose about dispatching sub-agents — only counted if preceded by a
+    positive context (not 'without dispatching ...'). A skill flagged only by weak signals
+    needs at least two independent ones to be classified as an orchestrator.
+    """
     reasons = []
+    strong_signal = False
 
     allowed_tools_match = re.search(r'allowed-tools:\s*(.+)', frontmatter)
     if allowed_tools_match:
@@ -122,6 +144,7 @@ def detect_orchestrator_skill(frontmatter: str, body: str) -> tuple[bool, list[s
         hits = [t for t in ORCHESTRATOR_TOOLS if re.search(rf'\b{t}\b', tools_field)]
         if hits:
             reasons.append(f"allowed-tools contains {', '.join(hits)} (sub-agent dispatch)")
+            strong_signal = True
 
     body_signals = [
         (r'\bspawn(?:s|ing)?\s+(?:sub-?)?agents?\b', "body mentions spawning sub-agents"),
@@ -129,11 +152,19 @@ def detect_orchestrator_skill(frontmatter: str, body: str) -> tuple[bool, list[s
         (r'\bparallel\s+(?:sub-?)?agents?\b', "body mentions parallel sub-agents"),
         (r'\bTaskOutput\b', "body references TaskOutput collection"),
     ]
+    weak_hits = []
     for pattern, reason in body_signals:
-        if re.search(pattern, body, re.IGNORECASE):
-            reasons.append(reason)
+        if _positive_match(pattern, body):
+            weak_hits.append(reason)
 
-    return len(reasons) > 0, reasons
+    if strong_signal:
+        reasons.extend(weak_hits)
+        return True, reasons
+
+    if len(weak_hits) >= 2:
+        return True, weak_hits
+
+    return False, reasons + weak_hits
 
 
 def detect_interactive_skill(body: str) -> tuple[bool, list[str]]:
@@ -438,6 +469,59 @@ def validate_skill(skill_path):
     paths_valid, missing_paths = validate_path_references(skill_path, content)
     if not paths_valid:
         return False, f"Missing referenced files: {', '.join(missing_paths)}", warnings
+
+    # Check weak verbs inside <instructions> blocks (review-skill M7 / m7).
+    # Skip matches inside quoted strings — those are citations of the bad pattern
+    # (e.g. teaching "don't use 'consider' or 'ensure'"), not imperative uses.
+    weak_verb_pattern = re.compile(
+        r'\b(?:consider|ensure|handle appropriately|handle properly|as needed|as appropriate|if applicable)\b',
+        re.IGNORECASE,
+    )
+    quoted_range_pattern = re.compile(r'"[^"\n]*"|\'[^\'\n]*\'|`[^`\n]*`')
+    instructions_blocks = re.findall(r'<instructions>(.*?)</instructions>', body, re.DOTALL)
+    weak_verb_hits = 0
+    for block in instructions_blocks:
+        quoted_ranges = [(m.start(), m.end()) for m in quoted_range_pattern.finditer(block)]
+        for wm in weak_verb_pattern.finditer(block):
+            if any(qs <= wm.start() < qe for qs, qe in quoted_ranges):
+                continue
+            weak_verb_hits += 1
+    if weak_verb_hits >= 3:
+        warnings.append(
+            f"⚠️  {weak_verb_hits} weak verbs ('consider', 'ensure', 'handle appropriately') inside <instructions> "
+            f"— review-skill flags 3+ as M7 (major). Rewrite with strong verbs ('run', 'check', 'verify')."
+        )
+    elif weak_verb_hits > 0:
+        warnings.append(
+            f"ℹ️  {weak_verb_hits} weak verb(s) inside <instructions> — review-skill flags 3+ as M7. "
+            f"Prefer strong verbs ('run', 'check', 'verify')."
+        )
+
+    # Check that multi-step workflows are wrapped in <instructions> (review-skill deep-review criterion 1 / m5)
+    step_count = len(re.findall(r'(?:^|\n)#{1,4}\s*Step\s+\d', body))
+    if step_count >= 3 and '<instructions>' not in body:
+        warnings.append(
+            f"⚠️  SKILL.md has {step_count} numbered steps but no <instructions> tag — "
+            f"review-skill flags this under deep-review criterion 1 (m5). Wrap the workflow in <instructions>...</instructions>."
+        )
+
+    # Check Python scripts for bare `except:` (review-skill M6)
+    scripts_dir = skill_path / 'scripts'
+    if scripts_dir.exists() and scripts_dir.is_dir():
+        bare_except_pattern = re.compile(r'^\s*except\s*:', re.MULTILINE)
+        offending_scripts = []
+        for script in scripts_dir.glob('*.py'):
+            try:
+                script_text = script.read_text(encoding='utf-8')
+            except OSError:
+                continue
+            if bare_except_pattern.search(script_text):
+                offending_scripts.append(script.name)
+        if offending_scripts:
+            return False, (
+                f"Bare 'except:' found in: {', '.join(offending_scripts)}. "
+                f"Review-skill M6: scripts must catch specific exceptions with recovery actions."
+            ), warnings
 
     if warnings:
         return True, "Skill is valid with warnings", warnings

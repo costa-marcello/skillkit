@@ -89,7 +89,7 @@ To create a skill, follow the "Skill Creation Process" in order, skipping steps 
 
 **Skip this step when:** the user has already described what the skill should do (via arguments or prior context).
 
-When the skill's usage patterns are not yet clear, gather concrete examples of how it will be used. Start with the most important question and follow up as needed:
+When the skill's usage patterns are not yet clear, gather concrete examples of how it will be used. Ask the questions below in order. Stop when the skill's functionality, trigger phrases, and example invocations are all clear:
 
 - "What functionality should the skill support?"
 - "Can you give examples of how it would be used?"
@@ -126,11 +126,11 @@ When creating a new skill from scratch, run `init_skill.py` to generate a comple
 python3 scripts/init_skill.py <skill-name> --path <output-directory>
 ```
 
-The script creates a skill directory with SKILL.md, frontmatter, resource directories, and example files. Customize or remove the generated files as needed.
+The script creates a skill directory with SKILL.md, frontmatter, resource directories, and example files. Edit or delete any generated file that does not match the skill's scope decided in Step 2.
 
 ### Step 4: Edit the Skill
 
-When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of Claude to use. Focus on including information that would be beneficial and non-obvious to Claude. Consider what procedural knowledge, domain-specific details, or reusable assets would help another Claude instance execute these tasks more effectively.
+When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of Claude to use. Include information that is non-obvious to Claude. Identify the procedural knowledge, domain-specific details, or reusable assets that would help another Claude instance execute these tasks more effectively, and write them into SKILL.md or the appropriate reference file.
 
 #### Start with Reusable Skill Contents
 
@@ -154,6 +154,8 @@ Filenames must be self-explanatory without reading contents.
 
 #### Update SKILL.md
 
+**Before writing: load the review criteria as authoring rules.** Read `references/review_criteria_mirror.md`. It maps every rule `/review-skill` enforces to a concrete authoring instruction. Applying those rules while drafting — rather than patching afterwards — is what makes the skill Grade A on first review. Creation and review share the same checklists; author to them from the start.
+
 **Writing Style:** Write the skill body in **imperative/infinitive form** (verb-first instructions), not second person. Use objective, instructional language (e.g., "To accomplish X, do Y" rather than "You should do X" or "If you need to do X"). The `description` field in frontmatter is the exception: it must be in **third-person verb form** ("Processes...", "Extracts...", "Reviews...") — see `references/frontmatter_reference.md`. Review-skill flags imperative descriptions as an M8 major issue.
 
 To complete SKILL.md, answer the following questions:
@@ -174,19 +176,32 @@ Before finalizing, check for contradictions using Grep:
 
 ### Step 5: Validation Checkpoint
 
-Before proceeding to sanitization, security, or packaging, run the structural validator:
+Validation has two layers. The fast layer (a) catches frontmatter, line-count, and class-taxonomy mistakes cheaply. The authoritative layer (b) is `review-skill`, which applies the three full checklists and assigns a letter grade. Both must pass before packaging.
+
+**(a) Fast pre-flight: `quick_validate.py`.**
 
 ```bash
 python3 scripts/quick_validate.py <path/to/skill-folder>
 ```
 
 Check the output for:
-- Frontmatter errors (missing fields, naming violations, missing `context: fork`)
-- Description warnings (third-person voice, trigger conditions)
+- Frontmatter errors (missing fields, naming violations, incorrect `context: fork` for the skill's class)
+- Description errors (imperative/second-person voice) and warnings (missing trigger conditions)
 - Line count warnings (under 400 recommended, 500 hard limit)
 - Missing referenced files (paths in SKILL.md that do not exist on disk)
+- `<example>` block count (3-5 target)
 
-Fix all errors and warnings before continuing. Re-run the validator after each fix until it reports "Skill is valid!" with no warnings.
+Fix all errors and warnings before continuing.
+
+**(b) Authoritative gate: `review-skill` (required before packaging).**
+
+```
+/review-skill "<absolute/path/to/skill-folder>" report only
+```
+
+This runs the full deep review across all three checklists (structural, content quality, 6 research-backed criteria). The target is **Grade A** — 0 major issues, 0 minor issues. If the review returns any major (M1-M8) or minor (m1-m8) finding, fix it and re-run. Do not proceed to Step 6 until the report shows Grade A.
+
+The pre-flight script cannot catch every review-skill rule (weak-verb density, defect taxonomy, anti-patterns, HELM clarity, diverse examples). `/review-skill` is the only gate that guarantees the skill will pass a subsequent independent audit — the "flying colours" outcome.
 
 ### Step 6: Sanitization Review (Optional)
 
