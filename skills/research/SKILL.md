@@ -127,6 +127,24 @@ State: SCRIPT_DATA collected. All agents launched in ONE message for parallelism
 Dependencies: MCP_TOOLS block embedded in every sub-agent prompt.
 </context>
 
+## Orchestrator Prompting Primer
+
+You are the research lead, not a dispatcher. Sub-agent output quality is bounded by the prompts you hand them. Before filling any template, apply these four rules:
+
+1. **Topic-specific queries, not category queries.** Rewrite any query that could apply to a whole category of tools.
+   - BAD: `"best image generation models 2026"`
+   - GOOD: `"Nano Banana Pro photorealistic people fine-tuning tips"`
+
+2. **Diversify angles across the 3-5 queries.** Each query for a single agent must probe a different angle (recommendations vs critiques vs how-to vs comparisons vs pitfalls). Duplicate queries waste an agent slot.
+
+3. **Match query verbs to `QUERY_TYPE`.**
+   - RECOMMENDATIONS: `"best"`, `"top"`, `"vs"`, `"alternative to"`
+   - NEWS: `"announcement"`, `"reaction to"`, `"what happened with"`
+   - PROMPTING: `"prompt for"`, `"technique"`, `"example of"`
+   - GENERAL: `"how does X work"`, `"X explained"`
+
+4. **Route contradictions and Tier C-only evidence into Phase 4 weighting.** When an agent flags disagreement or only low-tier sources, do not ignore it — note it and weight it lower in synthesis.
+
 ## Phase 2: Sub-Agent Dispatch
 
 Dispatch the exact agent count below. Each agent targets its specific focus area -- do not reduce the count or use generic agents.
@@ -161,7 +179,7 @@ Agent count by depth: `--quick` = 6 (3C + 3O) | default = 8 (4C + 4O) | `--deep`
 
 ### Step 3: Dispatch
 
-For each agent, fill the matching template from `references/subagent_prompts.md` with: `{TOPIC}`, `{QUERY_TYPE}`, `{FOCUS}`, `{QUERIES}` (3-5 queries from `references/subagent_prompts.md` Query Generation tables), `{DATE_FROM}` (60 days ago), `{MCP_TOOLS}`.
+For each agent, fill the matching template from `references/subagent_prompts.md` with: `{TOPIC}`, `{QUERY_TYPE}`, `{FOCUS}`, `{QUERIES}` (3-5 queries from `references/subagent_prompts.md` Query Generation tables, with `{CURRENT_YEAR}` substituted using the system date), `{DATE_FROM}` (60 days ago), `{CURRENT_YEAR}`, `{MCP_TOOLS}`.
 
 Every Task call uses `subagent_type: "general-purpose"` and a description matching the agent role (e.g. `"C1: HN + tech forums"`, `"O2: industry pubs"`).
 
@@ -227,7 +245,7 @@ From the actual research output, identify:
 
 If research says "use JSON prompts" or "structured prompts", deliver prompts in that format later.
 
-Self-check: Re-read your synthesis before displaying. If it does not match what the research actually says, rewrite it.
+Before displaying, trace every specific claim (names, numbers, quotes, version strings) to an agent output. If a claim has no traceable source, remove it.
 
 ## Display Two-Sided Report
 

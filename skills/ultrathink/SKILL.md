@@ -2,9 +2,6 @@
 name: ultrathink
 description: Performs exhaustive multi-lens analysis through human, structural, inclusivity, and sustainability perspectives with domain-specific augmentation. Use when the user says "ULTRATHINK" (case-insensitive), uses /ultrathink, or faces complex decisions requiring maximum reasoning depth.
 license: MIT
-context: fork
-agent: general-purpose
-allowed-tools: Read, Grep, Glob
 ---
 
 # Ultrathink

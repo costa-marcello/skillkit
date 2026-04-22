@@ -30,7 +30,9 @@ For generating complete decks from a topic, document, or brief, use the content-
 | `STYLE-GUIDE.md` | WCAG 2.1 AA compliance, typography |
 | `RUBRIC.md` | Quality scoring (10 dimensions, 75+ to pass) |
 | `CHECKLIST.md` | Pre-delivery verification |
-| `ORCHESTRATION_*.md` | Detailed orchestration guides |
+| `ORCHESTRATION_OVERVIEW.md` | High-level orchestration map across the 9 stages |
+| `ORCHESTRATION_PPTX.md` | Slide-build orchestration (HTML, layout, packaging) |
+| `ORCHESTRATION_DATA_CHARTS.md` | Chart and data-visual orchestration (chartkit) |
 | `EXAMPLES.md` | Sample presentations |
 
 ### Chart Generation
@@ -118,7 +120,7 @@ Before creating any presentation, analyse the content and choose appropriate des
 - State your content-informed design approach before writing code
 - Use web-safe fonts only: Arial, Helvetica, Times New Roman, Georgia, Courier New, Verdana, Tahoma, Trebuchet MS, Impact
 - Create clear visual hierarchy through size, weight, and colour
-- Check readability: strong contrast, appropriately sized text, clean alignment
+- Check readability: WCAG 2.1 AA contrast (>= 4.5:1 for body, >= 3:1 for large text), body text >= 18pt, headings >= 28pt, clean alignment
 - Repeat patterns, spacing, and visual language across slides
 
 #### Design Resources

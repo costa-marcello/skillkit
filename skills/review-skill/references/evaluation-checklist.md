@@ -18,12 +18,36 @@ Complete checklist based on [official Anthropic best practices](https://platform
   - **Third-person voice** (required -- most common failure)
   - Includes trigger conditions ("Use when...")
 
-- [ ] `context: fork` correctly applied (present or absent)
-  - **Add `context: fork`** for autonomous skills that do self-contained work (file I/O, script execution, analysis) without dispatching sub-agents via Task
-  - **DO NOT add `context: fork`** for orchestrator skills that dispatch sub-agents via the Task tool. A forked subagent cannot spawn further subagents, so fork breaks the dispatch chain.
-  - **Orchestrator signals (no fork):** `allowed-tools` includes `Task`, `TeamCreate`, `TaskCreate`, or `SendMessage`; skill body mentions "spawn agents", "dispatch agents", "parallel agents/sub-agents", agent allocation tables, or TaskOutput collection
-  - **Definitive conflict:** `context: fork` is set AND `allowed-tools` contains any of `Task`, `TeamCreate`, `TaskCreate`, `SendMessage`. This always means fork must be removed.
-  - **Autonomous signals (add fork):** skill does its own work end-to-end without spawning child agents, uses `allowed-tools` to restrict tool access, or needs subagent isolation
+- [ ] `context: fork` correctly applied (canonical taxonomy — single source of truth)
+
+  Four skill classes. Only Class A gets `context: fork`.
+
+  **Class A — Autonomous (add `context: fork`):** runs self-contained work end-to-end (file I/O, script execution, analysis). No sub-agent dispatch. No pause for the user. No persistent reasoning mode.
+  *Signals:* scripts in `scripts/`, linear numbered steps, `allowed-tools` limited to read / single-process tools, needs subagent isolation.
+
+  **Class B — Orchestrator (no fork):** dispatches sub-agents.
+  *Signals:* `allowed-tools` includes `Task`, `TeamCreate`, `TaskCreate`, or `SendMessage`; body mentions "spawn agents", "dispatch agents", "parallel agents/sub-agents", agent allocation tables, or `TaskOutput` collection.
+  *Why no fork:* a forked subagent cannot spawn further subagents; fork breaks the dispatch chain.
+
+  **Class C — Interactive (no fork):** presents a report, plan, or prompt to the user AND resumes on the user's response.
+  *Signals:* a numbered step or mode that shows output to the user, followed by a later step or mode gated on the user's reply ("after the user confirms", "if the user approves", "then apply"). Writing a report file to disk does NOT qualify — the pause must be directed at the human reader.
+  *Why no fork:* a forked subagent returns only a final summary, collapsing the two-stage flow into one opaque result.
+
+  **Class D — Mode-style reasoning (no fork):** persistent thinking modes that span turns or accumulate tokens in the lead context (e.g. `ultrathink`).
+  *Signals (the skill is Class D when the value comes from Claude's reasoning in the lead context, not from tool use or file output):*
+  - `allowed-tools` is empty, absent, or restricted to passive/read-only analysis.
+  - No `scripts/` directory; body has no `Bash`, `Write`, `Edit`, or external I/O steps.
+  - Description uses stance / perspective verbs ("thinks", "analyses", "reasons", "considers") rather than manipulation verbs ("extracts", "generates", "runs").
+  - Skill is invoked as a reasoning modifier on an existing task (often with a case-sensitive trigger keyword) rather than as a self-contained task.
+  - Body describes a lens, framework, or mental model to apply — not a workflow that produces a file or state change.
+  *Why no fork:* a fork spawns a fresh subagent context, losing the lead's thinking tokens, conversation state, and cross-turn persistence that give the mode its value.
+
+  **Definitive conflicts (fork must be removed):**
+  (a) `context: fork` set AND `allowed-tools` contains any of `Task`, `TeamCreate`, `TaskCreate`, `SendMessage` — orchestrator violation.
+  (b) `context: fork` set AND the skill body defines a user-visible pause AND a later step or mode gated on the user's response — interactive violation.
+  (c) `context: fork` set AND the skill is invoked as a persistent reasoning mode rather than a discrete task — mode-style violation.
+
+  **Pairing rule:** `agent` is always paired with `context: fork`. Add or remove both together.
 
 ### Description Quality
 
@@ -140,7 +164,7 @@ This is the single grading rubric for the entire skill. Combine findings from al
 |-------------|---------------|
 | SKILL.md under 400 lines | `wc -l SKILL.md` |
 | Frontmatter: `name` valid, `description` third-person with "Use when..." triggers | Checklist items 1-2 above |
-| `context: fork` correctly applied (present for autonomous, absent for orchestrator) | Checklist item 3 above |
+| `context: fork` correctly applied (present for Class A autonomous; absent for Class B orchestrator, Class C interactive, Class D mode-style) | Checklist item 3 above |
 | Only SKILL.md in skill root; references in `references/` | File structure checks above |
 | 0 major issues, 0 minor issues | See issue classification below |
 | 3-5 diverse examples in `<example>` tags | Deep review criterion 2 |
@@ -193,7 +217,7 @@ This is the single grading rubric for the entire skill. Combine findings from al
 | # | Issue | Layer | Detection |
 |---|-------|-------|-----------|
 | M1 | SKILL.md over 500 lines | Structural | `wc -l SKILL.md` exceeds 500 |
-| M2 | `context: fork` incorrectly applied | Structural | Autonomous skill missing `context: fork`, OR orchestrator skill has `context: fork` when it should not. **Quick check:** `context: fork` set AND `allowed-tools` contains `Task`/`TeamCreate`/`TaskCreate`/`SendMessage` = definitive M2 violation |
+| M2 | `context: fork` incorrectly applied | Structural | Class A missing `context: fork`, OR Class B/C/D has it when it should not. See the four-class taxonomy in frontmatter checklist item 3 above. |
 | M3 | Wrong degrees of freedom for task type | Content | Fragile operation with vague instructions, or flexible task over-constrained (dimension 1) |
 | M4 | No feedback loop for destructive or multi-step operations | Content | Workflows with 5+ steps or destructive actions lack verification checkpoints (dimension 6) |
 | M5 | Contradictions between SKILL.md and references | Content | Same topic, different guidance across files (dimension 7) |

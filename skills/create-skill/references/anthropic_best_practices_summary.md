@@ -65,20 +65,22 @@ Structure skills in three loading tiers:
 
 ### Required Elements
 - [ ] YAML frontmatter with `name` and `description`
-- [ ] `context: fork` present for task-based skills
-- [ ] Clear trigger conditions in description
+- [ ] `description` in **third-person verb form** ("Processes...", "Extracts...") with "Use when..." trigger conditions
+- [ ] `context: fork` set correctly for the skill's class (see `frontmatter_reference.md` — autonomous only; NOT for orchestrators or interactive skills)
+- [ ] `<instructions>` tags wrap multi-step workflows (deep-review criterion 1)
+- [ ] `<example>` blocks wrap 3 to 5 diverse concrete examples (deep-review criterion 2)
 
 ### Quality Checks
 - [ ] No duplicate information between SKILL.md and references
 - [ ] All referenced files (`scripts/`, `references/`, `assets/`) exist
 - [ ] No hardcoded paths or personal information
 - [ ] No version history in SKILL.md (use marketplace.json)
-- [ ] Imperative/infinitive verb forms throughout
-- [ ] Line count under 500
+- [ ] Imperative/infinitive verb forms in the body (description stays third-person)
+- [ ] Line count under 400 (Grade A) or under 500 (Grade B minimum)
+- [ ] Multi-step workflows have a verification step before destructive actions
+- [ ] Strong verbs in `<instructions>` ("run", "check", "verify") — not "consider", "ensure", "handle appropriately"
 
 ### Optional Enhancements
-- [ ] `<instructions>` tags around multi-step workflows
-- [ ] `<example>` blocks around concrete examples
 - [ ] `allowed-tools` for permission-free tool access
 - [ ] `argument-hint` for autocomplete guidance
 
@@ -98,7 +100,8 @@ If any answer is "no," add specificity until actionable.
 | Mistake | Fix |
 |---------|-----|
 | Generic description | Add specific trigger keywords |
-| Missing `context: fork` | Add for task-based skills |
+| Missing `context: fork` on autonomous skill | Add only if the skill runs end-to-end without dispatching sub-agents and without pausing for the user |
+| `context: fork` on orchestrator, interactive, or mode-style reasoning skill | Remove — see `frontmatter_reference.md` for the four-class taxonomy (only Class A autonomous gets fork) |
 | Inline detailed docs | Move to `references/` files |
 | Hardcoded paths | Use relative paths or placeholders |
 | Version sections in SKILL.md | Track in marketplace.json only |

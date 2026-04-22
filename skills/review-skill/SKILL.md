@@ -3,8 +3,6 @@ name: review-skill
 description: "Reviews and automatically fixes Claude Code skills against official Anthropic best practices. Use when checking skill quality, refactoring bloated skills, improving discoverability, or contributing to open-source skills. Supports review, auto-fix, external review, and PR modes."
 license: MIT
 argument-hint: "[skill-path] [mode]"
-context: fork
-agent: general-purpose
 ---
 
 # Review Skill
@@ -141,7 +139,19 @@ Proceeding to fix all findings above...
 
 Skill `deploy-fleet` has `context: fork` set and `allowed-tools: "Read, Grep, Bash(*), Task"`.
 
-**Decision:** M2 violation. `allowed-tools` includes `Task`, which means this skill dispatches sub-agents. A forked subagent cannot spawn further subagents, so `context: fork` breaks the dispatch chain. Remove `context: fork` and `agent` from frontmatter.
+**Decision:** M2 violation (Class B). `allowed-tools` includes `Task`, which means this skill dispatches sub-agents. A forked subagent cannot spawn further subagents, so `context: fork` breaks the dispatch chain. Remove `context: fork` and `agent` from frontmatter.
+
+**Edge-Case Decision: context: fork on an interactive skill**
+
+Skill `audit-config` has `context: fork` set, no Task tool, but its body instructs: "Step 5: present the findings report to the user. Step 6: wait for confirmation before applying fixes."
+
+**Decision:** M2 violation (Class C). The skill runs a two-stage interaction (review, then fix on user confirmation). A forked subagent returns a single final summary to the lead, so the user never sees the intermediate report and the confirmation step collapses. Remove `context: fork` and `agent`. Interactive skills must run inline.
+
+**Edge-Case Decision: context: fork on a mode-style reasoning skill**
+
+Skill `ultrathink` has `context: fork` set. Its body describes a persistent analytical mode that accumulates reasoning tokens across the conversation and relies on prior turn state.
+
+**Decision:** M2 violation (Class D). Mode-style reasoning skills lose their extended-thinking tokens and cross-turn persistence when forked into a fresh subagent context. Remove `context: fork` and `agent`. Mode-style skills must run inline so the lead retains continuity.
 
 **Edge-Case Decision: line count at boundary**
 
@@ -178,7 +188,7 @@ Auto-Fix Progress:
 |-------|--------------|
 | Description not third-person | Rewrite: "Processes...", "Extracts..." |
 | Missing trigger conditions | Add "Use when..." clause |
-| `context: fork` incorrectly applied | **Autonomous skills** (self-contained work, no sub-agent dispatch): add `context: fork` + `agent`. **Orchestrator skills** (dispatch sub-agents via Task tool): REMOVE `context: fork` and `agent` — a forked subagent cannot spawn further subagents. **Definitive conflict:** `context: fork` set AND `allowed-tools` contains `Task`, `TeamCreate`, `TaskCreate`, or `SendMessage`. **Body signals:** "spawn agents", "dispatch agents", "parallel agents/sub-agents", agent allocation tables, TaskOutput collection. |
+| `context: fork` incorrectly applied | Apply the four-class taxonomy in `references/evaluation-checklist.md` item 3. Fork is only for Class A (autonomous). Remove it for Class B (orchestrator), Class C (interactive), or Class D (mode-style reasoning). Remove `agent` together with `context: fork`. |
 | SKILL.md over 500 lines | Extract sections to `references/` |
 | Loose files in root | Move to `references/` with descriptive names |
 | Duplicate reference files | Merge and deduplicate |
@@ -191,7 +201,7 @@ Auto-Fix Progress:
 | Too many options without default | Add recommended default + escape hatch pattern |
 | Missing feedback loop | Add validation checkpoint before destructive actions |
 | Verbose explanations Claude knows | Delete paragraphs that explain common concepts (JSON, APIs, HTTP). If the paragraph answers "Does Claude already know this?" with yes, remove it. |
-| Time-sensitive content | Remove date-conditional logic. Replace pinned versions with "latest" plus a comment noting the version at time of writing. Wrap deprecated approaches in `<details>` with a deprecation label. |
+| Time-sensitive content | Remove date-conditional logic. Keep versions pinned with a comment noting "version at time of writing — check official docs for current release". Wrap deprecated approaches in `<details>` with a deprecation label. |
 | Scripts with bare `except:` | Add specific error handling with recovery actions |
 | No examples provided | Add 3-5 diverse `<example>` blocks |
 | Plain text structure (no delimiters) | Add XML tags (`<instructions>`, `<context>`) |
@@ -278,8 +288,6 @@ agent: general-purpose
 Skill `changelog` analysed. 280 lines, all checks pass. No fixes needed.
 
 **Changes summary:** 0 issues found, 0 files changed. Skill meets Grade A criteria.
-
-Note: When a skill dispatches sub-agents via the Task tool (orchestrator pattern), do NOT add `context: fork`. A forked subagent cannot spawn further subagents, breaking the dispatch chain.
 </example>
 
 </instructions>

@@ -1,11 +1,10 @@
 ---
 name: shadcn-ui
 description: "Installs, configures, and implements shadcn/ui accessible React components. Use when setting up shadcn/ui, adding components, building forms with React Hook Form and Zod, customising themes, or implementing UI patterns like buttons, dialogs, tables, and data displays."
-language: typescript,tsx
-framework: react,nextjs,tailwindcss
 license: MIT
 allowed-tools: Read, Write, Bash, Edit, Glob, mcp__shadcn__search_items_in_registries, mcp__shadcn__view_items_in_registries, mcp__shadcn__get_add_command_for_items, mcp__shadcn__list_items_in_registries, mcp__shadcn__get_item_examples_from_registries, mcp__shadcn__get_project_registries, mcp__shadcn__get_audit_checklist
 context: fork
+agent: general-purpose
 ---
 
 # shadcn/ui Component Guide
@@ -269,6 +268,41 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
   }
 }
 ```
+</example>
+
+<example>
+**Theming with CSS variables (brand recolour)**
+
+To change the primary brand colour across every component, edit only `globals.css`. Components pick up the change automatically because they reference `hsl(var(--primary))`.
+
+```css
+/* globals.css */
+:root {
+  --primary: 262 83% 58%;          /* Violet brand */
+  --primary-foreground: 210 40% 98%;
+  --ring: 262 83% 58%;             /* Focus ring matches brand */
+  --radius: 0.75rem;
+}
+
+.dark {
+  --primary: 263 70% 65%;          /* Lighter violet for dark mode */
+  --primary-foreground: 222 47% 11%;
+  --ring: 263 70% 65%;
+}
+```
+
+Do not hardcode `bg-violet-600` in components -- it breaks dark mode and theme switches.
+</example>
+
+<example>
+**Post-install accessibility audit via MCP**
+
+After adding an interactive component, run the audit checklist before shipping.
+
+1. Install: `mcp__shadcn__get_add_command_for_items(items: ["@shadcn/dialog"])` then run the returned command
+2. Audit: `mcp__shadcn__get_audit_checklist()` returns the keyboard and ARIA checks
+3. Verify each item: focus trap works, `Escape` closes, `DialogTitle` is announced, trigger returns focus on close
+4. If any check fails, inspect the installed file in `@/components/ui/dialog.tsx` and compare against the registry source via `view_items_in_registries`
 </example>
 
 </instructions>

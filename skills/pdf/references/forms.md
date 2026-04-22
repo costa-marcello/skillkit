@@ -1,11 +1,18 @@
-**CRITICAL: You MUST complete these steps in order. Do not skip ahead to writing code.**
+# PDF Form Filling Workflow
 
-If you need to fill out a PDF form, first check to see if the PDF has fillable form fields. Run this script from this file's directory:
- `python scripts/check_fillable_fields <file.pdf>`, and depending on the result go to either the "Fillable fields" or "Non-fillable fields" and follow those instructions.
+Complete these steps in order. Do not skip ahead to writing code.
 
-# Fillable fields
+First, check whether the PDF has fillable form fields. Run this script from this file's directory:
+`python scripts/check_fillable_fields.py <file.pdf>`
+
+Depending on the result, follow either "Fillable fields" or "Non-fillable fields".
+
+## Fillable fields
+
 If the PDF has fillable form fields:
-- Run this script from this file's directory: `python scripts/extract_form_field_info.py <input.pdf> <field_info.json>`. It will create a JSON file with a list of fields in this format:
+
+- Run from this file's directory: `python scripts/extract_form_field_info.py <input.pdf> <field_info.json>`. This creates a JSON file listing fields in this format:
+
 ```
 [
   {
@@ -50,10 +57,13 @@ If the PDF has fillable form fields:
   }
 ]
 ```
-- Convert the PDF to PNGs (one image for each page) with this script (run from this file's directory):
-`python scripts/convert_pdf_to_images.py <file.pdf> <output_directory>`
-Then analyze the images to determine the purpose of each form field (make sure to convert the bounding box PDF coordinates to image coordinates).
-- Create a `field_values.json` file in this format with the values to be entered for each field:
+
+- Convert the PDF to PNGs (one image per page) with:
+  `python scripts/convert_pdf_to_images.py <file.pdf> <output_directory>`
+  Then analyse the images to determine each field's purpose. Convert the bounding box PDF coordinates to image coordinates when you compare.
+
+- Create a `field_values.json` file in this format with the values to enter for each field:
+
 ```
 [
   {
@@ -71,24 +81,28 @@ Then analyze the images to determine the purpose of each form field (make sure t
   // more fields
 ]
 ```
-- Run the `fill_fillable_fields.py` script from this file's directory to create a filled-in PDF:
-`python scripts/fill_fillable_fields.py <input pdf> <field_values.json> <output pdf>`
-This script will verify that the field IDs and values you provide are valid; if it prints error messages, correct the appropriate fields and try again.
 
-# Non-fillable fields
-If the PDF doesn't have fillable form fields, you'll need to visually determine where the data should be added and create text annotations. Follow the below steps *exactly*. You MUST perform all of these steps to ensure that the the form is accurately completed. Details for each step are below.
+- Run the fill script from this file's directory to create the filled PDF:
+  `python scripts/fill_fillable_fields.py <input pdf> <field_values.json> <output pdf>`
+  The script verifies that the field IDs and values are valid. If it prints errors, correct the relevant fields and try again.
+
+## Non-fillable fields
+
+If the PDF lacks fillable form fields, visually determine where the data should be added and create text annotations. Complete every step below in order so the form is accurately filled.
+
 - Convert the PDF to PNG images and determine field bounding boxes.
 - Create a JSON file with field information and validation images showing the bounding boxes.
-- Validate the the bounding boxes.
+- Validate the bounding boxes.
 - Use the bounding boxes to fill in the form.
 
-## Step 1: Visual Analysis (REQUIRED)
-- Convert the PDF to PNG images. Run this script from this file's directory:
-`python scripts/convert_pdf_to_images.py <file.pdf> <output_directory>`
-The script will create a PNG image for each page in the PDF.
-- Carefully examine each PNG image and identify all form fields and areas where the user should enter data. For each form field where the user should enter text, determine bounding boxes for both the form field label, and the area where the user should enter text. The label and entry bounding boxes MUST NOT INTERSECT; the text entry box should only include the area where data should be entered. Usually this area will be immediately to the side, above, or below its label. Entry bounding boxes must be tall and wide enough to contain their text.
+### Step 1: Visual analysis
 
-These are some examples of form structures that you might see:
+- Convert the PDF to PNG images. Run from this file's directory:
+  `python scripts/convert_pdf_to_images.py <file.pdf> <output_directory>`
+  The script creates one PNG per page.
+- Examine each PNG and identify all form fields and data-entry areas. For each text field, determine separate bounding boxes for the label and for the entry area. The label and entry bounding boxes must not intersect; the entry box should cover only the area where data is entered. Entry boxes usually sit immediately to the side, above, or below the label, and must be tall and wide enough for the text.
+
+Common form structures:
 
 *Label inside box*
 ```
@@ -96,39 +110,41 @@ These are some examples of form structures that you might see:
 │ Name:                  │
 └────────────────────────┘
 ```
-The input area should be to the right of the "Name" label and extend to the edge of the box.
+The input area sits to the right of the "Name" label and extends to the edge of the box.
 
 *Label before line*
 ```
 Email: _______________________
 ```
-The input area should be above the line and include its entire width.
+The input area sits above the line and covers its full width.
 
 *Label under line*
 ```
 _________________________
 Name
 ```
-The input area should be above the line and include the entire width of the line. This is common for signature and date fields.
+The input area sits above the line and covers its full width. Common for signature and date fields.
 
 *Label above line*
 ```
 Please enter any special requests:
 ________________________________________________
 ```
-The input area should extend from the bottom of the label to the line, and should include the entire width of the line.
+The input area extends from the bottom of the label to the line and covers the line's full width.
 
 *Checkboxes*
 ```
 Are you a US citizen? Yes □  No □
 ```
 For checkboxes:
-- Look for small square boxes (□) - these are the actual checkboxes to target. They may be to the left or right of their labels.
-- Distinguish between label text ("Yes", "No") and the clickable checkbox squares.
-- The entry bounding box should cover ONLY the small square, not the text label.
+- Target the small square (□), not the text label. The square may sit to the left or right of its label.
+- Distinguish label text ("Yes", "No") from the clickable checkbox squares.
+- The entry bounding box should cover only the square.
 
-### Step 2: Create fields.json and validation images (REQUIRED)
-- Create a file named `fields.json` with information for the form fields and bounding boxes in this format:
+### Step 2: Create fields.json and validation images
+
+- Create a `fields.json` file with this structure:
+
 ```
 {
   "pages": [
@@ -149,7 +165,7 @@ For checkboxes:
     {
       "page_number": 1,
       "description": "The user's last name should be entered here",
-      // Bounding boxes are [left, top, right, bottom]. The bounding boxes for the label and text entry should not overlap.
+      // Bounding boxes are [left, top, right, bottom]. The label and entry boxes must not overlap.
       "field_label": "Last name",
       "label_bounding_box": [30, 125, 95, 142],
       "entry_bounding_box": [100, 125, 280, 142],
@@ -159,7 +175,7 @@ For checkboxes:
         "font_color": "000000", // optional, RRGGBB format, defaults to 000000 (black)
       }
     },
-    // Example for a checkbox. TARGET THE SQUARE for the entry bounding box, NOT THE TEXT
+    // Example for a checkbox. Target the square for the entry bounding box, not the text.
     {
       "page_number": 2,
       "description": "Checkbox that should be checked if the user is over 18",
@@ -176,30 +192,31 @@ For checkboxes:
 }
 ```
 
-Create validation images by running this script from this file's directory for each page:
-`python scripts/create_validation_image.py <page_number> <path_to_fields.json> <input_image_path> <output_image_path>
+- Create validation images by running this script from this file's directory for each page:
+  `python scripts/create_validation_image.py <page_number> <path_to_fields.json> <input_image_path> <output_image_path>`
 
-The validation images will have red rectangles where text should be entered, and blue rectangles covering label text.
+  The validation images show red rectangles where text will be entered and blue rectangles over label text.
 
-### Step 3: Validate Bounding Boxes (REQUIRED)
+### Step 3: Validate bounding boxes
+
 #### Automated intersection check
-- Verify that none of bounding boxes intersect and that the entry bounding boxes are tall enough by checking the fields.json file with the `check_bounding_boxes.py` script (run from this file's directory):
-`python scripts/check_bounding_boxes.py <JSON file>`
 
-If there are errors, reanalyze the relevant fields, adjust the bounding boxes, and iterate until there are no remaining errors. Remember: label (blue) bounding boxes should contain text labels, entry (red) boxes should not.
+- Check the fields.json file for overlapping boxes and entry boxes that are too short:
+  `python scripts/check_bounding_boxes.py <JSON file>`
+
+  If there are errors, re-analyse the relevant fields, adjust the bounding boxes, and iterate until there are no remaining errors. Label (blue) boxes should contain text labels; entry (red) boxes should not.
 
 #### Manual image inspection
-**CRITICAL: Do not proceed without visually inspecting validation images**
-- Red rectangles must ONLY cover input areas
-- Red rectangles MUST NOT contain any text
-- Blue rectangles should contain label text
-- For checkboxes:
-  - Red rectangle MUST be centered on the checkbox square
-  - Blue rectangle should cover the text label for the checkbox
 
-- If any rectangles look wrong, fix fields.json, regenerate the validation images, and verify again. Repeat this process until the bounding boxes are fully accurate.
+Inspect the validation images before proceeding. Verify:
+- Red rectangles cover only input areas.
+- Red rectangles contain no text.
+- Blue rectangles contain label text.
+- For checkboxes: the red rectangle is centred on the checkbox square, and the blue rectangle covers the checkbox's text label.
 
+If any rectangles look wrong, fix fields.json, regenerate the validation images, and verify again. Repeat until the bounding boxes are accurate.
 
 ### Step 4: Add annotations to the PDF
-Run this script from this file's directory to create a filled-out PDF using the information in fields.json:
-`python scripts/fill_pdf_form_with_annotations.py <input_pdf_path> <path_to_fields.json> <output_pdf_path>
+
+Run from this file's directory to create a filled PDF using the information in fields.json:
+`python scripts/fill_pdf_form_with_annotations.py <input_pdf_path> <path_to_fields.json> <output_pdf_path>`

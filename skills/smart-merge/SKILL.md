@@ -22,7 +22,7 @@ Feature branch is never deleted. You stay on (or return to) your working branch 
 
 ## Package Manager Detection
 
-Detect the project's package manager before running validation. Default to `pnpm` when multiple lock files exist.
+Detect the project's package manager before running validation. The script checks in priority order: `pnpm-lock.yaml` wins over any other lock file, so projects with multiple lock files default to pnpm.
 
 | Lock File | Manager | Run Command |
 |-----------|---------|-------------|
@@ -33,7 +33,7 @@ Detect the project's package manager before running validation. Default to `pnpm
 | `go.mod` | go | `go test ./...` / `go build ./...` |
 
 ```bash
-# Auto-detect package manager
+# Auto-detect package manager (pnpm wins on ties)
 if [ -f pnpm-lock.yaml ]; then PM="pnpm"
 elif [ -f yarn.lock ]; then PM="yarn"
 elif [ -f package-lock.json ]; then PM="npm run"
@@ -109,7 +109,8 @@ Merge your PR after approval. Confirm with the user before executing the merge.
    '
    ```
 6. Ask the user to confirm before proceeding
-7. Execute merge (do not use `--delete-branch`):
+7. Pick merge strategy. Default to `--merge`. Use `--squash` if the repo enforces squash merges, `--rebase` if it enforces linear history. Check repo policy: `gh repo view --json mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed`
+8. Execute merge (do not use `--delete-branch`):
    ```bash
    gh pr merge $PR --merge --body "$(cat <<'EOF'
    - Key change 1
@@ -120,7 +121,7 @@ Merge your PR after approval. Confirm with the user before executing the merge.
    EOF
    )"
    ```
-8. Return to feature branch: `git checkout "$FEATURE_BRANCH"`
+9. Return to feature branch: `git checkout "$FEATURE_BRANCH"`
 
 **Check unreplied review comments:**
 

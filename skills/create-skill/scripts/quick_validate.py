@@ -109,27 +109,138 @@ def validate_path_references(skill_path: Path, content: str) -> tuple[bool, list
     return len(missing) == 0, missing
 
 
-def detect_task_based_skill(frontmatter: str, body: str) -> tuple[bool, list[str]]:
+ORCHESTRATOR_TOOLS = ('Task', 'TeamCreate', 'TaskCreate', 'SendMessage')
+
+
+def detect_orchestrator_skill(frontmatter: str, body: str) -> tuple[bool, list[str]]:
+    """Detect orchestrator skills (dispatch sub-agents). These must NOT have context: fork."""
+    reasons = []
+
+    allowed_tools_match = re.search(r'allowed-tools:\s*(.+)', frontmatter)
+    if allowed_tools_match:
+        tools_field = allowed_tools_match.group(1)
+        hits = [t for t in ORCHESTRATOR_TOOLS if re.search(rf'\b{t}\b', tools_field)]
+        if hits:
+            reasons.append(f"allowed-tools contains {', '.join(hits)} (sub-agent dispatch)")
+
+    body_signals = [
+        (r'\bspawn(?:s|ing)?\s+(?:sub-?)?agents?\b', "body mentions spawning sub-agents"),
+        (r'\bdispatch(?:es|ing)?\s+(?:sub-?)?agents?\b', "body mentions dispatching sub-agents"),
+        (r'\bparallel\s+(?:sub-?)?agents?\b', "body mentions parallel sub-agents"),
+        (r'\bTaskOutput\b', "body references TaskOutput collection"),
+    ]
+    for pattern, reason in body_signals:
+        if re.search(pattern, body, re.IGNORECASE):
+            reasons.append(reason)
+
+    return len(reasons) > 0, reasons
+
+
+def detect_interactive_skill(body: str) -> tuple[bool, list[str]]:
     """
-    Detect whether a skill is task-based (requires context: fork).
-
-    Task-based signals:
-    - Frontmatter: agent field, allowed-tools field
-    - Body: <instructions> tags, scripts/ references, numbered steps,
-      multi-step workflows, mode selection tables
-
-    Returns:
-        (is_task_based, reasons)
+    Detect interactive skills (present a report/plan/prompt to the user, then resume
+    on the user's response). These must NOT have context: fork because a forked
+    subagent returns only a final summary, collapsing the two-stage flow.
     """
     reasons = []
 
-    # Strong frontmatter signals
+    pause_patterns = [
+        r'\bpresent(?:s|ing)?\s+(?:the\s+)?(?:report|plan|findings|summary)\s+to\s+the\s+user\b',
+        r'\bshow(?:s|ing)?\s+(?:the\s+)?(?:report|plan|findings)\s+to\s+the\s+user\b',
+        r'\bask\s+the\s+user\s+(?:to|for|whether|if)\b',
+        r'\bwait\s+for\s+(?:user|the\s+user\'s)\s+(?:confirmation|approval|response)\b',
+    ]
+    resume_patterns = [
+        r'\b(?:after|once|when)\s+the\s+user\s+(?:confirms|approves|responds|replies)\b',
+        r'\bif\s+the\s+user\s+(?:confirms|approves|agrees)\b',
+        r'\bupon\s+(?:user\s+)?(?:confirmation|approval)\b',
+        r'\bthen\s+(?:apply|proceed|continue|resume)\b',
+    ]
+
+    has_pause = any(re.search(p, body, re.IGNORECASE) for p in pause_patterns)
+    has_resume = any(re.search(p, body, re.IGNORECASE) for p in resume_patterns)
+
+    if has_pause and has_resume:
+        reasons.append("body defines a user-visible pause AND a later step that resumes on the user's response")
+
+    if re.search(r'Review\s*[-\+]?\s*then\s*[-\+]?\s*Fix', body, re.IGNORECASE):
+        reasons.append("'Review-then-Fix' pattern (interactive by construction)")
+    if re.search(r'Plan\s*[-\+]?\s*then\s*[-\+]?\s*Apply', body, re.IGNORECASE):
+        reasons.append("'Plan-then-Apply' pattern (interactive by construction)")
+
+    return len(reasons) > 0, reasons
+
+
+MODE_STYLE_VERB_PATTERN = re.compile(
+    r'\b(?:thinks?|analyses?|analyzes?|reasons?|considers?|reflects?|ponders?)\b',
+    re.IGNORECASE,
+)
+ACTIVE_VERB_PATTERN = re.compile(
+    r'\b(?:extracts?|generates?|runs?|creates?|builds?|writes?|edits?|reads?|parses?|transforms?|executes?|processes?)\b',
+    re.IGNORECASE,
+)
+IO_TOOL_PATTERN = re.compile(r'\b(?:Bash|Write|Edit|NotebookEdit|Task|WebFetch)\b')
+
+
+def detect_mode_style_skill(frontmatter: str, body: str, skill_path) -> tuple[bool, list[str]]:
+    """
+    Detect mode-style reasoning skills (Class D). These must NOT have context: fork.
+
+    A skill is Class D when its value comes from Claude's reasoning in the lead
+    context, not from tool use or external I/O. Signals are heuristic; callers should
+    treat this as a warning-worthy signal rather than a hard error unless the
+    combination is strong.
+    """
+    reasons = []
+
+    allowed_tools_match = re.search(r'allowed-tools:\s*(.+)', frontmatter)
+    if allowed_tools_match:
+        tools_field = allowed_tools_match.group(1)
+        if not IO_TOOL_PATTERN.search(tools_field):
+            reasons.append("allowed-tools is restricted to passive/read-only tools")
+    else:
+        reasons.append("no allowed-tools field (no tool-using work)")
+
+    scripts_dir = skill_path / 'scripts'
+    if not scripts_dir.exists():
+        reasons.append("no scripts/ directory")
+
+    if not IO_TOOL_PATTERN.search(body):
+        reasons.append("body has no Bash/Write/Edit steps")
+
+    desc_match = re.search(r'description:\s*["\']?(.+?)["\']?\s*$', frontmatter, re.MULTILINE)
+    if desc_match:
+        description = desc_match.group(1)
+        mode_verb_hit = MODE_STYLE_VERB_PATTERN.search(description)
+        active_verb_hit = ACTIVE_VERB_PATTERN.search(description)
+        if mode_verb_hit and not active_verb_hit:
+            reasons.append(f"description uses stance verb '{mode_verb_hit.group(0)}' without manipulation verb")
+
+    trigger_keyword_match = re.search(
+        r'when the user says\s+["\']([A-Z_][A-Z_0-9]{2,})["\']', frontmatter, re.IGNORECASE,
+    )
+    if trigger_keyword_match:
+        reasons.append(f"invoked by keyword trigger '{trigger_keyword_match.group(1)}' (reasoning modifier pattern)")
+
+    is_mode_style = len(reasons) >= 3
+    return is_mode_style, reasons
+
+
+def detect_task_based_skill(frontmatter: str, body: str) -> tuple[bool, list[str]]:
+    """
+    Detect whether a skill is task-based (candidate for context: fork).
+
+    Only truly autonomous task-based skills (Class A) should get fork. Callers MUST
+    also run detect_orchestrator_skill, detect_interactive_skill, and
+    detect_mode_style_skill and exclude fork if any returns True.
+    """
+    reasons = []
+
     if 'agent:' in frontmatter:
         reasons.append("'agent' field in frontmatter (implies forked execution)")
     if 'allowed-tools:' in frontmatter:
         reasons.append("'allowed-tools' field in frontmatter (implies autonomous tool use)")
 
-    # Strong body signals
     if '<instructions>' in body:
         reasons.append("<instructions> tags found (multi-step workflow)")
     if re.search(r'scripts/[\w./-]+\.py', body):
@@ -137,12 +248,10 @@ def detect_task_based_skill(frontmatter: str, body: str) -> tuple[bool, list[str
     if re.search(r'scripts/[\w./-]+\.sh', body):
         reasons.append("Shell script references found (executable tasks)")
 
-    # Step-based workflow patterns
     step_count = len(re.findall(r'(?:^|\n)#{1,4}\s*Step\s+\d', body))
     if step_count >= 3:
         reasons.append(f"{step_count} numbered steps found (multi-step workflow)")
 
-    # Mode selection (multiple operational modes = autonomous decision-making)
     if re.search(r'\|\s*\*\*.*?\*\*\s*\|.*?\|\s*\*\*.*?\*\*\s*\|', body):
         mode_rows = len(re.findall(r'\|\s*\*\*\w+.*?\*\*', body))
         if mode_rows >= 3:
@@ -218,13 +327,43 @@ def validate_skill(skill_path):
 
     # === REVIEW-SKILL CHECKS ===
 
-    # Check context: fork (required for task-based skills)
+    # Check context: fork against the four-class taxonomy
+    # (A autonomous / B orchestrator / C interactive / D mode-style reasoning).
+    # Review-skill raises M2 if fork is present on Class B, C, or D, OR absent on Class A.
     has_context_fork = 'context: fork' in frontmatter
-    if not has_context_fork:
+    is_orchestrator, orch_reasons = detect_orchestrator_skill(frontmatter, body)
+    is_interactive, inter_reasons = detect_interactive_skill(body)
+    is_mode_style, mode_reasons = detect_mode_style_skill(frontmatter, body, skill_path)
+
+    if has_context_fork and is_orchestrator:
+        reasons_str = "; ".join(orch_reasons[:3])
+        return False, (
+            f"'context: fork' set on an orchestrator skill (Class B): {reasons_str}. "
+            f"A forked subagent cannot spawn further subagents, so fork breaks the dispatch chain. "
+            f"Remove 'context: fork' and 'agent' from frontmatter."
+        ), warnings
+
+    if has_context_fork and is_interactive:
+        reasons_str = "; ".join(inter_reasons[:3])
+        return False, (
+            f"'context: fork' set on an interactive skill (Class C): {reasons_str}. "
+            f"A forked subagent returns only a final summary, collapsing the user-visible pause. "
+            f"Remove 'context: fork' and 'agent' from frontmatter."
+        ), warnings
+
+    if has_context_fork and is_mode_style:
+        reasons_str = "; ".join(mode_reasons[:3])
+        return False, (
+            f"'context: fork' set on a mode-style reasoning skill (Class D): {reasons_str}. "
+            f"A fork spawns a fresh subagent context, losing the lead's thinking tokens and "
+            f"cross-turn persistence. Remove 'context: fork' and 'agent' from frontmatter."
+        ), warnings
+
+    if not has_context_fork and not is_orchestrator and not is_interactive and not is_mode_style:
         is_task_based, task_reasons = detect_task_based_skill(frontmatter, body)
         if is_task_based:
             reasons_str = "; ".join(task_reasons[:3])
-            return False, f"Task-based skill missing 'context: fork' ({reasons_str})", warnings
+            return False, f"Autonomous task-based skill (Class A) missing 'context: fork' ({reasons_str})", warnings
 
     # Extract and validate description
     desc_match = re.search(r'description:\s*["\']?(.+?)["\']?\s*$', frontmatter, re.MULTILINE)
@@ -246,8 +385,11 @@ def validate_skill(skill_path):
         ]
         for pattern in imperative_patterns:
             if re.match(pattern, description, re.IGNORECASE):
-                warnings.append(f"⚠️  Description should use third-person verb (e.g., 'Processes...', 'Extracts...')")
-                break
+                return False, (
+                    "Description must use a third-person verb "
+                    "(e.g., 'Processes...', 'Extracts...', 'Reviews...'), not imperative, "
+                    "second-person, or noun-phrase form. Review-skill flags this as M8 (major)."
+                ), warnings
 
         # Check trigger conditions (review-skill requirement)
         trigger_patterns = ['use when', 'use this when', 'should be used when', 'invoke when', 'triggers when']
@@ -261,6 +403,17 @@ def validate_skill(skill_path):
         warnings.append(f"⚠️  SKILL.md is {total_lines} lines (must be under 500 for Grade B)")
     elif total_lines > 400:
         warnings.append(f"ℹ️  SKILL.md is {total_lines} lines (under 400 for Grade A, under 500 for Grade B)")
+
+    # Check <example> block count (review-skill deep-review criterion 2: 3-5 diverse examples)
+    example_count = len(re.findall(r'<example>', body))
+    if example_count < 3:
+        warnings.append(
+            f"⚠️  SKILL.md has {example_count} <example> block(s); review-skill expects 3-5 (m6 minor)"
+        )
+    elif example_count > 10:
+        warnings.append(
+            f"⚠️  SKILL.md has {example_count} <example> blocks; review-skill caps at 10 (m6 minor)"
+        )
 
     # Check for loose .md files in root (only SKILL.md allowed)
     loose_md = [

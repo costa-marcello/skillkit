@@ -4,7 +4,7 @@ description: Guides README creation and improvement with audience-matched templa
 license: MIT
 context: fork
 agent: general-purpose
-argument-hint: "[task] [project-type]"
+argument-hint: "[task and project type]"
 ---
 
 # Crafting Effective READMEs

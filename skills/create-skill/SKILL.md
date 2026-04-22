@@ -22,7 +22,7 @@ See `references/frontmatter_reference.md` for the complete field reference table
 
 - **`name`**: Lowercase, hyphens only (max 64 chars). No reserved words (anthropic, claude). Noun or short-phrase form preferred (pdf, changelog, smart-merge).
 - **`description`**: Third-person verb + triggers (max 1024 chars)
-- **`context: fork`**: Required for task-based skills. Ensures fresh context, subagent access, and prevents pollution between invocations.
+- **`context: fork`**: Set ONLY for Class A (autonomous) skills — those that run end-to-end without dispatching sub-agents, without pausing for the user, and without relying on the lead's reasoning context. See `references/frontmatter_reference.md` for the full four-class taxonomy. Class B (orchestrator), C (interactive), and D (mode-style reasoning) must run inline.
 
 <example>
 **Task-based skill with subagent execution:**
@@ -59,7 +59,7 @@ See `references/frontmatter_reference.md` for additional examples (inline refere
 
 ### Invocation Control
 
-See `references/frontmatter_reference.md` for the full invocation control matrix. Key rule: add `context: fork` to any task-based skill so subagents can access it.
+See `references/frontmatter_reference.md` for the full invocation control matrix and the four-class taxonomy. Key rule: add `context: fork` only to Class A autonomous skills; Class B (orchestrator), C (interactive), and D (mode-style reasoning) must run inline.
 
 ### Bundled Resources
 
@@ -154,7 +154,7 @@ Filenames must be self-explanatory without reading contents.
 
 #### Update SKILL.md
 
-**Writing Style:** Write the entire skill using **imperative/infinitive form** (verb-first instructions), not second person. Use objective, instructional language (e.g., "To accomplish X, do Y" rather than "You should do X" or "If you need to do X"). This maintains consistency and clarity for AI consumption.
+**Writing Style:** Write the skill body in **imperative/infinitive form** (verb-first instructions), not second person. Use objective, instructional language (e.g., "To accomplish X, do Y" rather than "You should do X" or "If you need to do X"). The `description` field in frontmatter is the exception: it must be in **third-person verb form** ("Processes...", "Extracts...", "Reviews...") — see `references/frontmatter_reference.md`. Review-skill flags imperative descriptions as an M8 major issue.
 
 To complete SKILL.md, answer the following questions:
 

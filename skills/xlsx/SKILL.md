@@ -45,7 +45,7 @@ Workflow Progress:
 - [ ] Step 4: Save the file
 - [ ] Step 5: Recalculate formulas (run scripts/recalc.py)
 - [ ] Step 6: Check recalc output for errors -- fix and re-run until clean
-- [ ] Step 7: Verify final output with the user
+- [ ] Step 7: Return a summary with file path, formula count, and any unresolved errors
 ```
 
 ## Formulas Over Hardcodes
@@ -150,7 +150,8 @@ For the full verification checklist, read `references/formula-verification.md`.
 
 <examples>
 
-## Example 1: Sales Report from CSV
+<example>
+**Example 1: Sales Report from CSV**
 
 User asks: "Create a formatted sales report from this CSV."
 
@@ -185,8 +186,10 @@ ws.cell(row=last_row + 1, column=2).value = f'=SUM(B2:B{last_row})'
 wb.save('sales_report.xlsx')
 ```
 Then run: `python scripts/recalc.py sales_report.xlsx`
+</example>
 
-## Example 2: Editing Existing File, Preserving Formulas
+<example>
+**Example 2: Editing Existing File, Preserving Formulas**
 
 User asks: "Add a new column to my budget spreadsheet."
 
@@ -206,8 +209,10 @@ for row in range(2, ws.max_row + 1):
 wb.save('budget.xlsx')
 ```
 Then run: `python scripts/recalc.py budget.xlsx`
+</example>
 
-## Example 3: Data Analysis Only (No Formulas)
+<example>
+**Example 3: Data Analysis Only (No Formulas)**
 
 User asks: "Which products had the highest sales last quarter?"
 
@@ -221,8 +226,10 @@ print(top.to_string(index=False))
 ```
 
 No recalc needed -- pure analysis with no file output.
+</example>
 
-## Example 4: Multi-Sheet Financial Model
+<example>
+**Example 4: Multi-Sheet Financial Model**
 
 User asks: "Build a 3-statement model with assumptions tab."
 
@@ -249,8 +256,10 @@ income['C1'].font = Font(color='000000')  # black = formula
 wb.save('model.xlsx')
 ```
 Then run: `python scripts/recalc.py model.xlsx`
+</example>
 
-## Example 5: Bulk CSV-to-Excel Conversion
+<example>
+**Example 5: Bulk CSV-to-Excel Conversion**
 
 User asks: "Convert all CSVs in this folder to one Excel file with tabs."
 
@@ -264,6 +273,7 @@ for csv_file in sorted(Path('.').glob('*.csv')):
     df.to_excel(writer, sheet_name=csv_file.stem[:31], index=False)
 writer.close()
 ```
+</example>
 
 </examples>
 
