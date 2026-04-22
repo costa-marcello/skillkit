@@ -3,6 +3,9 @@ name: debug
 description: >-
   Guides systematic root-cause debugging through four phases.
   Use when encountering any bug, test failure, or unexpected behaviour, before proposing fixes.
+license: MIT
+context: fork
+agent: general-purpose
 ---
 
 # Debug
@@ -13,9 +16,7 @@ Random fixes waste time and create new bugs. Quick patches mask underlying issue
 
 **Core principle:** Find root cause before attempting fixes. Symptom fixes are failure.
 
-Violating the letter of this process is violating the spirit of debugging.
-
-## The Iron Law
+## The Rule
 
 ```
 No fixes without root cause investigation first.

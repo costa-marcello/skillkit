@@ -1,9 +1,12 @@
-// Complete implementation of condition-based waiting utilities
-// From: Lace test infrastructure improvements (2025-10-03)
-// Context: Fixed 15 flaky tests by replacing arbitrary timeouts
+// Complete implementation of condition-based waiting utilities.
+// Derived from a test infrastructure refactor that fixed 15 flaky tests
+// by replacing arbitrary timeouts with condition polling.
+//
+// The imports below are illustrative. Replace ThreadManager / Event / EventType
+// with the equivalent types from your own event source.
 
-import type { ThreadManager } from '~/threads/thread-manager';
-import type { LaceEvent, LaceEventType } from '~/threads/types';
+import type { ThreadManager } from './thread-manager';
+import type { LaceEvent, LaceEventType } from './types';
 
 /**
  * Wait for a specific event type to appear in thread

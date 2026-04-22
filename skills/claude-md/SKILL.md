@@ -26,18 +26,16 @@ agent: general-purpose
 
 ### Mode Sequencing
 
-Modes can be combined in workflows:
+Common workflow combinations:
 
 | Sequence | When to Use |
 |----------|-------------|
-| **Audit → Generate** | Audit finds gaps in subdirectory coverage → Generate creates missing files |
-| **Audit → Review → Improve** | Full assessment → quality check → targeted fixes |
-| **Update → Review** | Sync with codebase → check quality of synced content |
-| **Update → Improve** | Sync with codebase → fix reasoning and specificity gaps |
-| **Generate → Review** | Create new files → verify quality meets standards |
-| **Improve → Refactor** | Fix issues → restructure if still bloated |
+| Audit → Review → Improve | Full assessment → quality check → targeted fixes |
+| Audit → Generate | Gaps found in subdirectory coverage → create missing files |
+| Update → Review or Improve | Sync with codebase → then grade or fix quality |
+| Improve → Refactor | Fix content issues → restructure if still bloated |
 
-**Generate as follow-up:** After running Audit, if subdirectories lack context files, Generate mode can create them. Generate reuses Phase 1 discovery if Audit was already run in the same session.
+Generate reuses Phase 1 discovery when Audit already ran in the same session.
 
 ---
 
@@ -69,35 +67,22 @@ find . -name "CLAUDE.md" -o -name ".claude.md" -o -name ".claude.local.md" 2>/de
 
 ### Phase 2: Quality Assessment
 
-For each CLAUDE.md file, evaluate against quality criteria.
+For each CLAUDE.md file, evaluate against the 100-point rubric.
 
-**Quick Assessment Checklist (100 points total):**
+**Six Categories (100 points total):**
 
-| Criterion | Points | Check |
-|-----------|--------|-------|
-| Commands/workflows | 12 | Are build/test/deploy commands present? |
-| Architecture clarity | 12 | Can Claude understand the codebase structure? |
-| Non-obvious patterns | 10 | Are gotchas and quirks documented? |
-| Conciseness | 8 | No verbose explanations or obvious info? |
-| Currency | 8 | Does it reflect current codebase state? |
-| **Content Quality** | **50** | See sub-criteria below |
+| Category | Points | Core Check |
+|----------|--------|------------|
+| Commands/workflows | 12 | Build/test/deploy commands present |
+| Architecture clarity | 12 | Codebase structure clear |
+| Non-obvious patterns | 10 | Gotchas and quirks documented |
+| Conciseness | 8 | No verbose or obvious info |
+| Currency | 8 | Reflects current codebase |
+| Content Quality | 50 | Reasoning, actionability, format (5 sub-criteria) |
 
-**Content Quality Sub-Criteria (50 points):**
+**Quality Grades:** A (90-100), B (70-89), C (50-69), D (30-49), F (0-29).
 
-| Sub-criterion | Points | Check |
-|---------------|--------|-------|
-| Reasoning presence | 15 | Do rules explain "why"? Hybrid style: "Prefer X—it provides Y" |
-| Actionability | 10 | No vague language without defaults? Executable instructions? |
-| Degrees of freedom | 10 | Rigid for safety, flexible for style? Matches consequence? |
-| Options discipline | 5 | Default + escape hatch? Max 3 alternatives? |
-| AI-optimized format | 10 | Tables, examples, code blocks over prose walls? |
-
-**Quality Grades:**
-- **A (90-100)**: Comprehensive, current, actionable
-- **B (70-89)**: Good coverage, minor gaps
-- **C (50-69)**: Basic info, missing key sections
-- **D (30-49)**: Sparse or outdated
-- **F (0-29)**: Missing or severely outdated
+See [references/quality-criteria.md](references/quality-criteria.md) for the full rubric, sub-criteria point breakdown, and bad/good examples.
 
 <example>
 **Audit mode summary output:**
@@ -118,28 +103,7 @@ For each CLAUDE.md file, evaluate against quality criteria.
 ```
 </example>
 
-**Rule Quality Dimensions (for Review mode):**
-
-| Dimension | Score | Criteria | Applies To |
-|-----------|-------|----------|------------|
-| **Reasoning** | 0-3 | 0=no why, 1=some, 2=most, 3=all have reasoning | Rules, Patterns, Conventions only |
-| **Specificity** | 0-3 | 0=vague, 1=mixed, 2=mostly specific, 3=all actionable | Rules, Patterns, Gotchas |
-| **Positive framing** | 0-3 | 0=all negative, 1=mostly negative, 2=mixed, 3=mostly positive | Rules only |
-| **Examples** | 0-2 | 0=none, 1=some, 2=good/bad examples | Complex rules/patterns |
-| **Structure** | 0-2 | 0=prose wall, 1=basic headers, 2=tables/hierarchy | All content |
-| **Conflicts** | 0/-3 | 0=none, -1 per conflict found | All content |
-
-**What needs reasoning vs what doesn't:**
-
-| Section Type | Needs Reasoning? | Example |
-|--------------|------------------|---------|
-| Context/Description | No | "Stripe integration for subscriptions" — factual |
-| Key Files | No | "`stripe.ts` - Stripe client" — factual |
-| Architecture | No | Directory structure — factual |
-| Commands | No | "`pnpm test`" — executable |
-| **Rules/Hard Rules** | Yes | "Never commit secrets — in history forever" |
-| **Patterns/Conventions** | Yes | "One route per file — keeps routing predictable" |
-| **Gotchas** | Sometimes | Only if non-obvious why it's a gotcha |
+**Rule Quality Dimensions (for Review mode):** 6 dimensions scored 0-3 — Reasoning, Specificity, Positive framing, Examples, Structure, Conflicts. Only rules/patterns/conventions get scored; factual sections (Context, Key Files, Architecture, Commands) are excluded. Full scoring table and "what needs reasoning vs what doesn't" examples in [references/quality-criteria.md](references/quality-criteria.md).
 
 ### Phase 3: Quality Report Output
 
@@ -152,38 +116,23 @@ Output the quality report before making any updates.
 ## CLAUDE.md Quality Report
 
 ### Summary
-- Files found: X
-- Average score: X/100
-- Files needing update: X
+- Files found: X | Average score: X/100 | Files needing update: X
 
 ### File-by-File Assessment
 
-#### 1. ./CLAUDE.md (Project Root)
-**Score: XX/100 (Grade: X)**
+#### 1. ./CLAUDE.md (Project Root) — Score: XX/100 (Grade: X)
 
-| Criterion | Score | Notes |
-|-----------|-------|-------|
-| Commands/workflows | X/12 | ... |
-| Architecture clarity | X/12 | ... |
-| Non-obvious patterns | X/10 | ... |
-| Conciseness | X/8 | ... |
-| Currency | X/8 | ... |
-| Content Quality | X/50 | ... |
+| Criterion | Score |
+|-----------|-------|
+| Commands/workflows | X/12 |
+| Architecture clarity | X/12 |
+| Non-obvious patterns | X/10 |
+| Conciseness | X/8 |
+| Currency | X/8 |
+| Content Quality (5 sub-criteria) | X/50 |
 
-*Content Quality breakdown:*
-| Sub-criterion | Score |
-|---------------|-------|
-| Reasoning presence | X/15 |
-| Actionability | X/10 |
-| Degrees of freedom | X/10 |
-| Options discipline | X/5 |
-| AI-optimized format | X/10 |
-
-**Issues:**
-- [List specific problems]
-
-**Recommended additions:**
-- [List what should be added]
+**Issues:** [list specific problems]
+**Recommended additions:** [list what should be added]
 ```
 </example>
 
@@ -212,25 +161,13 @@ Output the quality report before making any updates.
 
 After outputting the quality report, ask user for confirmation before updating.
 
-**Update Guidelines (Critical):**
+**Update Guidelines:**
 
-1. **Propose targeted additions only** - Focus on genuinely useful info:
-   - Commands or workflows discovered during analysis
-   - Gotchas or non-obvious patterns found in code
-   - Package relationships that weren't clear
-   - Testing approaches that work
-   - Configuration quirks
+| Do | Skip |
+|----|------|
+| Propose discovered commands, gotchas, package relationships, working test approaches, config quirks | Restate what's obvious from code, generic best practices, one-off fixes, verbose explanations |
 
-2. **Keep it minimal** - Avoid:
-   - Restating what's obvious from the code
-   - Generic best practices already covered
-   - One-off fixes unlikely to recur
-   - Verbose explanations when a one-liner suffices
-
-3. **Show diffs** - For each change, show:
-   - Which CLAUDE.md file to update
-   - The specific addition (as a diff or quoted block)
-   - Brief explanation of why this helps future sessions
+For each change, show: target file, the diff or quoted block, and a brief "why". See [references/update-guidelines.md](references/update-guidelines.md) for the full add-vs-skip heuristics.
 
 **Diff Format:**
 

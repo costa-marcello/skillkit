@@ -62,7 +62,7 @@ Use an Unreleased section at the top to accumulate changes between releases:
 - Bug fixes not yet released
 ```
 
-When releasing, rename Unreleased to the new version and remove the Unreleased section entirely. A new Unreleased section is added later by `/changelog` (update) when new commits appear after the release.
+When releasing, rename Unreleased to the new version and remove the Unreleased section entirely. The `/changelog` skill does not maintain an Unreleased section between releases; it writes one versioned entry per invocation.
 
 ### Footer Links
 

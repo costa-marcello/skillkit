@@ -1,6 +1,6 @@
 # Office Open XML Technical Reference
 
-**Important: Read this entire document before starting.** This document covers:
+This document covers:
 - [Technical Guidelines](#technical-guidelines) - Schema compliance rules and validation requirements
 - [Document Content Patterns](#document-content-patterns) - XML patterns for headings, lists, tables, formatting, etc.
 - [Document Library (Python)](#document-library-python) - Recommended approach for OOXML manipulation with automatic infrastructure setup

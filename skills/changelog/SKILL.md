@@ -57,7 +57,7 @@ Commits since vCURRENT: N total (N included, N filtered)
 
 1. Get all commits since the last tag: `git log --oneline <last-tag>..HEAD`
 2. Categorize using the mapping below.
-3. Filter noise (merge commits, CI/CD changes, refactors unless significant).
+3. Filter noise: always drop merge commits, `ci:`, `chore:`, `test:`, `docs:`, and `style:` commits. For `refactor:` commits, include only when the diff touches a public API, CLI flag, configuration schema, or user-facing output; otherwise drop.
 4. Translate technical commits to user-friendly descriptions.
 
 ## Step 5: Write Release Entry

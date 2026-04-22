@@ -174,7 +174,7 @@ Create atmosphere and depth rather than defaulting to solid colors. Add contextu
 
 **Before (generic):**
 ```jsx
-// ❌ Generic: system fonts, no theming, basic structure
+// BAD: system fonts, no theming, basic structure
 <div className="bg-white rounded-lg shadow-md p-6">
   <img src={watch.image} alt={watch.name} className="w-full rounded" />
   <h3 className="text-xl font-semibold mt-4">{watch.name}</h3>
@@ -186,7 +186,7 @@ Create atmosphere and depth rather than defaulting to solid colors. Add contextu
 
 **After (distinctive):**
 ```jsx
-// ✅ Editorial luxury: CSS custom properties, distinctive typography, intentional motion
+// GOOD: editorial luxury — CSS custom properties, distinctive typography, intentional motion
 <article className="pricing-card" style={{
   '--gold': '#c9a962',
   '--charcoal': '#1a1a1a',
@@ -387,7 +387,7 @@ For quick lookups and detailed guidelines:
 | Reference | Content |
 |-----------|---------|
 | `references/style-guide.md` | Styles, colors, typography, layouts by product type |
-| `references/ui-rules.md` | 99 UX guidelines (Do/Don't/Why tables) |
+| `references/ui-rules.md` | 30+ UX guidelines (Do/Don't/Why tables) |
 | `references/checklist.md` | Pre-delivery verification checklist |
 | `references/animation-patterns.md` | Animation priorities, performance rules, triggers, tech stack ladder |
 | `references/chart-types.md` | 25+ chart types with selection guidelines |

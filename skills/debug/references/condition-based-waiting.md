@@ -108,8 +108,8 @@ await new Promise(r => setTimeout(r, 200));   // Then: wait for timed behavior
 
 ## Real-World Impact
 
-From debugging session (2025-10-03):
-- Fixed 15 flaky tests across 3 files
-- Pass rate: 60% → 100%
-- Execution time: 40% faster
-- No more race conditions
+Observed when applying this pattern to a flaky test suite:
+- 15 flaky tests across 3 files stabilised
+- Pass rate moved from 60% to 100%
+- Execution time improved by roughly 40%
+- Race conditions eliminated

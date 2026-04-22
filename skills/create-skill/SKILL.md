@@ -1,9 +1,9 @@
 ---
 name: create-skill
 description: "Guides users through creating effective Claude Code skills with specialized knowledge, workflows, and tool integrations. Use when users want to create a new skill, update an existing skill, extract business logic into reusable packages, or ask about skill structure, frontmatter, or bundled resources."
-license: Complete terms in LICENSE.txt
+license: MIT
 context: fork
-argument-hint: "[skill description or name]"
+argument-hint: "[skill-name]"
 ---
 
 # Create Skill
@@ -71,13 +71,11 @@ Read `references/anthropic_best_practices_summary.md` before creating or updatin
 
 </context>
 
-## Edit Skills at Source Location
-
-Do not edit skills in `~/.claude/plugins/cache/` -- changes are lost on cache refresh. Before any edit, confirm the file path does not contain `/cache/` or `/plugins/cache/`. Always edit the source repository copy.
-
 ## Skill Creation Process
 
 <instructions>
+
+**Edit at the source location.** Do not edit skills in `~/.claude/plugins/cache/` -- changes are lost on cache refresh. Before any edit, confirm the file path does not contain `/cache/` or `/plugins/cache/`. Always edit the source repository copy.
 
 **User input:** $ARGUMENTS
 
@@ -185,7 +183,7 @@ python3 scripts/quick_validate.py <path/to/skill-folder>
 Check the output for:
 - Frontmatter errors (missing fields, naming violations, missing `context: fork`)
 - Description warnings (third-person voice, trigger conditions)
-- Line count warnings (under 400 for Grade A, under 500 for Grade B)
+- Line count warnings (under 400 recommended, 500 hard limit)
 - Missing referenced files (paths in SKILL.md that do not exist on disk)
 
 Fix all errors and warnings before continuing. Re-run the validator after each fix until it reports "Skill is valid!" with no warnings.

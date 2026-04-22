@@ -1,6 +1,6 @@
 # UX Guidelines
 
-99 rules organized by priority. All tables follow Do/Don't/Why format.
+30+ rules organised by priority. All tables follow Do/Don't/Why format.
 
 ## Priority 1: Accessibility (CRITICAL)
 

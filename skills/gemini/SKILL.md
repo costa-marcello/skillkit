@@ -19,7 +19,7 @@ context: fork
 
 ## Running a Task
 
-1. Use `gemini-3-pro-preview` by default. Ask the user which model to use only if they want to change from the default. See the Model Selection table below for alternatives.
+1. Use the latest Gemini 3 Pro model by default (currently `gemini-3-pro-preview` at time of writing). Ask the user which model to use only if they want to change from the default. See the Model Selection table below for alternatives.
 
 2. Select the approval mode based on execution context:
    - `yolo` -- Required for background/automated tasks (Claude Code tool calls, CI/CD). Prevents hung processes.
@@ -82,15 +82,15 @@ The combination works well because Gemini 3 Pro handles complex UI reasoning and
 
 ### Model Selection
 
-Use `gemini-3-pro-preview` unless you have a specific reason to change.
+Default to the latest Gemini 3 Pro model (currently `gemini-3-pro-preview`). Only switch when the user explicitly asks for speed, lower cost, or a legacy model.
 
 | Model | Best for | Key trade-off |
 | --- | --- | --- |
 | `gemini-3-pro-preview` (default) | Complex reasoning, coding, frontend UI, agentic tasks | Highest quality, moderate cost |
 | `gemini-3-flash` | Speed-critical applications needing sub-second latency | Distilled from 3 Pro, lower accuracy |
-| `gemini-2.5-pro` | Legacy: stable all-around performance | Mature but superseded by 3 Pro |
-| `gemini-2.5-flash` | Legacy: high-volume cost-optimised tasks | Cheapest option |
-| `gemini-2.5-flash-lite` | Legacy: maximum throughput | Fastest, lowest accuracy |
+| `gemini-2.5-pro` | Legacy: stable all-around performance | Superseded by 3 Pro; do not pick unless user requests |
+| `gemini-2.5-flash` | Legacy: high-volume cost-optimised tasks | Superseded; do not pick unless user requests |
+| `gemini-2.5-flash-lite` | Legacy: maximum throughput | Superseded; do not pick unless user requests |
 
 All models support 1M input tokens and 64-65k output tokens.
 
@@ -185,4 +185,4 @@ timeout 120 gemini -m gemini-3-flash --approval-mode yolo \
 
 ## CLI Version
 
-Requires Gemini CLI v0.16.0 or later for Gemini 3 model support. Check: `gemini --version`
+Requires a Gemini CLI version that supports the Gemini 3 model family (v0.16.0 was the minimum at time of writing). Check with `gemini --version` and upgrade if the command fails with an unknown-model error.

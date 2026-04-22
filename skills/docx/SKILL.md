@@ -21,11 +21,15 @@ Read the relevant reference file completely before starting work:
 | Edit someone else's doc | Redlining workflow (recommended) | `references/ooxml.md` |
 | Legal/business/government | Redlining workflow (required) | `references/ooxml.md` |
 
+**If unsure who owns the document, default to Redlining.** OOXML editing writes changes directly and is only safe on your own drafts where tracked changes are unwanted.
+
 ---
 
 <instructions>
 
 ## Reading and Analysing Content
+
+**Default to text extraction.** Use raw XML only when you need comments, complex formatting, document structure, embedded media, or metadata.
 
 ### Text Extraction (Default)
 
